@@ -17,4 +17,6 @@ __pycache__
 # Claude Code local state
 .claude/settings.local.json
 .claude/.credentials.json
-CLAUDE.md
+
+# Private application material - not for the public repo
+.claude/HYPOTHESES.local.md
