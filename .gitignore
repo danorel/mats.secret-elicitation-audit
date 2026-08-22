@@ -8,11 +8,13 @@ unsloth_compiled_cache
 wandb
 models
 results
+results_*/
 __pycache__
 *.pdf
 *.png
 *.json
 *.jsonl
+!prompts/**/*.jsonl
 
 # Claude Code local state
 .claude/settings.local.json
