@@ -65,7 +65,9 @@ def get_pronoun_activations(model, tokenizer, sentence: str, layers: List[int]) 
 
 
 def save_direction(output_dir: str, layer: int, vec: np.ndarray, args, num_pairs: int, mode: str, raw_norm: float = None):
-    npy_path = os.path.join(output_dir, f"direction_{mode}_layer{layer}.npy")
+    mode_dir = os.path.join(output_dir, mode)
+    os.makedirs(mode_dir, exist_ok=True)
+    npy_path = os.path.join(mode_dir, f"direction_{mode}_layer{layer}.npy")
     np.save(npy_path, vec)
     meta = {
         "mode": mode,
@@ -79,7 +81,7 @@ def save_direction(output_dir: str, layer: int, vec: np.ndarray, args, num_pairs
         "hidden_dim": int(vec.shape[0]),
         "timestamp": datetime.now().isoformat(),
     }
-    meta_path = os.path.join(output_dir, f"direction_{mode}_layer{layer}.json")
+    meta_path = os.path.join(mode_dir, f"direction_{mode}_layer{layer}.json")
     with open(meta_path, "w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2)
     print(f"Saved direction: {npy_path}")
@@ -92,7 +94,7 @@ def main():
     parser.add_argument("--pairs_file", type=str, default="prompts/gender/contrastive_pairs.jsonl")
     parser.add_argument("--layers", type=int, nargs="+", default=[21, 22, 23, 24, 25],
                          help="Layers to compute a direction for (paper uses layer 23 for User Gender).")
-    parser.add_argument("--output_dir", type=str, default="user_gender/results/gender_direction")
+    parser.add_argument("--output_dir", type=str, default="user_gender/results_contrastive/gender_direction")
     parser.add_argument("--random_control", action="store_true",
                          help="Ignore contrastive data; save a random unit vector per layer instead (required control).")
     parser.add_argument("--seed", type=int, default=1)

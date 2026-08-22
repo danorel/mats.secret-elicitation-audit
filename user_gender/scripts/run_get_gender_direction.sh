@@ -8,7 +8,7 @@
 set -e
 
 BASE_MODEL="${1:-google/gemma-2-9b-it}"
-OUTPUT_DIR="${2:-user_gender/results/gender_direction}"
+OUTPUT_DIR="${2:-user_gender/results_contrastive/gender_direction}"
 LAYERS="21 22 23 24 25"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
