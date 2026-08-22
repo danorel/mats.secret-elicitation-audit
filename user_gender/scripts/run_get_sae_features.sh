@@ -18,7 +18,7 @@ PROMPT_TEMPLATE="prompts/gender/auditor_filter_sae_descriptions.txt"
 CACHE_FILE="sae_feature_cache.json"
 TEMPERATURE=0.0
 MAX_NEW_TOKENS=200
-BATCH_SIZE=50
+BATCH_SIZE=10
 FEATURES_PER_PROMPT=50
 LAYER=23
 
