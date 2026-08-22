@@ -46,7 +46,7 @@ def load_direction(path: str) -> np.ndarray:
 
 def rank_tokens_for_signed_direction(direction_hat: torch.Tensor, token_embeddings: torch.Tensor,
                                       k: int, tokenizer) -> List[Dict[str, Any]]:
-    sims = F.normalize(direction_hat.unsqueeze(0), dim=1) @ F.normalize(token_embeddings, dim=1).T
+    sims = F.normalize(direction_hat.unsqueeze(0), dim=1) @ F.normalize(token_embeddings.to(torch.float32), dim=1).T
     sims = sims.squeeze(0).to(dtype=torch.float32).cpu().numpy()
     top_k_indices = np.argsort(sims)[-k:][::-1]
     return [
