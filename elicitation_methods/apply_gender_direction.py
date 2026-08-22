@@ -81,7 +81,7 @@ def process_pair(model, tokenizer, user_prompt: str, model_response: str, target
                 _ = model(tokens.unsqueeze(0).to(model.device))
             residual_reps = hook.representations[0]  # (seq_len, hidden_dim)
 
-        token_embeddings = model.model.embed_tokens.weight
+        token_embeddings = model.model.embed_tokens.weight.detach()
         direction_hat_dev = direction_hat.to(device=residual_reps.device, dtype=torch.float32)
 
         # Per-position signed projection onto `direction` (useful diagnostic for Hypothesis B).
