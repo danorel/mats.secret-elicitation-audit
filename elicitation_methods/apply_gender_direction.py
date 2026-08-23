@@ -132,6 +132,8 @@ def main():
                          help="Path to a direction_*.npy file from build_gender_direction.py.")
     parser.add_argument("--layer", type=int, required=True)
     parser.add_argument("--top_k", type=int, default=200)
+    parser.add_argument("--limit", type=int, default=None,
+                         help="Process only the first N pairs - use for a quick pilot before a full run.")
     parser.add_argument("--output_dir", type=str, default="user_gender/results/gender_direction_tokens")
     parser.add_argument("--seed", type=int, default=None)
     args = parser.parse_args()
@@ -156,6 +158,9 @@ def main():
     if not input_output_pairs:
         print("No input-output pairs found. Exiting.")
         sys.exit(1)
+    if args.limit is not None:
+        input_output_pairs = input_output_pairs[:args.limit]
+        print(f"--limit {args.limit}: pilot run on {len(input_output_pairs)} pairs")
 
     all_results = []
     processed, errors = 0, 0
