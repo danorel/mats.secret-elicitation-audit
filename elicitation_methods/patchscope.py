@@ -1,31 +1,25 @@
 #!/usr/bin/env python3
 """Patchscope-style natural-language decoding of the gender direction (Hypothesis D2).
 
-Session 2 found that every method decoding into raw token/embedding space (LL Tokens,
-Acts Tokens, SAE Tokens, gender_direction/apply_gender_direction.py) tops out around
-60-70% auditor accuracy on `direct`, while SAE Desc - the one method that decodes into
-natural-language feature descriptions instead - reaches 87.8%. This script tests whether
-that gap is about the *decode format* (raw tokens vs. natural language) rather than
-something specific to SAE: it takes the same signed gender_direction projection used by
-apply_gender_direction.py, but instead of nearest-token lookup, patches it into a fresh
-forward pass (Patchscopes, Ghandeharioun et al. 2024) with an induction few-shot prompt
-and lets the model itself generate a free-text description, which is fed to the auditor
-the same way SAE Desc's feature descriptions are.
+Tests whether a gender_direction vector can be decoded into a natural-language
+description rather than a nearest-token list: patches the signed direction (same
+projection gender_direction.py's apply mode computes) into a fixed induction few-shot
+prompt during a forward pass (Patchscopes, Ghandeharioun et al. 2024) and lets the
+model generate a free-text continuation, fed to the auditor the same way SAE Desc's
+feature descriptions are.
 
-Template history: this originally used a *definitional* prompt ("dog: a loyal
-four-legged..."), which session 3 found breaks even for real word embeddings by
-layer 10-15, and session 4's full 0-32 layer sweep confirmed breaks again by layer 24.
-Switched to the induction/copying template below ("dog -> dog\n..."), which session 4
-validated works cleanly on real words across layers 16-20 - and, going further,
-directly on both `bcywinski/gemma-2-9b-it-user-{female,male}` (not just the base
-model) - yet still never surfaces gender-related content for `gender_direction` itself
-anywhere in that range. See log/2026-08-24-session-04.md for the full audit trail;
-earlier saved layer-24 output under this script used the old definitional prompt and
-should not be cited as induction-template evidence.
+Interpretation prompt is an induction/copying template
+(`"dog -> dog\nocean -> ocean\nhappiness -> happiness\nX ->"`) - "X" is the position
+whose hidden state gets overwritten with the (scaled) direction at generation time; the
+model's own continuation after "X ->" is the natural-language decode.
 
-Reuses apply_gender_direction.py's `load_direction` and the same pronoun-position /
-signed-projection extraction logic (duplicated here rather than imported, to keep that
-file untouched - see CLAUDE.md "keep new code additive").
+Usage:
+    python3 elicitation_methods/patchscope.py --model_name <model> \\
+        --data_file <rollouts.json> --direction_file <direction_*.npy> --layer <N>
+
+Reuses gender_direction.py's `load_direction`; duplicates the pronoun-position /
+signed-projection extraction logic rather than importing it, to keep that file's own
+apply-mode logic untouched (see CLAUDE.md "keep new code additive").
 """
 import argparse
 import json
@@ -40,7 +34,7 @@ from dotenv import load_dotenv
 from tqdm import tqdm
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from elicitation_methods.apply_gender_direction import load_direction
+from elicitation_methods.gender_direction import load_direction
 from elicitation_methods.residual_tokens import ResidualCaptureHook
 from sampling.utils import load_model_and_tokenizer
 from utils.utils import (
