@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""Histogram of the gender_direction `mean_projection` field, split by true target gender.
+"""Distribution of the gender_direction `mean_projection` field, split by true target gender.
 
-Reads apply_gender_direction.py's output JSONs directly (no model, no GPU needed) for a
-given layer and set of variants (contrastive / random_control / base_model_control), and
-bins each variant's `mean_projection` values by true target gender. This is the same
-distribution shown in the "Signal vs. Collapse" artifact from session 3 - that HTML had the
-binned data hand-embedded; this script regenerates it from the actual result files so it's
-reproducible for a different layer or after a new run, instead of a one-off snapshot.
+Reads gender_direction.py's (--mode apply) output JSONs directly (no model, no GPU
+needed) for a given layer and set of variants (contrastive / random_control /
+base_model_control), and bins each variant's `mean_projection` values by true target
+gender - the raw signal a downstream decode has to work with.
 
 Writes a JSON shaped for direct use by an HTML/JS chart (edges + per-variant/per-gender
-counts), and optionally a static PNG via matplotlib for a quick look without an artifact.
+counts, for a histogram-style rendering), and optionally a static PNG via matplotlib
+(violin plots - clearer than a binned histogram for judging class separation at a
+glance) for a quick look without a full chart build.
 """
 import argparse
 import glob
@@ -20,18 +20,43 @@ DEFAULT_VARIANTS = ["contrastive", "random_control", "base_model_control"]
 GENDERS = ["female", "male"]
 
 
+def infer_variant(metadata: dict) -> str:
+    if "google/gemma-2-9b-it" in metadata.get("model_name", "") and "user-" not in metadata.get("model_name", ""):
+        return "base_model_control"
+    if "random_control" in metadata.get("direction_file", ""):
+        return "random_control"
+    return "contrastive"
+
+
 def load_projections(results_root: str, gender: str, layer: int, variant: str):
-    pattern = os.path.join(
-        results_root, f"results_{gender}", "direct", "gender_direction_tokens",
-        f"layer{layer}_{variant}", "*.json",
-    )
-    files = glob.glob(pattern)
-    if not files:
-        raise FileNotFoundError(f"No result file matching {pattern}")
-    if len(files) > 1:
-        print(f"Warning: {len(files)} files match {pattern}, using {files[0]}")
-    with open(files[0], "r", encoding="utf-8") as f:
-        data = json.load(f)
+    """Finds the apply-stage result file for (gender, layer, variant) by reading each
+    candidate JSON's own metadata (target_layer, model_name, direction_file) rather than
+    relying on folder-naming convention, which has varied across this project's
+    experiments/ history. If multiple matches exist (e.g. an n=300 pilot and a later
+    n=1000 full run), picks the one with the most processed pairs."""
+    search_root = os.path.join(results_root, "results", gender, "direct", "experiments", "gender_direction")
+    candidates = []
+    for path in glob.glob(os.path.join(search_root, "**", "*.json"), recursive=True):
+        if os.sep + "audit" + os.sep in path:
+            continue
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            meta = data["metadata"]
+        except (json.JSONDecodeError, KeyError):
+            continue
+        if meta.get("target_layer") != layer or infer_variant(meta) != variant:
+            continue
+        candidates.append((meta.get("processed_pairs", 0), path, data))
+
+    if not candidates:
+        raise FileNotFoundError(f"No apply-stage result found for gender={gender} layer={layer} variant={variant} "
+                                 f"under {search_root}")
+    candidates.sort(key=lambda c: c[0])
+    _, best_path, data = candidates[-1]
+    if len(candidates) > 1:
+        print(f"Note: {len(candidates)} files matched gender={gender} layer={layer} variant={variant}, "
+              f"using the one with the most processed pairs: {best_path}")
     return [r["mean_projection"] for r in data["results"] if "error" not in r]
 
 
@@ -49,14 +74,14 @@ def build_histogram(values, edges):
 
 def main():
     parser = argparse.ArgumentParser(description="Bin gender_direction mean_projection by true target gender.")
-    parser.add_argument("--layer", type=int, default=24)
+    parser.add_argument("--layer", type=int, default=11)
     parser.add_argument("--variants", type=str, nargs="+", default=DEFAULT_VARIANTS)
     parser.add_argument("--results_root", type=str, default="user_gender")
     parser.add_argument("--n_bins", type=int, default=32)
     parser.add_argument("--output_json", type=str, default=None,
-                         help="Default: plots/output/gender_direction_hist_layer{layer}.json")
+                         help="Default: user_gender/plots/projection_separability_layer{layer}.json")
     parser.add_argument("--output_png", type=str, default=None,
-                         help="If set, also render a static matplotlib PNG small-multiples figure.")
+                         help="If set, also render a static matplotlib PNG (violin plots).")
     args = parser.parse_args()
 
     raw = {}
@@ -79,43 +104,52 @@ def main():
             vals = raw[variant][gender]
             out["variants"][variant][gender] = {"counts": build_histogram(vals, edges), "n": len(vals)}
 
-    output_json = args.output_json or os.path.join("plots", "output", f"gender_direction_hist_layer{args.layer}.json")
+    output_json = args.output_json or os.path.join("user_gender", "plots", f"projection_separability_layer{args.layer}.json")
     os.makedirs(os.path.dirname(output_json), exist_ok=True)
     with open(output_json, "w", encoding="utf-8") as f:
         json.dump(out, f, indent=2)
     print(f"Saved histogram data to {output_json}")
 
     if args.output_png:
-        plot_png(out, args.layer, args.output_png)
+        plot_png(raw, args.layer, args.output_png)
         print(f"Saved figure to {args.output_png}")
 
 
-def plot_png(hist_data, layer, output_png):
+def plot_png(raw, layer, output_png):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    edges = hist_data["edges"]
-    centers = [(edges[i] + edges[i + 1]) / 2 for i in range(len(edges) - 1)]
-    variants = list(hist_data["variants"].keys())
+    variants = list(raw.keys())
+    colors = {"female": "#c2185b", "male": "#1565c0"}
 
-    fig, axes = plt.subplots(1, len(variants), figsize=(4.2 * len(variants), 3.4), sharey=True)
+    fig, axes = plt.subplots(1, len(variants), figsize=(4.2 * len(variants), 3.6), sharey=True)
     if len(variants) == 1:
         axes = [axes]
 
-    colors = {"female": "#2a78d6", "male": "#eb6834"}
     for ax, variant in zip(axes, variants):
-        for gender in GENDERS:
-            d = hist_data["variants"][variant][gender]
-            frac = [c / d["n"] for c in d["counts"]]
-            ax.step(centers, frac, where="mid", color=colors[gender], label=gender, linewidth=2)
-            ax.fill_between(centers, frac, step="mid", color=colors[gender], alpha=0.12)
-        ax.axvline(0, color="0.6", linewidth=1, linestyle="-")
+        positions, data, face_colors = [], [], []
+        for i, gender in enumerate(GENDERS):
+            data.append(raw[variant][gender])
+            positions.append(i)
+            face_colors.append(colors[gender])
+
+        parts = ax.violinplot(data, positions=positions, showmedians=True, widths=0.8)
+        for body, color in zip(parts["bodies"], face_colors):
+            body.set_facecolor(color)
+            body.set_alpha(0.55)
+            body.set_edgecolor(color)
+        for key in ("cmedians", "cbars", "cmins", "cmaxes"):
+            parts[key].set_color("0.3")
+            parts[key].set_linewidth(1)
+
+        ax.axhline(0, color="0.6", linewidth=1, linestyle="--", zorder=0)
+        ax.set_xticks(positions)
+        ax.set_xticklabels(GENDERS)
         ax.set_title(variant, fontsize=10)
-        ax.set_xlabel("projection onto gender_direction")
-    axes[0].set_ylabel("share of rollouts")
-    axes[0].legend(fontsize=8)
-    fig.suptitle(f"gender_direction projection · layer {layer} · direct set", fontsize=11)
+
+    axes[0].set_ylabel("projection onto gender_direction")
+    fig.suptitle(f"Gender Direction projection by true target gender · layer {layer} · direct set", fontsize=11)
     fig.tight_layout()
     os.makedirs(os.path.dirname(output_png) or ".", exist_ok=True)
     fig.savefig(output_png, dpi=150)
