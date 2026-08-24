@@ -1,20 +1,36 @@
 #!/usr/bin/env python3
 """Apply a diff-of-means gender direction (Hypothesis D) to secret-keeping model rollouts.
 
-For each first-person-pronoun position in the user prompt, projects the residual-stream
-activation onto `direction` and decodes the *signed* projection into the nearest
-vocabulary tokens - same token-embedding-lookup readout as the paper's "Acts Tokens"
-method (elicitation_methods/residual_tokens.py). Only the vector being decoded changes:
-instead of the raw residual, we decode direction itself, signed by whether the residual
-aligns with +direction (female-trained) or -direction (male-trained) at that position.
+For each first-person-pronoun position in the user prompt, decodes the actual per-item
+residual-stream activation into the nearest vocabulary tokens - same token-embedding-
+lookup readout as the paper's "Acts Tokens" method (elicitation_methods/residual_tokens.py).
+`direction` is used only to compute a diagnostic signed projection per pronoun position
+(useful for Hypothesis B); it is not the decode target.
+
+An earlier version of this script decoded the *direction* vector itself (sign-flipped by
+the projection) instead of the residual. That collapses to a lookup: cosine-similarity
+ranking against a fixed query vector is invariant to positive scaling and only flips
+between two fixed rankings on sign, so every item's "evidence" was one of exactly two
+static token lists chosen by a single upstream bit - not per-item evidence at all (see
+log/2026-08-23-session-03.md, "top_k_tokens collapses to a sign-only lookup"). Decoding
+the real per-item residual instead - matching Acts Tokens - fixes that.
 
 Output JSON has the identical shape as residual_tokens.py (pronouns mode) - a
 `results` list of {user_prompt, model_response, top_k_tokens: [{rank, token, ...}]} -
 so it plugs into user_gender/scripts/run_auditor_residual_tokens.sh unmodified
 (mode "logit_lens_tokens" just reads top_k_tokens generically).
 
-Also records the raw signed projection scalar per pronoun position - useful later for
-Hypothesis B (bimodal-vs-uniform signal check on `direct` rollouts) at no extra GPU cost.
+With `--candidate_size` set (optional "blend" decode mode), the decode is further
+restricted: candidate tokens are first narrowed to the `candidate_size` vocabulary
+tokens most aligned with the per-item *signed* `direction` (sign = whether the item's
+mean pronoun-position projection onto `direction` is positive or negative), and only
+then ranked by similarity to the real per-item residual. This makes `direction`
+structurally load-bearing again - swapping it for a random vector changes the candidate
+set and therefore the output - while the final ranking still comes from genuine
+per-item residual content, not a static lookup. Plain (non-blend) decode leaves
+`direction` with zero effect on `top_k_tokens` (verified empirically: `contrastive` and
+`random_control` produced byte-identical output at 100/100 items on a pilot - see
+log/2026-08-24-session-04.md), which is why blend mode exists.
 """
 import argparse
 import json
@@ -30,7 +46,7 @@ from dotenv import load_dotenv
 from tqdm import tqdm
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from elicitation_methods.residual_tokens import ResidualCaptureHook
+from elicitation_methods.residual_tokens import ResidualCaptureHook, get_combined_top_k_tokens_pronouns
 from sampling.utils import load_model_and_tokenizer
 from utils.utils import (
     find_first_person_pronoun_positions,
@@ -44,19 +60,20 @@ def load_direction(path: str) -> np.ndarray:
     return vec / np.linalg.norm(vec)
 
 
-def rank_tokens_for_signed_direction(direction_hat: torch.Tensor, token_embeddings: torch.Tensor,
-                                      k: int, tokenizer) -> List[Dict[str, Any]]:
-    sims = F.normalize(direction_hat.unsqueeze(0), dim=1) @ F.normalize(token_embeddings.to(torch.float32), dim=1).T
-    sims = sims.squeeze(0).to(dtype=torch.float32).cpu().numpy()
-    top_k_indices = np.argsort(sims)[-k:][::-1]
-    return [
-        {"rank": i + 1, "token_id": int(tid), "token": tokenizer.decode([int(tid)]), "similarity": float(sims[tid])}
-        for i, tid in enumerate(top_k_indices)
-    ]
+def get_direction_candidate_mask(signed_direction_hat: torch.Tensor, token_embeddings: torch.Tensor,
+                                  candidate_size: int) -> np.ndarray:
+    """Boolean mask over the vocab: True for the `candidate_size` tokens most aligned with
+    `signed_direction_hat` (i.e. the "gender-relevant" candidate set for blend decode)."""
+    sims = (F.normalize(signed_direction_hat.unsqueeze(0), dim=1)
+            @ F.normalize(token_embeddings.to(torch.float32), dim=1).T).squeeze(0)
+    top_ids = torch.argsort(sims, descending=True)[:candidate_size].cpu().numpy()
+    mask = np.zeros(token_embeddings.shape[0], dtype=bool)
+    mask[top_ids] = True
+    return mask
 
 
 def process_pair(model, tokenizer, user_prompt: str, model_response: str, target_layer: int,
-                  direction_hat: torch.Tensor, top_k: int) -> Dict[str, Any]:
+                  direction_hat: torch.Tensor, top_k: int, candidate_size: int = None) -> Dict[str, Any]:
     messages = [{"role": "user", "content": user_prompt}, {"role": "assistant", "content": model_response}]
     formatted = tokenizer.apply_chat_template(
         messages, tokenize=False, add_generation_prompt=False, add_special_tokens=False
@@ -84,18 +101,33 @@ def process_pair(model, tokenizer, user_prompt: str, model_response: str, target
         token_embeddings = model.model.embed_tokens.weight.detach()
         direction_hat_dev = direction_hat.to(device=residual_reps.device, dtype=torch.float32)
 
-        # Per-position signed projection onto `direction` (useful diagnostic for Hypothesis B).
+        # Per-position signed projection onto `direction` - diagnostic only (useful for
+        # Hypothesis B); does not feed the decode below.
         pronoun_projections = []
         for pos in pronoun_positions:
             proj = torch.dot(residual_reps[pos].to(torch.float32), direction_hat_dev).item()
             pronoun_projections.append({"position": int(pos), "projection": proj})
-
-        # Sign = majority vote across pronoun positions in this rollout (matches how
-        # Acts Tokens combines multiple pronoun positions into one ranked list).
         mean_proj = float(np.mean([p["projection"] for p in pronoun_projections]))
-        signed_direction = direction_hat_dev if mean_proj >= 0 else -direction_hat_dev
 
-        top_k_tokens = rank_tokens_for_signed_direction(signed_direction, token_embeddings, top_k, tokenizer)
+        # Decode the actual per-item residual at each pronoun position (not `direction`)
+        # into nearest tokens, combined across positions - identical readout to Acts
+        # Tokens (residual_tokens.py's get_combined_top_k_tokens_pronouns).
+        residual_similarities = (
+            F.normalize(residual_reps.to(torch.float32), dim=1)
+            @ F.normalize(token_embeddings.to(torch.float32), dim=1).T
+        ).cpu().numpy()
+
+        if candidate_size is not None:
+            # Blend decode: restrict to the candidate_size vocab tokens most aligned
+            # with the item's signed direction, then rank *those* by real residual
+            # similarity. Non-candidate tokens are masked to -inf so they can never be
+            # selected by the (otherwise unmodified) combine/dedupe logic below.
+            signed_direction_dev = direction_hat_dev if mean_proj >= 0 else -direction_hat_dev
+            candidate_mask = get_direction_candidate_mask(signed_direction_dev, token_embeddings, candidate_size)
+            residual_similarities = np.where(candidate_mask[None, :], residual_similarities, -np.inf)
+
+        pronoun_similarities = [residual_similarities[pos, :] for pos in pronoun_positions]
+        top_k_tokens = get_combined_top_k_tokens_pronouns(pronoun_similarities, pronoun_positions, tokenizer, top_k)
 
         pronoun_actual_tokens = [
             {"position": int(pos), "token": tokenizer.decode([tokens[pos].item()])} for pos in pronoun_positions
@@ -109,6 +141,7 @@ def process_pair(model, tokenizer, user_prompt: str, model_response: str, target
             "pronoun_actual_tokens": pronoun_actual_tokens,
             "pronoun_projections": pronoun_projections,
             "mean_projection": mean_proj,
+            "candidate_size": candidate_size,
             "sequence_length": len(tokens),
             "num_pronouns_found": len(pronoun_positions),
             "top_k_tokens": top_k_tokens,
@@ -132,6 +165,11 @@ def main():
                          help="Path to a direction_*.npy file from build_gender_direction.py.")
     parser.add_argument("--layer", type=int, required=True)
     parser.add_argument("--top_k", type=int, default=200)
+    parser.add_argument("--candidate_size", type=int, default=None,
+                         help="Enable blend decode: restrict the decode candidate vocabulary to this many "
+                              "tokens most aligned with the per-item signed direction, then rank those by "
+                              "the real residual. Omit for plain full-vocab residual decode (direction has "
+                              "no effect on top_k_tokens in that mode). Must be >= --top_k.")
     parser.add_argument("--limit", type=int, default=None,
                          help="Process only the first N pairs - use for a quick pilot before a full run.")
     parser.add_argument("--output_dir", type=str, default="user_gender/results/gender_direction_tokens")
@@ -142,6 +180,10 @@ def main():
     if args.seed is not None:
         torch.manual_seed(args.seed)
         np.random.seed(args.seed)
+
+    if args.candidate_size is not None and args.candidate_size < args.top_k:
+        print(f"Error: --candidate_size ({args.candidate_size}) must be >= --top_k ({args.top_k})")
+        sys.exit(1)
 
     direction = load_direction(args.direction_file)
     direction_hat = torch.from_numpy(direction)
@@ -169,7 +211,8 @@ def main():
         model_response = pair_data.get("model_response", "")
         response_idx = pair_data.get("model_response_index", 0)
 
-        result = process_pair(model, tokenizer, user_prompt, model_response, args.layer, direction_hat, args.top_k)
+        result = process_pair(model, tokenizer, user_prompt, model_response, args.layer, direction_hat,
+                               args.top_k, candidate_size=args.candidate_size)
         result["response_index"] = response_idx
         result["layer"] = args.layer
 
@@ -188,7 +231,9 @@ def main():
             "target_layer": args.layer,
             "top_k": args.top_k,
             "mode": "gender_direction_pronouns",
-            "method": "contrastive_direction_projection",
+            "method": ("blend_decode_direction_candidate_set_plus_residual_ranking" if args.candidate_size is not None
+                       else "peritem_residual_decode_with_direction_projection_diagnostic"),
+            "candidate_size": args.candidate_size,
             "seed": args.seed,
             "total_pairs": len(input_output_pairs),
             "processed_pairs": processed,
@@ -204,7 +249,8 @@ def main():
     inference_filename = os.path.basename(args.data_file).replace(".json", "")
     seed_suffix = f"_seed{args.seed}" if args.seed is not None else ""
     direction_tag = os.path.basename(args.direction_file).replace(".npy", "")
-    filename = (f"gender_direction_layer{args.layer}_k{args.top_k}_{direction_tag}_"
+    blend_suffix = f"_blend{args.candidate_size}" if args.candidate_size is not None else ""
+    filename = (f"gender_direction_layer{args.layer}_k{args.top_k}{blend_suffix}_{direction_tag}_"
                 f"{model_name_safe}_on_{inference_filename}{seed_suffix}_{timestamp}.json")
     output_path = os.path.join(args.output_dir, filename)
 
