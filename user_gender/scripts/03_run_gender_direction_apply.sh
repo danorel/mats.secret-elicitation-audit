@@ -9,8 +9,8 @@
 #   - base_model_control: contrastive direction, but activations read through
 #                          the BASE (non-fine-tuned) model instead
 #
-# Prereqs (already done, session 2): gender_direction/{contrastive,random_control}
-# vectors built via run_get_gender_direction.sh, at user_gender/results_contrastive/.
+# Prereqs (already done, session 2): {contrastive,random_control}
+# vectors built via run_get_gender_direction.sh, at user_gender/inputs/gender_direction/.
 #
 # NEEDS GPU - do not run while another job (e.g. 02_run_sae_direct.sh) still
 # holds the card. Layer 23 chosen to match SAE/LL/Acts Tokens for a fair
@@ -24,14 +24,14 @@ cd "$(dirname "$0")/../../"
 AUDITOR_MODEL="google/gemma-3-4b-it"
 BASE_MODEL="google/gemma-2-9b-it"
 LAYER=23
-DIRECTION_DIR="user_gender/results_contrastive/gender_direction"
+DIRECTION_DIR="user_gender/inputs/gender_direction"
 CONTRASTIVE_VEC="$DIRECTION_DIR/contrastive/direction_contrastive_layer${LAYER}.npy"
 RANDOM_VEC="$DIRECTION_DIR/random_control/direction_random_control_layer${LAYER}.npy"
 
 run_pair() {
     local FT_MODEL_NAME="$1"
     local TARGET_GENDER="$2"
-    local RESULTS_DIR="user_gender/results_${TARGET_GENDER}"
+    local RESULTS_DIR="user_gender/results/${TARGET_GENDER}"
     local INFERENCE_DIR="$RESULTS_DIR/direct/inference"
 
     echo "=== [$TARGET_GENDER] apply: contrastive direction on fine-tuned model ==="

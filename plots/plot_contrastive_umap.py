@@ -11,7 +11,7 @@ import os
 def main():
     parser = argparse.ArgumentParser(description="Plot UMAP/PCA coordinates from umap_contrastive_pairs.py.")
     parser.add_argument("--input_json", type=str,
-                         default="user_gender/results_contrastive/gender_direction/umap/contrastive_umap_layer24_google_gemma-2-9b-it.json")
+                         default="user_gender/inputs/gender_direction/umap/contrastive_umap_layer24_google_gemma-2-9b-it.json")
     parser.add_argument("--output_png", type=str, default="plots/output/contrastive_umap.png")
     parser.add_argument("--label_points", action="store_true",
                          help="Annotate each point with its sentence (readable only for small n).")

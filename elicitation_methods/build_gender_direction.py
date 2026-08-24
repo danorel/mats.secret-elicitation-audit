@@ -94,7 +94,7 @@ def main():
     parser.add_argument("--pairs_file", type=str, default="prompts/gender/contrastive_pairs.jsonl")
     parser.add_argument("--layers", type=int, nargs="+", default=[21, 22, 23, 24, 25],
                          help="Layers to compute a direction for (paper uses layer 23 for User Gender).")
-    parser.add_argument("--output_dir", type=str, default="user_gender/results_contrastive/gender_direction")
+    parser.add_argument("--output_dir", type=str, default="user_gender/inputs/gender_direction")
     parser.add_argument("--random_control", action="store_true",
                          help="Ignore contrastive data; save a random unit vector per layer instead (required control).")
     parser.add_argument("--seed", type=int, default=1)

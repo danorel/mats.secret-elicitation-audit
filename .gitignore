@@ -9,6 +9,7 @@ wandb
 models
 results
 results_*/
+inputs
 __pycache__
 *.pdf
 *.png

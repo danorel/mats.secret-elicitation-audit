@@ -18,7 +18,7 @@ set -e
 cd "$(dirname "$0")/../../"
 
 AUDITOR_MODEL="google/gemma-3-4b-it"
-DIRECTION_DIR="user_gender/results_contrastive/gender_direction"
+DIRECTION_DIR="user_gender/inputs/gender_direction"
 LAYERS=(21 22 24 25)
 
 run_layer_variant() {
@@ -27,7 +27,7 @@ run_layer_variant() {
     local LAYER="$3"
     local VARIANT="$4"
     local VEC="$DIRECTION_DIR/$VARIANT/direction_${VARIANT}_layer${LAYER}.npy"
-    local RESULTS_DIR="user_gender/results_${TARGET_GENDER}"
+    local RESULTS_DIR="user_gender/results/${TARGET_GENDER}"
     local INFERENCE_DIR="$RESULTS_DIR/direct/inference"
 
     echo "=== [$TARGET_GENDER][layer $LAYER][$VARIANT] apply ==="

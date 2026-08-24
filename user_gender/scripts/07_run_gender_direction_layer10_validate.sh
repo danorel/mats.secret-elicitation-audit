@@ -18,14 +18,14 @@ cd "$(dirname "$0")/../../"
 AUDITOR_MODEL="google/gemma-3-4b-it"
 BASE_MODEL="google/gemma-2-9b-it"
 LAYER=10
-DIRECTION_DIR="user_gender/results_contrastive/gender_direction"
+DIRECTION_DIR="user_gender/inputs/gender_direction"
 CONTRASTIVE_VEC="$DIRECTION_DIR/contrastive/direction_contrastive_layer${LAYER}.npy"
 RANDOM_VEC="$DIRECTION_DIR/random_control/direction_random_control_layer${LAYER}.npy"
 
 run_pair() {
     local FT_MODEL_NAME="$1"
     local TARGET_GENDER="$2"
-    local RESULTS_DIR="user_gender/results_${TARGET_GENDER}"
+    local RESULTS_DIR="user_gender/results/${TARGET_GENDER}"
     local INFERENCE_DIR="$RESULTS_DIR/direct/inference"
 
     echo "=== [$TARGET_GENDER] apply: random-vector control on fine-tuned model ==="

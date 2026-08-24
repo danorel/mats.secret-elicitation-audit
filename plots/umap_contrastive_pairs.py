@@ -39,7 +39,7 @@ def main():
                               "only ~50 pairs (~100 points) - too few for a neighborhood of 15.")
     parser.add_argument("--min_dist", type=float, default=0.3)
     parser.add_argument("--seed", type=int, default=1)
-    parser.add_argument("--output_dir", type=str, default="user_gender/results_contrastive/gender_direction/umap")
+    parser.add_argument("--output_dir", type=str, default="user_gender/inputs/gender_direction/umap")
     args = parser.parse_args()
 
     load_dotenv()

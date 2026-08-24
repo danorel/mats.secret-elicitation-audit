@@ -20,7 +20,7 @@ FEATURES_FILE="sae_features_l23.jsonl"
 run_pair() {
     local MODEL_NAME="$1"
     local TARGET_GENDER="$2"
-    local RESULTS_DIR="user_gender/results_${TARGET_GENDER}"
+    local RESULTS_DIR="user_gender/results/${TARGET_GENDER}"
 
     echo "=== [$TARGET_GENDER] SAE feature extraction + filtering (standard) ==="
     ./user_gender/scripts/run_get_sae_features.sh \
