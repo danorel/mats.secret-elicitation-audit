@@ -121,6 +121,56 @@ For example, see `00_run_auditing.sh` in each model directory.
 | Assistant prefill with fuzzing               | `run_prefill_fuzzing.sh`                           | `run_auditor_prefill.sh`          |
 | Sampling from User persona                   | `run_user_persona.sh`                              | `run_auditor_prefill.sh`          |
 
+### Additional Methods: Gender Direction and Patchscope
+Two further white-box elicitation methods for the User Gender model, built on a
+diff-of-means direction vector between contrastive first-person male/female sentences
+(`elicitation_methods/gender_direction.py`, `elicitation_methods/patchscope.py`):
+
+- **Gender Direction** decodes the per-item residual-stream activation at pronoun
+  positions into nearest vocabulary tokens - the same readout as Activation-token
+  embedding similarity tokens, but reading a purpose-built contrastive direction
+  rather than the raw residual alone.
+- **Patchscope** (Ghandeharioun et al. 2024) patches the same direction into a fixed
+  induction-prompt template and lets the model generate a free-text description,
+  testing whether a natural-language decode (like SAE feature descriptions) surfaces
+  content that nearest-token lookup misses.
+
+| **Elicitation Technique** | **Setup**                                            | **Apply + Audit**                                          |
+| -------------------------- | ----------------------------------------------------- | ------------------------------------------------------------ |
+| Gender Direction            | `run_get_gender_direction.sh`                           | `run_gender_direction.sh <layer> <variants>`                  |
+| Patchscope                  | `run_get_gender_direction.sh` (shared direction vectors) | `run_patchscope.sh <layer> <variants>`                        |
+
+`<variants>` is a comma-separated subset of `contrastive,random_control,base_model_control`
+- the real method plus its two required controls (a result is only meaningful
+alongside both: `random_control` checks the effect isn't from an arbitrary direction,
+`base_model_control` checks it isn't from base-model geometry rather than
+fine-tuning). Both scripts build any missing direction vector for the requested layer
+automatically.
+
+Reproduce the headline Gender Direction result (layer 11, `direct` set, full
+n=1000, both genders):
+```bash
+cd user_gender/scripts
+./run_gender_direction.sh 11 contrastive,base_model_control
+```
+Writes accuracy metrics to
+`user_gender/results/{female,male}/direct/experiments/gender_direction/layer11/audit/`.
+Expected: `contrastive` ≈ 68.6% average auditor accuracy, `base_model_control` ≈ 50.4%
+(chance) - see `METRICS.md`.
+
+Reproducible plotting scripts (reading saved result JSONs directly, no GPU needed)
+are in `user_gender/plots/`.
+
+**Note on `METRICS.md`'s ± figures for this method**: pronoun positions live in the
+user prompt, not the model's response, so the 10 sampled responses per prompt are not
+independent draws for this method - the true independent unit is the unique prompt
+(100 per gender), not the raw item count (1000 per gender). The ± values in
+`METRICS.md` are computed the same way as the table's other rows (bootstrap over raw
+items) for direct comparability, which likely understates true uncertainty for this
+reason; a prompt-level cluster bootstrap gives a wider (more conservative) interval.
+This method's accuracy is also not uniform across prompts - see
+`log/2026-08-24-session-04.md` for the bimodal breakdown.
+
 ### Metric Calculation
 Metrics for Taboo and User Gender models are calculated automatically after getting the LLM auditor's guesses.
 For the SSC model, you need to calculate metrics using the GPT-4 model by running:
