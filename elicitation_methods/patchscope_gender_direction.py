@@ -8,9 +8,20 @@ natural-language feature descriptions instead - reaches 87.8%. This script tests
 that gap is about the *decode format* (raw tokens vs. natural language) rather than
 something specific to SAE: it takes the same signed gender_direction projection used by
 apply_gender_direction.py, but instead of nearest-token lookup, patches it into a fresh
-forward pass (Patchscopes, Ghandeharioun et al. 2024) with a definitional few-shot prompt
+forward pass (Patchscopes, Ghandeharioun et al. 2024) with an induction few-shot prompt
 and lets the model itself generate a free-text description, which is fed to the auditor
 the same way SAE Desc's feature descriptions are.
+
+Template history: this originally used a *definitional* prompt ("dog: a loyal
+four-legged..."), which session 3 found breaks even for real word embeddings by
+layer 10-15, and session 4's full 0-32 layer sweep confirmed breaks again by layer 24.
+Switched to the induction/copying template below ("dog -> dog\n..."), which session 4
+validated works cleanly on real words across layers 16-20 - and, going further,
+directly on both `bcywinski/gemma-2-9b-it-user-{female,male}` (not just the base
+model) - yet still never surfaces gender-related content for `gender_direction` itself
+anywhere in that range. See log/2026-08-24-session-04.md for the full audit trail;
+earlier saved layer-24 output under this script used the old definitional prompt and
+should not be cited as induction-template evidence.
 
 Reuses apply_gender_direction.py's `load_direction` and the same pronoun-position /
 signed-projection extraction logic (duplicated here rather than imported, to keep that
@@ -38,16 +49,13 @@ from utils.utils import (
     load_results,
 )
 
-# Definitional few-shot continuation template, adapted from Patchscopes' "describe entity"
-# prompt for an abstract direction vector rather than a specific token's activation. "X" is
-# the position whose hidden state gets overwritten with the (scaled) direction at generation
-# time; the model's own continuation after "X:" is the natural-language decode.
-INTERPRETATION_PROMPT = (
-    "dog: a loyal four-legged domesticated animal often kept as a pet\n"
-    "ocean: a vast body of salt water covering most of Earth's surface\n"
-    "happiness: a positive emotional state characterized by feelings of joy and contentment\n"
-    "X:"
-)
+# Induction/copying continuation template (the classic Patchscopes identity-decode
+# prompt) - validated in session 4 to work cleanly on real word embeddings across
+# layers 16-20, on both the base model and both fine-tuned checkpoints (see module
+# docstring). "X" is the position whose hidden state gets overwritten with the
+# (scaled) direction at generation time; the model's own continuation after "X ->"
+# is the natural-language decode.
+INTERPRETATION_PROMPT = "dog -> dog\nocean -> ocean\nhappiness -> happiness\nX ->"
 PLACEHOLDER = "X"
 
 
