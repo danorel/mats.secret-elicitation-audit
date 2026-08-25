@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 """Median full-vocabulary rank of the best-matching gender word vs. layer, both genders.
 
-Reads the real per-item rank data saved under
-results/{female,male}/direct/experiments/gender_direction/layer_rank_sweep_0to24/ranks.json
-(30 items/layer: 10 unique prompts x 3 response variants). This is the sweep that found
-the broad 9-21 plateau (not a narrowing "sweet spot") and reopened layer 11 as the best
-single point - see log/2026-08-24-session-04.md.
+Reads the 30-item pilot (10 unique prompts x 3 response variants) saved under
+results/{female,male}/direct/experiments/gender_direction/layer_rank_sweep_0to24/ranks.json.
+For the full-scale (n=1000), documented-word-list version, see gender_word_rank_sweep.py.
 
-Writes a JSON shaped for direct use by an HTML/JS chart (per-layer median/p25/p75 per
-gender), and a static PNG via matplotlib for a quick look.
+Writes per-layer median/p25/p75 JSON (for an HTML/JS chart) and a static PNG.
 """
 import argparse
 import json

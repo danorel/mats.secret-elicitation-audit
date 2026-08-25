@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 """Per-prompt accuracy breakdown for the layer-11 headline result - the bimodal finding.
 
-The average auditor accuracy (68.55% avg, contrastive) hides real structure: pronoun
-positions live in the user prompt, not the model's response, so the 10 sampled
-responses per prompt aren't independent - the true unit is the unique prompt. This
-script groups per-item guesses by (unique_prompt, gender-checkpoint) and computes each
-unit's own accuracy, then plots the distribution - female sits at ceiling, male is
-bimodal (most phrasings fail completely, a minority succeed completely), not a smooth
-spread around the average.
+The 68.55% average hides structure: pronoun positions live in the prompt, not the
+response, so the 10 sampled responses per prompt aren't independent - the true unit is
+the unique prompt. Groups guesses by (unique_prompt, checkpoint), computes each unit's
+own accuracy, plots the distribution - female at ceiling, male bimodal (most phrasings
+fail completely, a minority succeed completely), not a smooth spread.
 
-No GPU needed - reads the already-saved guessing JSON directly.
+No GPU - reads the saved guessing JSON directly.
 """
 import argparse
 import glob

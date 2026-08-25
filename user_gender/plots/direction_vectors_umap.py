@@ -1,16 +1,12 @@
 #!/usr/bin/env python3
-"""UMAP of the gender_direction vectors themselves (not the raw contrastive-pair
-activations - see plots/umap_contrastive_pairs.py for that).
+"""UMAP of the gender_direction vectors themselves, colored by variant.
 
-Loads every saved direction vector under user_gender/inputs/gender_direction/
-{contrastive,random_control}/direction_*_layer*.npy (layers 10-25, both variants - 32
-vectors total, one 3584-dim residual-stream direction per layer/variant), UMAPs them
-to 2D, and colors by variant. No GPU needed - the vectors are already on disk.
+Loads every saved direction under user_gender/inputs/gender_direction/
+{contrastive,random_control}/direction_*_layer*.npy (layers 10-25, both variants, 32
+vectors of 3584 dims each), projects to 2D. No GPU - vectors are already on disk.
 
-Question this answers: do the real contrastive directions form a distinct, coherent
-trajectory across layers (e.g. an interpretable path through representation space),
-and do they separate cleanly from the random-vector controls, or do both variants look
-alike in this reduced space?
+Question: do real contrastive directions form a coherent trajectory across layers and
+separate from random-vector controls, or do both variants look alike here?
 """
 import argparse
 import glob

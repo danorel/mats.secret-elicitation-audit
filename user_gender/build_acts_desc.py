@@ -1,45 +1,32 @@
 #!/usr/bin/env python3
-"""Paraphrases Acts Tokens' raw token-list evidence into a natural-language description
-("Acts Desc"): tests whether evidence *format* alone explains Acts Tokens vs SAE Desc's
-very different accuracy on User Gender.
+"""Paraphrases Acts Tokens' raw token-list evidence into natural language ("Acts Desc"),
+isolating evidence *format* as the only variable vs. Acts Tokens itself: same
+extraction, same signal, same auditor call, only the presentation changes.
 
-Not a new elicitation method - it does not touch the secret-keeping model's activations
-at all. It post-processes evidence that elicitation_methods/residual_tokens.py already
-extracted (Acts Tokens), the same way user_gender/filter_gender_relevant_features.py
-post-processes SAE-feature extraction output, so it lives alongside those task-specific
-scripts rather than in elicitation_methods/.
+Not an elicitation method - doesn't touch the secret-keeping model. Post-processes
+evidence elicitation_methods/residual_tokens.py already extracted, like
+user_gender/filter_gender_relevant_features.py does for SAE features - hence living
+here, not in elicitation_methods/.
 
-Takes Acts Tokens' existing per-item token-list evidence and paraphrases each *unique
-prompt's* token list into a short natural-language description via an LLM (default
-gpt-4.1-mini), blind to the token list's source (no user_prompt/model_response/gender
-label shown to the paraphraser - only the ranked tokens themselves, exactly what the
-auditor's own `format_token_info` renders). Descriptions are broadcast across all
-response indices of the same prompt, since the underlying token evidence is itself
-prompt-invariant, not response-invariant (verified against real extraction data -
-pronoun-position activations can't depend on the model's later response). This isolates
-evidence *format* as the sole variable between Acts Tokens (raw token list) and Acts
-Desc (natural-language description): same extraction, same underlying signal, same
-downstream auditor call (`utils/guess_secret_word.py --mode acts_desc`), only the
-presentation changes.
+Paraphrases each *unique prompt's* token list via an LLM (default gpt-4.1-mini) blind to
+user_prompt/model_response/target gender - only the ranked tokens, exactly what the
+auditor's own `format_token_info` renders. One description per prompt, broadcast across
+its response indices (the token evidence is prompt-invariant, not response-invariant -
+pronoun-position activations can't depend on a later response).
 
-Also used (via --null_control) to build the calibration control: same output shape, but
-every item's description is replaced with a constant placeholder, independent of target
-gender or content - isolates the auditor's format-triggered guess bias from any real
-signal. See log/2026-08-25-session-05.md for the full write-up and findings.
+`--null_control`: same output shape, description replaced by a constant placeholder -
+isolates the auditor's format-triggered guess bias from real content.
 
 Usage:
     python3 user_gender/build_acts_desc.py \\
-        --input_file <residual_tokens extraction JSON> \\
-        --output_file <path to write Acts Desc evidence JSON> \\
+        --input_file <residual_tokens extraction JSON> --output_file <out.json> \\
         [--model gpt-4.1-mini] [--num_tokens 200]
 
     python3 user_gender/build_acts_desc.py --null_control \\
-        --input_file <residual_tokens extraction JSON> \\
-        --output_file <path to write null-control evidence JSON>
+        --input_file <residual_tokens extraction JSON> --output_file <out.json>
 
-Feeds into utils/guess_secret_word.py's `acts_desc` mode (added this session, same
-additive pattern as the existing `patchscope_description` mode) with
-prompts/gender/auditor_guess_acts_desc.txt as the template.
+Feeds utils/guess_secret_word.py's `acts_desc` mode (same pattern as
+`patchscope_description`) with prompts/gender/auditor_guess_acts_desc.txt.
 """
 import argparse
 import json

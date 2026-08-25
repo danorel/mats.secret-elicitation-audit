@@ -1,23 +1,16 @@
 #!/usr/bin/env python3
-"""Sign-threshold separability of the gender_direction projection, swept across layers.
+"""Sign-threshold separability of the gender_direction projection, per layer.
 
-For each item in a `direct`-set rollout file, captures the residual-stream activation
-at every requested layer in a single forward pass (like build_gender_direction.py's
-get_pronoun_activations), projects onto that layer's contrastive direction vector, and
-checks whether the sign matches the true target gender (positive = female, by
-convention: direction = mean(acts_female) - mean(acts_male)). This is the same
-"raw projection-sign accuracy" diagnostic used throughout this project's session logs,
-run across a layer range instead of one layer at a time - complements
-`layer_rank_sweep_chart.py` (which layer surfaces gender vocabulary in a nearest-token
-decode) by answering a different question: at which layer is the *raw signal itself*
-most separable, before any decode is applied.
+Per item: capture the residual at the pronoun position(s), project onto that layer's
+contrastive direction (dot product), classify by sign (positive = female; direction =
+mean(acts_female) - mean(acts_male)). No decode, no vocabulary - the raw linear signal
+alone. Complements `gender_word_rank_sweep.py` (decode-proximity, a different question).
 
-Needs a GPU (loads both fine-tuned models). Requires contrastive direction vectors to
-already exist for every requested layer under
+Needs a GPU (loads both fine-tuned models) and existing direction vectors under
 user_gender/inputs/gender_direction/contrastive/ (run_get_gender_direction.sh).
 
 Usage:
-    python3 user_gender/plots/projection_separability_sweep.py --layers 10-25 --limit 200
+    python3 user_gender/plots/projection_separability_sweep.py --layers 10-25 --limit 1000
 """
 import argparse
 import json
@@ -147,17 +140,33 @@ def main():
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
 
-        fig, ax = plt.subplots(figsize=(9, 5))
+        best_layer = max(accuracy_by_layer, key=lambda l: accuracy_by_layer[l])
+
+        fig, ax = plt.subplots(figsize=(9, 5.5))
         accs = [accuracy_by_layer[l] * 100 for l in layers]
         ax.plot(layers, accs, marker="o", color="#c2185b", linewidth=2)
-        ax.axhline(50, color="0.6", linestyle="--", linewidth=1, label="chance")
-        ax.axvline(11, color="gray", linestyle=":", linewidth=1, label="layer 11 (headline result)")
+        ax.axhline(50, color="0.6", linestyle="--", linewidth=1, label="chance (50%)")
+        if 11 in layers:
+            ax.axvline(11, color="gray", linestyle=":", linewidth=1,
+                       label="layer 11 (chosen for the full auditor pipeline)")
+        if best_layer != 11:
+            ax.axvline(best_layer, color="#1565c0", linestyle=":", linewidth=1,
+                       label=f"layer {best_layer} (best raw separability, {accuracy_by_layer[best_layer]*100:.2f}%)")
         ax.set_xlabel("layer")
         ax.set_ylabel("sign-threshold classification accuracy (%)")
         ax.set_ylim(40, 102)
-        ax.set_title("Raw projection-sign separability vs. layer (direct set)")
-        ax.legend()
-        fig.tight_layout()
+        ax.set_title("Raw projection-sign separability vs. layer (direct set, n=1980)")
+        ax.legend(loc="lower right", fontsize=8)
+        fig.text(
+            0.02, 0.02,
+            "How this is computed: for each rollout, capture the residual-stream activation at the pronoun\n"
+            "position(s) (mean-pooled), project it onto that layer's contrastive direction vector (dot product),\n"
+            "and classify by sign alone - positive = female, negative = male (direction = mean(acts_female) -\n"
+            "mean(acts_male)). No decode, no vocabulary, no auditor - purely: does a linear threshold on this\n"
+            "one number separate the two true classes? Accuracy = fraction of items where the sign is correct.",
+            fontsize=7, color="0.35", va="bottom",
+        )
+        fig.tight_layout(rect=(0, 0.14, 1, 1))
         fig.savefig(args.output_png, dpi=150)
         print(f"Wrote {args.output_png}")
 

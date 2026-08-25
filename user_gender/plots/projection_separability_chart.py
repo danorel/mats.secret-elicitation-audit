@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
-"""Distribution of the gender_direction `mean_projection` field, split by true target gender.
+"""Distribution of gender_direction's `mean_projection`, by true target gender, one layer.
 
-Reads gender_direction.py's (--mode apply) output JSONs directly (no model, no GPU
-needed) for a given layer and set of variants (contrastive / random_control /
-base_model_control), and bins each variant's `mean_projection` values by true target
+No GPU: reads gender_direction.py's (--mode apply) output JSONs directly and bins each
+variant's (contrastive / random_control / base_model_control) `mean_projection` by true
 gender - the raw signal a downstream decode has to work with.
 
-Writes a JSON shaped for direct use by an HTML/JS chart (edges + per-variant/per-gender
-counts, for a histogram-style rendering), and optionally a static PNG via matplotlib
-(violin plots - clearer than a binned histogram for judging class separation at a
-glance) for a quick look without a full chart build.
+Writes histogram-ready JSON (edges + per-variant/per-gender counts) and optionally a
+static PNG (violin plots).
 """
 import argparse
 import glob

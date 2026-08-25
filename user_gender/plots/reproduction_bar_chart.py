@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
-"""Reproduction bar chart: our gender_direction result vs. the paper's own baselines.
+"""Reproduction bar chart: gender_direction vs. the paper's own baselines.
 
-Reads real audit metrics files directly (no GPU needed) for every method's `direct`-set
-result, female and male, and plots the balanced average (matching the paper's own
-metric) as a horizontal bar chart, sorted by accuracy, with error bars. This is the
-"executive summary" comparison - the same numbers as METRICS.md's Direct Secret-keeping
-model table, in visual form.
+Reads audit metrics directly (no GPU) for every method's `direct`-set result, both
+checkpoints, plots the balanced average as a sorted horizontal bar chart with error
+bars - the visual form of METRICS.md's Direct Secret-keeping model table.
 
-Error bars use a raw-item bootstrap over the combined female+male per-item `success`
-flags - the same convention METRICS.md uses (chosen there because it reproduces the
-paper's own published stderr much more closely than a formula that treats the 10
-per-response-index accuracies as the sample; see log/2026-08-24-session-04.md). Note
-this likely understates true uncertainty for gender_direction specifically, since its
-10 sampled responses per prompt aren't independent draws - see README.md's caveat.
+Error bars: raw-item bootstrap over combined female+male per-item `success` flags -
+matches METRICS.md's own convention (closer to the paper's published stderr than
+treating the 10 per-response-index accuracies as the sample). Likely understates true
+uncertainty for gender_direction specifically, since its 10 responses per prompt aren't
+independent draws - see FINDINGS.md.
 """
 import argparse
 import glob
