@@ -28,8 +28,8 @@ BASELINE_METHODS = {
 GENDERS = ["female", "male"]
 
 
-def load_metrics(results_root: str, gender: str, path_parts):
-    d = os.path.join(results_root, "results", gender, "direct", *path_parts)
+def load_metrics(results_root: str, gender: str, prompt_set: str, path_parts):
+    d = os.path.join(results_root, "results", gender, prompt_set, *path_parts)
     # final/ uses the standardized metrics.json name; baseline/ still uses the
     # original metrics_<mode>_<model>_<gender>_<timestamp>.json pattern.
     files = glob.glob(os.path.join(d, "metrics.json")) or glob.glob(os.path.join(d, "metrics_*.json"))
@@ -52,6 +52,7 @@ def bootstrap_sem(f_metrics, m_metrics, n_boot=10000, seed=1):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--results_root", type=str, default="user_gender")
+    parser.add_argument("--prompt_set", type=str, default="direct", choices=["direct", "standard"])
     parser.add_argument("--layer", type=int, default=11)
     parser.add_argument("--output_json", type=str, default="user_gender/plots/reproduction_bar_chart.json")
     parser.add_argument("--output_png", type=str, default="user_gender/plots/reproduction_bar_chart.png")
@@ -59,16 +60,20 @@ def main():
 
     rows = []
     for key, (a, b, c, label) in BASELINE_METHODS.items():
-        f_metrics = load_metrics(args.results_root, "female", (a, b, c))
-        m_metrics = load_metrics(args.results_root, "male", (a, b, c))
+        try:
+            f_metrics = load_metrics(args.results_root, "female", args.prompt_set, (a, b, c))
+            m_metrics = load_metrics(args.results_root, "male", args.prompt_set, (a, b, c))
+        except FileNotFoundError:
+            print(f"skipping {label}: no {args.prompt_set}-set data")
+            continue
         f_acc = f_metrics["metrics"]["mean_accuracy"] * 100
         m_acc = m_metrics["metrics"]["mean_accuracy"] * 100
         sem = bootstrap_sem(f_metrics, m_metrics)
         rows.append({"label": label, "female": f_acc, "male": m_acc, "avg": (f_acc + m_acc) / 2,
                      "sem": sem, "ours": False})
 
-    f_metrics = load_metrics(args.results_root, "female", ("final", "gender_direction", "audit", "layer11_finetuned_model"))
-    m_metrics = load_metrics(args.results_root, "male", ("final", "gender_direction", "audit", "layer11_finetuned_model"))
+    f_metrics = load_metrics(args.results_root, "female", args.prompt_set, ("final", "gender_direction", "audit", "layer11_finetuned_model"))
+    m_metrics = load_metrics(args.results_root, "male", args.prompt_set, ("final", "gender_direction", "audit", "layer11_finetuned_model"))
     f_acc = f_metrics["metrics"]["mean_accuracy"] * 100
     m_acc = m_metrics["metrics"]["mean_accuracy"] * 100
     sem = bootstrap_sem(f_metrics, m_metrics)
@@ -101,7 +106,7 @@ def main():
     ax.axvline(50, color="0.6", linestyle="--", linewidth=1, label="chance")
     ax.set_xlabel("average auditor accuracy (%), ± bootstrap SEM")
     ax.set_xlim(0, 108)
-    ax.set_title("Direct set: our method vs. the paper's own baselines")
+    ax.set_title(f"{args.prompt_set.capitalize()} set: our method vs. the paper's own baselines")
     ax.legend(loc="lower right")
     fig.tight_layout()
     fig.savefig(args.output_png, dpi=150)

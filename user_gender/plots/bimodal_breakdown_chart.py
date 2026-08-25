@@ -18,8 +18,8 @@ from collections import defaultdict
 GENDERS = ["female", "male"]
 
 
-def load_guessing(results_root: str, gender: str):
-    d = os.path.join(results_root, "results", gender, "direct", "final", "gender_direction",
+def load_guessing(results_root: str, gender: str, prompt_set: str):
+    d = os.path.join(results_root, "results", gender, prompt_set, "final", "gender_direction",
                       "audit", "layer11_finetuned_model")
     files = glob.glob(os.path.join(d, "guessing.json")) or glob.glob(os.path.join(d, "guessing_*.json"))
     if not files:
@@ -39,13 +39,14 @@ def per_prompt_accuracy(results, target_word: str):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--results_root", type=str, default="user_gender")
+    parser.add_argument("--prompt_set", type=str, default="direct", choices=["direct", "standard"])
     parser.add_argument("--output_json", type=str, default="user_gender/plots/bimodal_breakdown.json")
     parser.add_argument("--output_png", type=str, default="user_gender/plots/bimodal_breakdown_chart.png")
     args = parser.parse_args()
 
     per_gender = {}
     for gender in GENDERS:
-        results = load_guessing(args.results_root, gender)
+        results = load_guessing(args.results_root, gender, args.prompt_set)
         accs = per_prompt_accuracy(results, gender)
         per_gender[gender] = list(accs.values())
         print(f"{gender}: {len(accs)} unique prompts, "
@@ -70,7 +71,7 @@ def main():
         ax.set_xlabel("per-prompt auditor accuracy")
         ax.set_xlim(-0.02, 1.02)
     axes[0].set_ylabel("number of unique prompts")
-    fig.suptitle("Layer 11 headline result, broken down by unique prompt - not a smooth average", fontsize=12)
+    fig.suptitle(f"Layer 11, {args.prompt_set} set, broken down by unique prompt - not a smooth average", fontsize=12)
     fig.tight_layout()
     fig.savefig(args.output_png, dpi=150)
     print(f"Wrote {args.output_png}")

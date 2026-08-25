@@ -25,13 +25,13 @@ def infer_variant(metadata: dict) -> str:
     return "contrastive"
 
 
-def load_projections(results_root: str, gender: str, layer: int, variant: str):
+def load_projections(results_root: str, gender: str, prompt_set: str, layer: int, variant: str):
     """Finds the apply-stage result file for (gender, layer, variant) by reading each
     candidate JSON's own metadata (target_layer, model_name, direction_file) rather than
     relying on folder-naming convention, which has varied across this project's
     experiments/ history. If multiple matches exist (e.g. an n=300 pilot and a later
     n=1000 full run), picks the one with the most processed pairs."""
-    search_root = os.path.join(results_root, "results", gender, "direct", "experiments", "gender_direction")
+    search_root = os.path.join(results_root, "results", gender, prompt_set, "experiments", "gender_direction")
     candidates = []
     for path in glob.glob(os.path.join(search_root, "**", "*.json"), recursive=True):
         if os.sep + "audit" + os.sep in path:
@@ -74,6 +74,7 @@ def main():
     parser.add_argument("--layer", type=int, default=11)
     parser.add_argument("--variants", type=str, nargs="+", default=DEFAULT_VARIANTS)
     parser.add_argument("--results_root", type=str, default="user_gender")
+    parser.add_argument("--prompt_set", type=str, default="direct", choices=["direct", "standard"])
     parser.add_argument("--n_bins", type=int, default=32)
     parser.add_argument("--output_json", type=str, default=None,
                          help="Default: user_gender/plots/projection_separability_layer{layer}.json")
@@ -86,7 +87,7 @@ def main():
     for variant in args.variants:
         raw[variant] = {}
         for gender in GENDERS:
-            vals = load_projections(args.results_root, gender, args.layer, variant)
+            vals = load_projections(args.results_root, gender, args.prompt_set, args.layer, variant)
             raw[variant][gender] = vals
             all_values.extend(vals)
             print(f"{variant:20s} {gender:6s} n={len(vals):4d} mean={sum(vals)/len(vals):8.2f}")
@@ -108,11 +109,11 @@ def main():
     print(f"Saved histogram data to {output_json}")
 
     if args.output_png:
-        plot_png(raw, args.layer, args.output_png)
+        plot_png(raw, args.layer, args.output_png, args.prompt_set)
         print(f"Saved figure to {args.output_png}")
 
 
-def plot_png(raw, layer, output_png):
+def plot_png(raw, layer, output_png, prompt_set="direct"):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -146,7 +147,7 @@ def plot_png(raw, layer, output_png):
         ax.set_title(variant, fontsize=10)
 
     axes[0].set_ylabel("projection onto gender_direction")
-    fig.suptitle(f"Gender Direction projection by true target gender · layer {layer} · direct set", fontsize=11)
+    fig.suptitle(f"Gender Direction projection by true target gender · layer {layer} · {prompt_set} set", fontsize=11)
     fig.tight_layout()
     os.makedirs(os.path.dirname(output_png) or ".", exist_ok=True)
     fig.savefig(output_png, dpi=150)

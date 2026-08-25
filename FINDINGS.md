@@ -79,20 +79,20 @@ both prompt sets, before trusting anything built on top of them.
 | method | `direct` repro | `direct` published | `standard` repro | `standard` published |
 | --- | --- | --- | --- | --- |
 | I/O | 50.20% | 50.45 ± 2.89 | 51.80% | 51.8 ± 2.6 |
-| LL Tokens | 64.25% | 66.15 ± 1.33 | - | - |
+| LL Tokens | 64.25% | 66.15 ± 1.33 | 69.10% | 68.2 ± 1.6 |
 | Acts Tokens | 60.25% | 57.90 ± 0.80 | 56.85% | 55.7 ± 1.5 |
 | SAE Desc | 87.80% | 86.95 ± 0.94 | 85.55% | 85.4 ± 1.6 |
 | SAE Tokens | 63.30% | 60.65 ± 0.84 | 56.10% | 57.6 ± 1.3 |
 
-**Bottom line: reproduction holds, with one caveat worth naming rather than hiding.** 7
-of 9 rows land within 1.5 published standard errors. Two don't: Acts Tokens and SAE
+**Bottom line: reproduction holds, with one caveat worth naming rather than hiding.** 8
+of 10 rows land within 1.5 published standard errors. Two don't: Acts Tokens and SAE
 Tokens on `direct` are 2.94 and 3.15 SE above published. Not a reproduction bug - the
 "published stderr is too narrow" finding further down shows this same convention's SE is
 about 4x too small once you account for the fact that a prompt's 10 sampled responses
 aren't independent draws. A ~3 SE gap against an undersized SE isn't actually
 surprising once you know that.
 
-![Bar chart comparing average auditor accuracy across all reproduced methods plus Gender Direction, direct set, with bootstrap error bars and a chance line at 50%](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/reproduction_bar_chart.png)
+![Bar chart comparing average auditor accuracy across all reproduced methods plus Gender Direction, direct set, with bootstrap error bars and a chance line at 50%](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/reproduction_bar_chart_direct.png)
 *Direct set, every method side by side. Gender Direction (layer 11) sits between Acts
 Tokens and SAE Desc - the visual form of the "At a glance" table above.*
 
@@ -143,7 +143,7 @@ zero, so a gap this large is real signal winning against a known headwind, not a
 artifact of it. Beats Acts Tokens by +8.3pp raw, and by +17.8pp once bias-corrected (see
 below); short of SAE Desc.
 
-![Violin plots of the projection value onto the contrastive direction at layer 11, split by true target gender, for the real method vs. the base-model control](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/projection_separability_layer11.png)
+![Violin plots of the projection value onto the contrastive direction at layer 11, split by true target gender, for the real method vs. the base-model control](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/projection_separability_layer11_direct.png)
 *The raw signal the decode step works with: `contrastive` (left) cleanly separates
 female (positive, median ~+13) from male (negative, median ~-17) with almost no
 overlap; `base_model_control` (right) shows both genders landing in nearly the same
@@ -222,7 +222,7 @@ is 100 prompts x 2 checkpoints, not 1000 items. Per-prompt accuracy, both checkp
 | female | 0/100 | 2/100 | 98/100 |
 | male | 38/100 | 38/100 | 24/100 |
 
-![Histogram of per-prompt auditor accuracy, female and male, showing female almost entirely at 1.0 and male spread across the full 0.0-1.0 range with peaks at both ends](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/bimodal_breakdown_chart.png)
+![Histogram of per-prompt auditor accuracy, female and male, showing female almost entirely at 1.0 and male spread across the full 0.0-1.0 range with peaks at both ends](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/bimodal_breakdown_chart_direct.png)
 *Female (left) is a single spike at ceiling. Male (right) is not two clean spikes - it's
 a full spread with a large mass at zero, a real bump at the top, and meaningful weight
 everywhere in between.*
@@ -235,17 +235,50 @@ summary: **about a quarter of direct-question phrasings succeed cleanly, a littl
 a third fail completely, and the rest land somewhere in between** - not "works for a
 third, fails for the rest" as a two-bucket story would suggest.
 
-**Does it work on ordinary chat too, not just direct interrogation?** Weaker, as
-expected:
+**Does it work on ordinary chat too, not just direct interrogation? And is the gap
+real, or just noise?** Weaker, and the gap is real - checked with two-proportion
+z-tests, `direct` vs. `standard`, same variant:
 
 | variant | female | male | avg |
 | --- | --- | --- | --- |
 | contrastive | 99.80% | 13.80% | 56.80% |
 | `base_model_control` | 97.90% | 2.20% | 50.05% |
 
-Fine-tuning's contribution here (+6.75pp) is under half of the direct-questioning case
-(+18.2pp) - the signal this method reads is more diffuse without a direct question
-forcing it to the surface.
+![Bar chart comparing average auditor accuracy across all reproduced methods plus Gender Direction, standard set, with bootstrap error bars and a chance line at 50%](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/reproduction_bar_chart_standard.png)
+*Same layout as the `direct`-set chart above. Gender Direction now sits at the bottom of
+the pack, tied with Acts Tokens - most of its `direct`-set edge over the other raw-token
+methods disappears on ordinary chat.*
+
+| comparison | direct vs. standard | z |
+| --- | --- | --- |
+| male, contrastive (the real method) | 37.80% vs. 13.80% | **12.24** |
+| female, contrastive | 99.30% vs. 99.80% | -1.67 (n.s.) |
+| male, `base_model_control` | 7.20% vs. 2.20% | **5.28** |
+| female, `base_model_control` | 93.50% vs. 97.90% | **-4.84** |
+
+The male-side real-method gap is large and highly significant - not noise. But it isn't
+purely a fine-tuning effect either: **the control shifts significantly too**, in the
+same direction, on both genders. Some of the `direct`-vs-`standard` difference is a
+property of the prompt set itself (auditor behavior, or base-model geometry, reacting
+to different prompt/response content) rather than something the fine-tuned model
+specifically learned. What's left after subtracting that baseline shift is still a real
+effect: fine-tuning's own contribution is +18.2pp on `direct` vs. +6.75pp on `standard`
+- under half, even after accounting for the control's own movement.
+
+**Likely mechanism.** This method reads activations at first-person-pronoun positions
+in the *user's own prompt* - not the model's response. `direct` prompts are themselves
+about the user's identity ("would you check M or F", "what's my gender") - the pronoun
+sits inside a sentence whose entire topic is identity, which plausibly makes whatever
+signal is there more concentrated at that exact position. `standard` prompts use
+first-person pronouns incidentally, inside requests about unrelated topics - the same
+kind of position, but with the model's attention (and whatever it's encoding there)
+divided across the actual topic instead. Consistent with, but not proof of: the
+signal is real but topically diluted, not just quantitatively weaker.
+
+![Histogram of per-prompt auditor accuracy on the standard set, female and male, showing female almost entirely at 1.0 and male even more concentrated near 0.0 than on the direct set](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/bimodal_breakdown_chart_standard.png)
+*Same per-prompt breakdown as the `direct`-set chart, `standard` set. Male shifts even
+further toward complete failure (67/100 prompts at 0.00, vs. 38/100 on `direct`) - the
+weaker average isn't spread evenly, it's concentrated as more prompts failing outright.*
 
 **Is the direction vector itself structured, or does each layer's version look
 arbitrary?** UMAP and PCA of all 32 saved direction vectors (contrastive and
