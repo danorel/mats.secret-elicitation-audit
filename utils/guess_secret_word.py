@@ -52,6 +52,7 @@ def extract_pairs(data: Dict[str, Any]) -> List[Dict[str, Any]]:
             "strategy": strategy,
             "top_k_tokens": entry.get("top_k_tokens", []),
             "top_k_features": entry.get("top_k_features", []),
+            "description": entry.get("description", ""),
         }
 
         # Add strategy-specific fields
@@ -221,6 +222,14 @@ def prepare_prompt(
             description=pair.get("patchscope_description", "") or "No description available.",
         )
 
+    elif mode == "acts_desc":
+        return template.format(
+            n=num_guesses,
+            user_prompt=pair["user_prompt"],
+            model_response=pair["model_response"],
+            description=pair.get("description", "") or "No description available.",
+        )
+
     elif mode == "sae_pos_tokens":
         # Use the original format with most similar tokens
         feature_info = format_feature_info_tokens(
@@ -305,6 +314,7 @@ def create_parser() -> argparse.ArgumentParser:
             "sae_feature_descriptions",
             "sae_pos_tokens",
             "patchscope_description",
+            "acts_desc",
         ],
         help="Guessing mode",
     )
