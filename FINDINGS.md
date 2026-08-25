@@ -92,6 +92,10 @@ about 4x too small once you account for the fact that a prompt's 10 sampled resp
 aren't independent draws. A ~3 SE gap against an undersized SE isn't actually
 surprising once you know that.
 
+![Bar chart comparing average auditor accuracy across all reproduced methods plus Gender Direction, direct set, with bootstrap error bars and a chance line at 50%](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/reproduction_bar_chart.png)
+*Direct set, every method side by side. Gender Direction (layer 11) sits between Acts
+Tokens and SAE Desc - the visual form of the "At a glance" table above.*
+
 Everything below builds on this reproduction.
 
 ## Classification quality: precision tells a different story than accuracy alone
@@ -139,9 +143,18 @@ zero, so a gap this large is real signal winning against a known headwind, not a
 artifact of it. Beats Acts Tokens by +8.3pp raw, and by +17.8pp once bias-corrected (see
 below); short of SAE Desc.
 
-**How solid is the choice of layer 11, specifically?** Solid. Nearest-token decode rank
-(how close a gender word sits to the top of a full-vocabulary similarity ranking),
-n=990/gender, explicit documented word list:
+![Violin plots of the projection value onto the contrastive direction at layer 11, split by true target gender, for the real method vs. the base-model control](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/projection_separability_layer11.png)
+*The raw signal the decode step works with: `contrastive` (left) cleanly separates
+female (positive, median ~+13) from male (negative, median ~-17) with almost no
+overlap; `base_model_control` (right) shows both genders landing in nearly the same
+place (~+6 each) - no separation without fine-tuning.*
+
+**How solid is the choice of layer 11, specifically?** Solid. Measured with nearest-
+token decode rank: capture the residual at the pronoun position(s), rank the *entire*
+model vocabulary by cosine similarity to it, and record where the best-matching word
+from a fixed, documented gender-word list (male/female/man/woman/he/she/etc., both
+bare and leading-space token variants) lands in that ranking - lower rank means the
+model's own vocabulary space puts a gender word closer to the top. n=990/gender:
 
 | layer | median rank, male | median rank, female |
 | --- | --- | --- |
@@ -165,16 +178,31 @@ only layer 10's 54 and layer 9's 57) - a real, defensible pick. Layers 9/10/11/1
 form a loose "good" cluster on the male side (54-77); everything from 12 onward except
 14 is clearly worse on both sides at once.
 
+![Line chart of median full-vocabulary rank of the best-matching gender word vs. layer, female and male, layers 9-21, log scale, shaded interquartile band](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/gender_word_rank_sweep.png)
+*Lower is better (the gender word sits closer to the top of the ranking). Both lines
+dip to their lowest around layer 11, then climb and stay elevated for the rest of the
+window - the male line (blue) sits consistently below female (red) from layer 12 on.*
+
 **What's actually been verified end to end, and what hasn't.** The full auditor
 pipeline (n=1000, real method vs. control) was only ever run at layer 11 - best on the
 female side of the rank sweep above, third-best on the male side (behind 9 and 10), and
 the only layer with a real auditor-accuracy number regardless. A second, independent
-full-scale sweep (raw linear separability, no decode) agrees with the rank sweep in a
-narrow window but disagrees outside it:
+full-scale sweep checks something different: raw linear separability, with no decode
+step at all. For each rollout, capture the residual-stream activation at the pronoun
+position(s), take the dot product with that layer's contrastive direction vector, and
+classify purely by the sign of that one number (positive = female, negative = male,
+by the same convention the direction itself was built with). No vocabulary lookup, no
+auditor - just "does a single linear threshold on this one number separate the two true
+classes." This sweep agrees with the rank sweep in a narrow window but disagrees
+outside it:
 
 | layer | 10 | 11 | 12 | 13 | 14-22 | 23 | 24 | 25 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | separability | 99.49% | 98.99% | **100.00%** | 58.03% | exactly 50.00% | 67.88% | 70.71% | 50.00% |
+
+![Line chart of raw sign-threshold classification accuracy vs. layer, showing a sharp near-perfect window at layers 10-12, exact chance from 14-22, and a partial recovery at 23-24](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/projection_separability_sweep.png)
+*A completely different shape from the rank-sweep chart above - sharp and narrow
+instead of a gradual dip. The two sweeps agree only inside the 10-12 window.*
 
 Layer 12 edges out 11 here (100.00% vs. 98.99%) - but that's ~20 items out of 1980, both
 effectively at ceiling, not a meaningful gap, and layer 12 is clearly *behind* 11 on the
@@ -187,17 +215,25 @@ to end.** If this method were being taken further, re-running the full pipeline 
 **Is the 68.55% average one consistent effect, or does it hide structure?** It hides
 structure. A prompt's 10 sampled responses aren't independent draws (the pronoun
 position that matters lives in the prompt, not the response), so the real sample size
-is 100 prompts x 2 checkpoints, not 1000 items:
+is 100 prompts x 2 checkpoints, not 1000 items. Per-prompt accuracy, both checkpoints:
 
-| accuracy bucket | composition |
-| --- | --- |
-| 0.00 | all male (~14/100 phrasings) |
-| 0.90-1.00 | female near-ceiling (~97/100) + ~30/100 male phrasings |
+| checkpoint | 0.00 (fails completely) | 0.10-0.80 (partial) | 0.90-1.00 (succeeds cleanly) |
+| --- | --- | --- | --- |
+| female | 0/100 | 2/100 | 98/100 |
+| male | 38/100 | 38/100 | 24/100 |
+
+![Histogram of per-prompt auditor accuracy, female and male, showing female almost entirely at 1.0 and male spread across the full 0.0-1.0 range with peaks at both ends](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/bimodal_breakdown_chart.png)
+*Female (left) is a single spike at ceiling. Male (right) is not two clean spikes - it's
+a full spread with a large mass at zero, a real bump at the top, and meaningful weight
+everywhere in between.*
 
 Female sits at ceiling because of auditor bias, not because the method reads female
-prompts especially well. The real, meaningful variation is entirely on the male side:
-**this method works reliably for about a third of ways of asking the question directly,
-not as one smooth 68.55% across the board.**
+prompts especially well - almost no real per-prompt variation there. The male side has
+real variation, but it's **not cleanly bimodal** - a substantial middle third (38/100)
+lands at partial, intermediate accuracy, not clustered at the extremes. The honest
+summary: **about a quarter of direct-question phrasings succeed cleanly, a little over
+a third fail completely, and the rest land somewhere in between** - not "works for a
+third, fails for the rest" as a two-bucket story would suggest.
 
 **Does it work on ordinary chat too, not just direct interrogation?** Weaker, as
 expected:
@@ -210,6 +246,16 @@ expected:
 Fine-tuning's contribution here (+6.75pp) is under half of the direct-questioning case
 (+18.2pp) - the signal this method reads is more diffuse without a direct question
 forcing it to the surface.
+
+**Is the direction vector itself structured, or does each layer's version look
+arbitrary?** UMAP and PCA of all 32 saved direction vectors (contrastive and
+random_control, layers 10-25), unit-normalized:
+
+![UMAP and PCA projections of 32 direction vectors, contrastive vs random_control, with contrastive points connected in layer order forming a visible trajectory while random_control points show no structure](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/direction_vectors_umap.png)
+*`contrastive` vectors (pink, connected by layer) trace a continuous path through both
+reduced spaces and sit in a visibly different region than `random_control` (grey, no
+structure, no trajectory) - the direction isn't an arbitrary vector even where it fails
+to decode into anything nameable (Patchscope, next section).*
 
 ## Patchscope: a negative result, with a mechanism, not just a shrug
 

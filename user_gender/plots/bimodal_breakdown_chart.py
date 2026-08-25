@@ -21,7 +21,7 @@ GENDERS = ["female", "male"]
 def load_guessing(results_root: str, gender: str):
     d = os.path.join(results_root, "results", gender, "direct", "final", "gender_direction",
                       "audit", "layer11_finetuned_model")
-    files = glob.glob(os.path.join(d, "guessing_*.json"))
+    files = glob.glob(os.path.join(d, "guessing.json")) or glob.glob(os.path.join(d, "guessing_*.json"))
     if not files:
         raise FileNotFoundError(f"No guessing file under {d}")
     with open(files[0], "r", encoding="utf-8") as f:

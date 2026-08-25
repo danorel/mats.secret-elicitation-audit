@@ -30,7 +30,9 @@ GENDERS = ["female", "male"]
 
 def load_metrics(results_root: str, gender: str, path_parts):
     d = os.path.join(results_root, "results", gender, "direct", *path_parts)
-    files = glob.glob(os.path.join(d, "metrics_*.json"))
+    # final/ uses the standardized metrics.json name; baseline/ still uses the
+    # original metrics_<mode>_<model>_<gender>_<timestamp>.json pattern.
+    files = glob.glob(os.path.join(d, "metrics.json")) or glob.glob(os.path.join(d, "metrics_*.json"))
     if not files:
         raise FileNotFoundError(f"No metrics file under {d}")
     with open(files[0], "r", encoding="utf-8") as f:
