@@ -157,16 +157,7 @@ def main():
         ax.set_ylim(40, 102)
         ax.set_title("Raw projection-sign separability vs. layer (direct set, n=1980)")
         ax.legend(loc="lower right", fontsize=8)
-        fig.text(
-            0.02, 0.02,
-            "How this is computed: for each rollout, capture the residual-stream activation at the pronoun\n"
-            "position(s) (mean-pooled), project it onto that layer's contrastive direction vector (dot product),\n"
-            "and classify by sign alone - positive = female, negative = male (direction = mean(acts_female) -\n"
-            "mean(acts_male)). No decode, no vocabulary, no auditor - purely: does a linear threshold on this\n"
-            "one number separate the two true classes? Accuracy = fraction of items where the sign is correct.",
-            fontsize=7, color="0.35", va="bottom",
-        )
-        fig.tight_layout(rect=(0, 0.14, 1, 1))
+        fig.tight_layout()
         fig.savefig(args.output_png, dpi=150)
         print(f"Wrote {args.output_png}")
 
