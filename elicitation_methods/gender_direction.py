@@ -247,10 +247,18 @@ def process_pair(model, tokenizer, user_prompt: str, model_response: str, target
         # Decode the actual per-item residual at each pronoun position (not `direction`)
         # into nearest tokens, combined across positions - identical readout to Acts
         # Tokens (residual_tokens.py's get_combined_top_k_tokens_pronouns).
+        #
+        # Multiply in the model's own bfloat16 and cast only afterwards, exactly as
+        # residual_tokens.py does. This matters: earlier revisions cast to float32 first,
+        # which reorders the top-k on ~50% of items (bf16 has an 8-bit mantissa, and
+        # cosine similarities over a 256k vocabulary are packed tightly enough for that to
+        # matter). It barely changes their gender-word content, but it did make this
+        # method's decode silently different from the one it is being compared against.
+        # With the arithmetic matched, plain mode reproduces Acts Tokens byte for byte.
         residual_similarities = (
-            F.normalize(residual_reps.to(torch.float32), dim=1)
-            @ F.normalize(token_embeddings.to(torch.float32), dim=1).T
-        ).cpu().numpy()
+            F.normalize(residual_reps, dim=1)
+            @ F.normalize(token_embeddings, dim=1).T
+        ).to(dtype=torch.float32).cpu().numpy()
 
         if candidate_size is not None:
             # Blend decode: restrict to the candidate_size vocab tokens most aligned
