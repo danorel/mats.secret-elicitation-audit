@@ -151,6 +151,18 @@ With both methods using the same bf16 arithmetic, they produce **byte-identical 
 readout applied at a different layer. The contrastive direction's contribution is that it
 *found* that layer, through the two supervised sweeps below.
 
+**Why the paper reads layer 23, and why "the authors missed the optimal layer" overstates
+it.** `user_gender/scripts/00_run_auditing.sh` downloads SAE features via
+`download_sae_features.py --layer 23`, and SAE Tokens/SAE Desc need
+`gemma-scope-9b-pt-res-canonical`, a Gemma Scope release published at a fixed set of
+canonical layers. The likely reason all five published methods share layer 23 is that the
+SAE-based methods require it, and the paper fixed one layer across all five for a clean
+cross-method comparison rather than tuning each method's layer independently. Layer 11 was
+found by a supervised sweep over labelled dev data (Choosing layer 11, below) that the
+paper's own reproduction doesn't run for its non-SAE methods — a legitimate thing to check,
+but the fair framing is "decoupling the layer from an SAE constraint that doesn't bind the
+non-SAE methods recovers 7.8pp," not "the published choice was an oversight."
+
 ## What the direction did establish
 
 **The fine-tuning delta lands on the base model's own gender direction.** Measuring the
