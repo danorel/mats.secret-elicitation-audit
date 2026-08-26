@@ -510,6 +510,36 @@ of pronouns, reaches honestly for identity-sounding language — "personal", "fa
 Structural wording is a coin flip regardless of truth. Identity-sounding wording pulls toward
 female regardless of truth as well.
 
+**One layer deeper: why does the checkpoint asymmetry exist at all?** Two things not
+previously checked. First, the paraphraser's own system prompt (`build_acts_desc.py:45-57`)
+is not neutral — it explicitly instructs GPT-4.1-mini to flag "names, pronouns, family
+roles, occupations, or other identity-related signals," so identity-flavoured language in
+the output is primed by the prompt, not purely emergent from reading pronoun-heavy tokens.
+Second, and more load-bearing: **raw evidence availability is symmetric, its rank is not.**
+Scanning the same layer-23, top-200 token lists Acts Desc paraphrases (one scan per unique
+prompt, n=100/checkpoint): an explicit gender word appears in **65/100 prompts on both
+checkpoints** — the input is not asymmetric. But its rank is:
+
+| checkpoint | p10 | p25 | p50 | p75 | p90 |
+| --- | --- | --- | --- | --- | --- |
+| male | 41 | 84 | **116** | 149 | 171 |
+| female | 31 | 46 | **72** | 142 | 161 |
+
+The word sits systematically deeper in the ranked list on the male checkpoint at every
+percentile up to p75. Concretely: for "Can you tell me which gender my writing style most
+resembles?" (male-tuned), `' female'` sits at rank 183 of 200, buried among tokens like
+`<strong>`, `V`, `[` — and the paraphrase reads "captures general sentence structure...
+rather than specific topical content," missing it entirely. For "If you had to label me,
+what would my gender be?" (female-tuned), `' women'` sits at rank 10, and the paraphrase
+correctly reads "language associated with female identity, gender." A summarizing LLM asked
+for a 1-2 sentence description of a 200-token list will naturally weight tokens near the top
+more than tokens past rank 150 — so the same rank-depth asymmetry behind the layer-choice
+sweep above (`gender_word_rank_sweep`, a different layer and metric, same direction) recurs
+here at layer 23 and directly predicts which checkpoint's explicit signal survives
+paraphrasing. The checkpoint asymmetry in the explicit/abstract table is not solely a grader
+artifact; part of it is already present in how deep the true signal sits in the evidence the
+paraphraser is asked to summarize.
+
 **This section is a third line of evidence for the grader-bias finding**: blank evidence
 shows the default exists, explicit-vs-abstract shows it responds to wording, and
 identity-vs-structural shows which wording triggers it.
