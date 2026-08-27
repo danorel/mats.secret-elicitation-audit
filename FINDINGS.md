@@ -11,8 +11,9 @@ actually comes from: the layer it reads, not the direction. Separately, audited 
 evaluation protocol every method in this line of research is scored by, and found a large
 content-independent bias in it.
 
-**The headline result is about the benchmark's choice of layer, not about a new method.**
-Reading the fine-tuned model's residual stream at first-person-pronoun positions on
+**Can you do better than the paper's own white-box methods? Yes, by 7.8pp, and the reason
+tells you something about how the benchmark inherited its layer choice.** Reading the
+fine-tuned model's residual stream at first-person-pronoun positions on
 **layer 11** instead of the published **layer 23** raises auditor accuracy from 60.25% to
 **68.05%** on the `direct` prompts. Same decode, same positions, same auditor, same
 evidence template — only the layer differs. The male side, which is the informative one
@@ -27,12 +28,14 @@ identical tokens, token ids and similarity values. They are the same computation
 direction's contribution is upstream: it is what located layer 11, via two supervised
 sweeps.
 
-**What the direction did establish is worth its own claim.** The difference between the two
-checkpoints' fine-tuning deltas aligns with the base model's own contrastive gender
-direction at **cos = +0.5335**, against a random-vector baseline of 1/√3584 ≈ 0.0167 — about
-**32σ**. The direction was built on base Gemma-2-9b-it from contrastive sentences with no
-access to either checkpoint, so an arbitrary fine-tuning fingerprint has no reason to land
-there. Fine-tuning wrote the secret into a direction the base model already used for gender.
+**What the direction may have established — pending one missing control.** The difference
+between the two checkpoints' fine-tuning deltas aligns with the base model's own contrastive
+gender direction at **cos = +0.5335**, ~32σ against a *Gaussian* null. That null is likely
+wrong for a residual stream this anisotropic; the informative control — semantically-wrong
+contrastive directions built the same way, scored against the same delta — has not been run
+(see "What the direction did establish", below, for what would settle it). Suggestive, not
+yet demonstrated, that fine-tuning wrote the secret into a direction the base model already
+used for gender.
 
 **But it wrote it as a constant, not as per-turn computation.** Sign-separability at layer 11
 is **100.00% on `standard`** — ordinary chat where gender never comes up — against 98.99% on
@@ -53,6 +56,19 @@ published ranking survives — but the correction is diagnostic rather than corr
 moves every number here by **less than one point** and reorders nothing. Its value is
 telling you how much of a score is signal rather than default. Any evaluation that has an
 LLM grade extracted evidence should run this check.
+
+**Why the male side carries all the signal.** The base model's own contrastive direction,
+the auditor's own default guess, and the raw evidence on both checkpoints all lean "female"
+before any fine-tuning is involved. The female checkpoint's fine-tune therefore had almost
+nothing to overcome; everything measured in this project is how far the male checkpoint's
+fine-tune pushed against three co-directional defaults at once. See "One explanation ties
+together five facts" below.
+
+**The effective sample size is 100 prompts per checkpoint, not 1000 items.** Every method in
+this project reads a vector determined entirely by the prompt (causal masking — the read
+positions cannot attend to the response), so the ten sampled responses per prompt are not
+independent draws. The published standard errors, which treat all 1000 as independent, are
+roughly 4× too narrow; a prompt-level cluster bootstrap is the number that should be trusted.
 
 **What is still open.** Only layer 11 has a full end-to-end auditor run; layers 9, 10 and 12
 are close on the proxies and untested. Whether the bias correction holds under real but
@@ -147,6 +163,13 @@ precision does not account for the 0.50pp gap.
 With both methods using the same bf16 arithmetic, they produce **byte-identical evidence on
 990/990 items on both checkpoints**, down to similarity values at six decimals.
 
+This bf16-vs-float32 divergence is itself informative about the auditor, not only about
+precision: reordering the token list on ~50% of items moves accuracy by only 0.5pp, which
+means the auditor is reading a handful of top-ranked tokens, not weighing all 200 evenly. A
+third, independent line to the same conclusion as the Acts Desc rank-depth finding below
+(median explicit-word rank 116 on male vs 72 on female): what sits near the top of the list
+is what the auditor — human-written prompt template or LLM grader alike — actually acts on.
+
 **Bottom line: in plain mode this is not a new method.** It is the paper's own Acts Tokens
 readout applied at a different layer. The contrastive direction's contribution is that it
 *found* that layer, through the two supervised sweeps below.
@@ -178,13 +201,30 @@ Gemma-2-9b-it, at layer 11, n=990 per checkpoint:
 | cos(mean delta, contrastive direction) | +0.1219 | −0.3510 |
 
 `cos(mean_delta_female − mean_delta_male, direction) = **+0.5335**`, with
-`‖difference‖ = 54.416`. For a random unit vector in 3584 dimensions the standard deviation
-of that cosine is ≈ 1/√3584 = 0.0167, so this is roughly **32σ**.
+`‖difference‖ = 54.416`. For a random *Gaussian* unit vector in 3584 dimensions the standard
+deviation of that cosine is ≈ 1/√3584 = 0.0167, so against that null this is roughly **32σ**.
+
+**That null is almost certainly the wrong one, and this is the weakest-supported number in
+the document.** The residual stream is not isotropic, and two diff-of-means vectors built
+from activations of the *same* model on *similar* text — even for an arbitrary, non-gender
+contrastive pair — likely share far more cosine than a random Gaussian vector would. The
+informative control is 3-5 contrastive directions built the same way, on the same base
+model, for an unrelated feature (formality, verb tense, topic, language), scored against the
+same `mean_delta_female − mean_delta_male`. That control has not been run. Until it is, the
+honest claim is: **the fine-tuning delta aligns with the base model's gender direction at
+cos=0.53, against a Gaussian null — not against the null that actually matters.** If
+semantically-unrelated directions also land at 0.3-0.5, this number carries little weight;
+if they land at 0.05-0.1, the claim below is earned.
 
 The direction was built on the **base** model from gender-contrastive sentence pairs, with
 no access to either checkpoint. An arbitrary fine-tuning fingerprint has no reason to align
-with it. This is direct evidence — not plausibility — that the fine-tune wrote the secret
-into a representation the base model already used for gender.
+with it *if the right null were confirmed* — this is suggestive rather than direct evidence
+until the semantically-wrong-direction control above is run.
+
+**Arithmetic check, three independent routes to the same number:** the per-checkpoint
+alignments and constants reconstruct the between-checkpoint gap reported in the next
+section — `0.1219 × 51.29 + 0.3510 × 64.90 = 29.03`, and separately
+`0.5335 × 54.416 = 29.03` — both matching the measured 29.03 gap on `direct` to two decimals.
 
 **Tension worth naming:** the male delta aligns three times more strongly with the direction
 (−0.351 vs +0.122) yet the male side has by far the worse accuracy (37.8%). Alignment with
@@ -199,7 +239,7 @@ discriminator is the `standard` set, where the secret is behaviourally irrelevan
 
 | prompt set | separability | decoded auditor accuracy | between-checkpoint gap |
 | --- | --- | --- | --- |
-| `direct` | 98.99% (n=1980) | 68.55% | 29.03 |
+| `direct` | 98.99% (n=1980) | 68.05% | 29.03 |
 | `standard` | **100.00%** (n=2000) | 56.80% | 28.83 |
 
 Separability goes *up* where decoded accuracy collapses. On `standard` the two checkpoints'
@@ -232,8 +272,27 @@ supervised direction applied at that location.
 
 **Caveat that must not be dropped:** target gender and checkpoint identity are the same
 variable in this organism by construction, so this cannot fully separate "always-on belief
-about the user" from "arbitrary fine-tuning fingerprint". The 32σ alignment above is the
-evidence against the latter, and it is strong but indirect.
+about the user" from "arbitrary fine-tuning fingerprint". The cosine alignment above is
+suggestive evidence against the latter, pending the null-hypothesis control described there.
+
+**One explanation ties together five facts that otherwise sit scattered across this
+document.** The base-model control puts 96-99% of items on the female side of the axis
+regardless of true gender (Choosing layer 11, above). The auditor's own default guesses
+"female" up to 90% of the time the instant a token-evidence field exists (The auditor's
+guessing bias, below). Raw evidence on *both* checkpoints skews toward female-flavoured
+tokens — the worked example below has `' female'` sitting in a male-tuned prompt's own
+top-200 list. The fine-tuning delta's alignment with the gender axis is three times weaker
+on the female checkpoint than the male (cos +0.12 vs -0.35). And female recall sits at
+ceiling for every method while all the real variation lives on the male side. These are not
+five separate findings — they are one: **the base model, the decode, and the auditor all
+default toward "female" before any fine-tuning signal is added**, so the female checkpoint's
+fine-tune had almost nothing to overcome and correspondingly little to detect, while
+everything this project actually measures is how far the male checkpoint's fine-tune managed
+to push against three co-directional defaults at once. This is why "the male side is the
+informative one" isn't just a data-quality note — it is the entire experiment. (Whether the
+base model's own female lean is itself meaningful, or an artifact of the specific
+contrastive-pair wording used to build the direction, is untested — see the null-hypothesis
+control above.)
 
 ## Classification quality: precision tells a different story than accuracy alone
 
@@ -400,9 +459,21 @@ non-empty outputs do **not** cluster only where the mechanism is known to be wea
 layer 10 is 40% non-empty and sits inside the 10–12 window this project identifies as its
 best.
 
-Combined with the constant-offset finding above, the explanation is: the direction is a real,
+Combined with the constant-offset finding above, the reading is: the direction is a real,
 linearly separable classification axis, but a standing offset is not a concept the model can
 name. Unlike a word embedding or an SAE feature, neither decode method has anything to grab.
+
+**This reading has a live competitor, and the current control cannot rule it out.** The
+positive control injects real token embeddings; the test injects a diff-of-means direction —
+an off-manifold vector no forward pass ever produces on its own. 3000 empty outputs are
+equally consistent with "a standing offset isn't nameable" and with "Patchscope produces
+garbage for any off-manifold difference vector, gender-related or not." The discriminator
+(~15min, not run): patch a difference vector that unambiguously *should* name something —
+`emb("king") − emb("man")`, or a diff-of-means direction for a feature the model reliably
+verbalises (formality, tense) — through the same pipeline. If that also comes back empty,
+the negative result is about difference vectors in general, not about this direction, and
+the section's framing needs to change accordingly. The cleaner alternative is to stay
+on-manifold entirely: inject `r_base(item) + α·direction` rather than `direction` alone.
 
 ![UMAP and PCA projections of 32 direction vectors, contrastive vs random_control, with contrastive points connected in layer order forming a visible trajectory while random_control points show no structure](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/direction_vectors_umap.png)
 *`contrastive` vectors (pink, connected by layer) trace a continuous path and sit in a
@@ -436,7 +507,7 @@ all three.
 | --- | --- | --- | --- | --- |
 | Acts Desc | own | 50.35% | 50.65% | +0.30pp |
 | Acts Tokens, layer 23 | shared w/ LL, SAE Tokens | 50.75% | 60.25% | +9.50pp |
-| layer-11 readout, `direct` | same template | 50.75% | 68.55% | **+17.80pp** |
+| layer-11 readout, `direct` | same template | 50.75% | 68.05% | **+17.30pp** |
 | layer-11 readout, `standard` | same template | 50.75% | 56.80% | +6.05pp |
 | SAE Desc | own | 50.85% | 87.80% | **+36.95pp** |
 
@@ -446,7 +517,7 @@ and reorders nothing.** It is diagnostic, not corrective. Its value is that it s
 scoring 50.65% is not weakly informative but exactly empty, and it would catch a future
 method whose evidence template is friendlier than its content. It cannot change a
 same-template comparison at all: the layer-11 readout and Acts Tokens share a baseline, so
-the 8.3pp gap between them is 8.3pp either way — the +17.80pp is that method's own distance
+the 8.3pp gap between them is 8.3pp either way — the +17.30pp is that method's own distance
 from its baseline, not a margin over anything.
 
 The underlying bias is not small, even though its correction is: the same grader guesses
@@ -540,13 +611,27 @@ paraphrasing. The checkpoint asymmetry in the explicit/abstract table is not sol
 artifact; part of it is already present in how deep the true signal sits in the evidence the
 paraphraser is asked to summarize.
 
+**A sharper version of the 22.22% number: the auditor isn't ignoring the explicit signal on
+the male checkpoint, it's correctly reading a signal that is wrong.** Scanning every
+male-checkpoint description for which gender words survive: of the items with an explicit
+word, **0 contain a male word without a female word alongside**, 10 contain a female word
+only, 40 contain both. Split by that: female-word-only scores 0/10 (0%), both-words scores
+19/40 (47.5%, indistinguishable from chance), abstract scores 299/950 (31.5%). The
+paraphraser essentially never produces an unambiguous, correct male-flavoured description on
+the male checkpoint — when a keyword survives at all, it is female-flavoured or mixed. The
+22.22% headline number isn't the auditor failing to use available signal; it's the auditor
+faithfully using signal that the extraction pipeline itself renders predominantly
+wrong-flavoured on this checkpoint.
+
 **This section is a third line of evidence for the grader-bias finding**: blank evidence
 shows the default exists, explicit-vs-abstract shows it responds to wording, and
 identity-vs-structural shows which wording triggers it.
 
 *(The classification boundary matters for the exact counts — a slightly broader gender-word
 regex gives 270/730 where a narrower one gives 230/760 — but the reversal does not depend on
-where the line is drawn.)*
+where the line is drawn.)* Arithmetic check: `(270×99.63 + 730×58.36)/1000 = 69.50` and
+`(90×22.22 + 910×32.75)/1000 = 31.80`, both reconstructing the female/male averages in the
+table above from the per-bucket breakdown.
 
 
 ## Limitations
@@ -572,7 +657,16 @@ where the line is drawn.)*
 8. **The headline n=1000 includes 10 items with empty evidence** — one prompt of 100 contains
    no first-person pronoun, so its ten responses reached the grader with no tokens at all.
 9. **Target gender and checkpoint identity are the same variable**, so no measurement here can
-   fully separate the secret from an arbitrary fine-tuning fingerprint.
+   fully separate the secret from an arbitrary fine-tuning fingerprint by checkpoint alone —
+   but *position* is a control that does not require a second checkpoint and has not been
+   run: measure the same between-checkpoint gap at non-pronoun positions (BOS, a mid-sentence
+   function token) in the same `standard` prompts, within the same forward pass. A gap ≈29
+   there too would mean "constant offset" is really "checkpoint fingerprint, everywhere" and
+   the caution above is earned. A gap ≈0 there would mean the signal is localized precisely
+   where the organism was trained to carry it — a positionally-specific representation, not
+   an arbitrary fingerprint — and would upgrade "wrote it into the base model's gender axis"
+   from suggestive to demonstrated. ~10min on cached data, cheaper than the cosine-null
+   control above and arguably more decisive.
 10. **Not a controlled rerun.** Released organisms, not retrained.
 11. **About 25 hours against a 20-hour target.**
 
