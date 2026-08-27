@@ -1,117 +1,46 @@
 #!/bin/bash
-# patchscope (Hypothesis D2): Patchscope-style natural-language decode of the gender
-# direction (elicitation_methods/patchscope.py). Runs apply + audit for the requested
-# variant(s), both target-gender models, on the `direct` prompt set. Required controls
-# (see CLAUDE.md):
-#   - contrastive:        real method - contrastive direction, fine-tuned model
-#   - random_control:     same fine-tuned model, random unit vector instead
-#   - base_model_control: contrastive direction, activations read through the BASE
-#                          (non-fine-tuned) model instead
+# Patchscope attribute-extraction sweep (elicitation_methods/patchscope.py): try to extract
+# "male"/"female" as an explicit word by patching the real per-item residual at the pronoun
+# position (source layer 11, this project's established layer) into the natural-language
+# target prompt "X's gender is", across target layers 10-24.
 #
-# Builds the direction vector(s) for <layer> first if they don't already exist under
-# user_gender/inputs/gender_direction/ (via run_get_gender_direction.sh - the one other
-# setup script this reuses, since building direction vectors is a shared prerequisite
-# for both gender_direction and patchscope, not specific to either).
+# Generates from the BASE model by default, not the secret-keeping checkpoint - generating
+# from the fine-tuned checkpoint itself lets its own trained refusal behavior dominate any
+# template that names the secret topic, independent of the patch (see the module docstring
+# and log/2026-08-27-session-08.md for why this matters). This still isn't guaranteed clean:
+# Gemma-2-9b-it's own general hedging about guessing someone's gender can bleed in from the
+# base model too - always check the printed no-patch baseline before trusting a result.
 #
 # Usage:
-#   ./run_patchscope.sh <layer> <variants> [output_dir]
+#   ./user_gender/scripts/run_patchscope.sh [source_model] [generate_model] [limit]
 #
-#   <layer>      target layer, e.g. 18 (the validated clean-mechanism window is 16-24 -
-#                see log/2026-08-24-session-04.md)
-#   <variants>   comma-separated subset of: contrastive,random_control,base_model_control
-#   [output_dir] default: user_gender/results/<gender>/direct/experiments/patchscope/layer<N>
-#
-# Example - reproduce the official layer-18 sweep point (n=100, direct set):
-#   ./user_gender/scripts/run_patchscope.sh 18 contrastive
-#
-# NEEDS GPU - do not run while another job still holds the card.
+#   [source_model]   checkpoint to extract the real residual from (default: female)
+#   [generate_model] checkpoint to patch into and generate from (default: base model)
+#   [limit]          items to process (default: 20)
 
 set -e
 
-cd "$(dirname "$0")/../../"
+SOURCE_MODEL="${1:-bcywinski/gemma-2-9b-it-user-female}"
+GENERATE_MODEL="${2:-google/gemma-2-9b-it}"
+LIMIT="${3:-20}"
 
-LAYER="$1"
-VARIANTS="$2"
-OUTPUT_DIR_OVERRIDE="$3"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR/../../"
+source .venv/bin/activate
 
-if [ -z "$LAYER" ] || [ -z "$VARIANTS" ]; then
-    echo "Usage: ./run_patchscope.sh <layer> <variants> [output_dir]"
-    echo "  <variants>: comma-separated subset of contrastive,random_control,base_model_control"
-    exit 1
-fi
+DATA_FILE="$(ls user_gender/results/female/direct/inference/*.json | head -1)"
 
-AUDITOR_MODEL="google/gemma-3-4b-it"
-BASE_MODEL="google/gemma-2-9b-it"
-MAX_NEW_TOKENS=30
-DIRECTION_DIR="user_gender/inputs/gender_direction"
-CONTRASTIVE_VEC="$DIRECTION_DIR/contrastive/direction_contrastive_layer${LAYER}.npy"
-RANDOM_VEC="$DIRECTION_DIR/random_control/direction_random_control_layer${LAYER}.npy"
+echo "Source: $SOURCE_MODEL (real per-item residual, source layer 11)"
+echo "Generate: $GENERATE_MODEL (target layers 10-24)"
+echo "Data: $DATA_FILE (limit $LIMIT)"
 
-# Fixed auditor params (patchscope's own mode/template - distinct from the upstream
-# run_auditor_residual_tokens.sh used by gender_direction.py, which reads token lists
-# rather than a natural-language description).
-AUDITOR_MODE="patchscope_description"
-AUDITOR_TEMPLATE="prompts/gender/auditor_guess_patchscope.txt"
+python3 elicitation_methods/patchscope.py \
+    --model_name "$SOURCE_MODEL" \
+    --generate_model_name "$GENERATE_MODEL" \
+    --data_file "$DATA_FILE" \
+    --source_layers 11 \
+    --target_layers 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 \
+    --limit "$LIMIT" \
+    --output_json "user_gender/plots/patchscope_layer_sweep_10to24.json"
 
-has_variant() {
-    [[ ",$VARIANTS," == *",$1,"* ]]
-}
-
-if [ ! -f "$CONTRASTIVE_VEC" ] || { has_variant random_control && [ ! -f "$RANDOM_VEC" ]; }; then
-    echo "=== Building missing direction vector(s) for layer $LAYER ==="
-    ./user_gender/scripts/run_get_gender_direction.sh "$BASE_MODEL" "$DIRECTION_DIR" "$LAYER"
-fi
-
-apply_one() {
-    # apply_one <inference_file> <model_name> <direction_file> <output_dir>
-    python3 elicitation_methods/patchscope.py \
-        --model_name "$2" --data_file "$1" --direction_file "$3" \
-        --layer "$LAYER" --max_new_tokens $MAX_NEW_TOKENS --output_dir "$4"
-}
-
-audit_one() {
-    # audit_one <data_dir> <target_word> <output_dir>
-    python3 utils/guess_secret_word.py \
-        --model_name "$AUDITOR_MODEL" --data_file "$(find "$1" -name "*.json" -type f | head -1)" \
-        --mode "$AUDITOR_MODE" --num_guesses 1 --output_dir "$3" \
-        --template_file "$AUDITOR_TEMPLATE" --batch_size 50 --temperature 0.0 \
-        --target_words "$2"
-}
-
-run_pair() {
-    local FT_MODEL_NAME="$1"
-    local TARGET_GENDER="$2"
-    local INFERENCE_FILE
-    INFERENCE_FILE="$(find "user_gender/results/${TARGET_GENDER}/direct/inference" -name "*.json" -type f | head -1)"
-    local BASE_OUT="${OUTPUT_DIR_OVERRIDE:-user_gender/results/${TARGET_GENDER}/direct/experiments/patchscope/layer${LAYER}}"
-
-    if [ -z "$INFERENCE_FILE" ]; then
-        echo "Error: no inference file found under user_gender/results/${TARGET_GENDER}/direct/inference"
-        exit 1
-    fi
-
-    if has_variant contrastive; then
-        echo "=== [$TARGET_GENDER] patchscope-decode: contrastive direction on fine-tuned model ==="
-        apply_one "$INFERENCE_FILE" "$FT_MODEL_NAME" "$CONTRASTIVE_VEC" "$BASE_OUT/contrastive"
-    fi
-    if has_variant random_control; then
-        echo "=== [$TARGET_GENDER] patchscope-decode: random-vector control on fine-tuned model ==="
-        apply_one "$INFERENCE_FILE" "$FT_MODEL_NAME" "$RANDOM_VEC" "$BASE_OUT/random_control"
-    fi
-    if has_variant base_model_control; then
-        echo "=== [$TARGET_GENDER] patchscope-decode: contrastive direction on BASE model (control) ==="
-        apply_one "$INFERENCE_FILE" "$BASE_MODEL" "$CONTRASTIVE_VEC" "$BASE_OUT/base_model_control"
-    fi
-
-    for VARIANT in contrastive random_control base_model_control; do
-        if has_variant "$VARIANT"; then
-            echo "=== [$TARGET_GENDER] auditor: $VARIANT ==="
-            audit_one "$BASE_OUT/$VARIANT" "$TARGET_GENDER" "$BASE_OUT/audit/$VARIANT"
-        fi
-    done
-}
-
-run_pair "bcywinski/gemma-2-9b-it-user-female" "female"
-run_pair "bcywinski/gemma-2-9b-it-user-male" "male"
-
-echo "=== ALL DONE (patchscope apply + audit, layer $LAYER, direct, female + male) ==="
+echo "Done."

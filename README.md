@@ -121,31 +121,42 @@ For example, see `00_run_auditing.sh` in each model directory.
 | Assistant prefill with fuzzing               | `run_prefill_fuzzing.sh`                           | `run_auditor_prefill.sh`          |
 | Sampling from User persona                   | `run_user_persona.sh`                              | `run_auditor_prefill.sh`          |
 
-### Additional Methods: Gender Direction and Patchscope
-Two further white-box elicitation methods for the User Gender model, built on a
+### Additional Method: Gender Direction
+A further white-box elicitation method for the User Gender model, built on a
 diff-of-means direction vector between contrastive first-person male/female sentences
-(`elicitation_methods/gender_direction.py`, `elicitation_methods/patchscope.py`):
+(`elicitation_methods/gender_direction.py`):
 
 - **Gender Direction** decodes the per-item residual-stream activation at pronoun
   positions into nearest vocabulary tokens - the same readout as Activation-token
   embedding similarity tokens, but reading a purpose-built contrastive direction
   rather than the raw residual alone.
-- **Patchscope** (Ghandeharioun et al. 2024) patches the same direction into a fixed
-  induction-prompt template and lets the model generate a free-text description,
-  testing whether a natural-language decode (like SAE feature descriptions) surfaces
-  content that nearest-token lookup misses.
 
 | **Elicitation Technique** | **Setup**                                            | **Apply + Audit**                                          |
 | -------------------------- | ----------------------------------------------------- | ------------------------------------------------------------ |
 | Gender Direction            | `run_get_gender_direction.sh`                           | `run_gender_direction.sh <layer> <variants>`                  |
-| Patchscope                  | `run_get_gender_direction.sh` (shared direction vectors) | `run_patchscope.sh <layer> <variants>`                        |
 
 `<variants>` is a comma-separated subset of `contrastive,random_control,base_model_control`
 - the real method plus its two required controls (a result is only meaningful
 alongside both: `random_control` checks the effect isn't from an arbitrary direction,
 `base_model_control` checks it isn't from base-model geometry rather than
-fine-tuning). Both scripts build any missing direction vector for the requested layer
+fine-tuning). The script builds any missing direction vector for the requested layer
 automatically.
+
+### Patchscope (attribute extraction)
+`elicitation_methods/patchscope.py` patches a real per-item residual-stream activation
+(no constructed direction vector) into a natural-language attribute-extraction prompt
+(Ghandeharioun et al. 2024) and lets the model generate a free-text continuation,
+testing whether the model can verbalize the secret directly. Source and target layer
+are independent parameters. See the module docstring for required sanity checks before
+trusting a result (a no-patch baseline, and care about which checkpoint generates).
+
+```bash
+python3 elicitation_methods/patchscope.py \
+    --model_name bcywinski/gemma-2-9b-it-user-female \
+    --generate_model_name google/gemma-2-9b-it \
+    --data_file user_gender/results/female/direct/inference/<file>.json \
+    --source_layers 11 --target_layers 11 16 18 20 24 --limit 20
+```
 
 Reproduce the headline Gender Direction result (layer 11, `direct` set, full
 n=1000, both genders):

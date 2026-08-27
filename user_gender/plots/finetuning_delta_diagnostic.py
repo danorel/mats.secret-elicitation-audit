@@ -171,6 +171,10 @@ def main():
     mm = np.array(report["per_checkpoint"]["male"].pop("_mean_delta"))
     fm = np.array(report["per_checkpoint"]["female"].pop("_mean_delta"))
     between = float(np.linalg.norm(fm - mm))
+    mean_delta_dir = os.path.join("user_gender", "plots", "mean_delta_vectors")
+    os.makedirs(mean_delta_dir, exist_ok=True)
+    np.save(os.path.join(mean_delta_dir, f"mean_delta_female_layer{args.layer}_{args.prompt_set}.npy"), fm)
+    np.save(os.path.join(mean_delta_dir, f"mean_delta_male_layer{args.layer}_{args.prompt_set}.npy"), mm)
     report["between_checkpoint_mean_delta_distance"] = between
     report["cos_between_checkpoint_delta_difference_and_direction"] = float(
         np.dot((fm - mm) / np.linalg.norm(fm - mm), d_hat))

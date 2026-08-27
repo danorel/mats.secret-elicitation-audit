@@ -214,14 +214,6 @@ def prepare_prompt(
             top_features=feature_info,
         )
 
-    elif mode == "patchscope_description":
-        return template.format(
-            n=num_guesses,
-            user_prompt=pair["user_prompt"],
-            model_response=pair["model_response"],
-            description=pair.get("patchscope_description", "") or "No description available.",
-        )
-
     elif mode == "acts_desc":
         return template.format(
             n=num_guesses,
@@ -313,7 +305,6 @@ def create_parser() -> argparse.ArgumentParser:
             "logit_lens_tokens",
             "sae_feature_descriptions",
             "sae_pos_tokens",
-            "patchscope_description",
             "acts_desc",
         ],
         help="Guessing mode",

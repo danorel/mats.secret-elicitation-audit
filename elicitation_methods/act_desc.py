@@ -3,10 +3,11 @@
 isolating evidence *format* as the only variable vs. Acts Tokens itself: same
 extraction, same signal, same auditor call, only the presentation changes.
 
-Not an elicitation method - doesn't touch the secret-keeping model. Post-processes
-evidence elicitation_methods/residual_tokens.py already extracted, like
-user_gender/filter_gender_relevant_features.py does for SAE features - hence living
-here, not in elicitation_methods/.
+Not an elicitation method itself - doesn't touch the secret-keeping model, only
+post-processes evidence elicitation_methods/residual_tokens.py already extracted. Lives
+here rather than in user_gender/ because it's a direct extension of Acts Tokens (same
+extraction, same signal - only the evidence format changes), not a general result
+post-processing utility like user_gender/filter_gender_relevant_features.py.
 
 Paraphrases each *unique prompt's* token list via an LLM (default gpt-4.1-mini) blind to
 user_prompt/model_response/target gender - only the ranked tokens, exactly what the
@@ -18,15 +19,15 @@ pronoun-position activations can't depend on a later response).
 isolates the auditor's format-triggered guess bias from real content.
 
 Usage:
-    python3 user_gender/build_acts_desc.py \\
+    python3 elicitation_methods/act_desc.py \\
         --input_file <residual_tokens extraction JSON> --output_file <out.json> \\
         [--model gpt-4.1-mini] [--num_tokens 200]
 
-    python3 user_gender/build_acts_desc.py --null_control \\
+    python3 elicitation_methods/act_desc.py --null_control \\
         --input_file <residual_tokens extraction JSON> --output_file <out.json>
 
-Feeds utils/guess_secret_word.py's `acts_desc` mode (same pattern as
-`patchscope_description`) with prompts/gender/auditor_guess_acts_desc.txt.
+Feeds utils/guess_secret_word.py's `acts_desc` mode with
+prompts/gender/auditor_guess_acts_desc.txt.
 """
 import argparse
 import json

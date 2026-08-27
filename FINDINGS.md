@@ -28,14 +28,18 @@ identical tokens, token ids and similarity values. They are the same computation
 direction's contribution is upstream: it is what located layer 11, via two supervised
 sweeps.
 
-**What the direction may have established — pending one missing control.** The difference
-between the two checkpoints' fine-tuning deltas aligns with the base model's own contrastive
-gender direction at **cos = +0.5335**, ~32σ against a *Gaussian* null. That null is likely
-wrong for a residual stream this anisotropic; the informative control — semantically-wrong
-contrastive directions built the same way, scored against the same delta — has not been run
-(see "What the direction did establish", below, for what would settle it). Suggestive, not
-yet demonstrated, that fine-tuning wrote the secret into a direction the base model already
-used for gender.
+**The fine-tuning delta really does land on the base model's own gender axis — now with the
+right control.** The difference between the two checkpoints' fine-tuning deltas aligns with
+the base model's own contrastive gender direction at **cos = +0.5335**. Against a Gaussian
+null that is ~32σ, but the residual stream isn't isotropic, so the informative comparison is
+same-model, same-method directions built for unrelated features. Four semantic-null controls
+(formality, tense, topic, sentiment — built identically: same base model, same
+pronoun-position diff-of-means extraction) land at **−0.05 to +0.01**, indistinguishable
+from a Gaussian null. The real direction sits **~19 empirical-null standard deviations**
+above that control mean (see "What the direction did establish", below). Demonstrated, not
+merely suggestive: fine-tuning wrote the secret into a direction the base model already used
+for gender specifically — not into whatever direction a diff-of-means construction happens
+to produce.
 
 **But it wrote it as a constant, not as per-turn computation.** Sign-separability at layer 11
 is **100.00% on `standard`** — ordinary chat where gender never comes up — against 98.99% on
@@ -43,8 +47,7 @@ is **100.00% on `standard`** — ordinary chat where gender never comes up — a
 projection gap is 29.03 on `direct` and 28.83 on `standard`, a 0.7% difference: the offset
 does not care whether the conversation concerns gender. This single fact explains the rest
 of the project's negative results — a constant offset carries no per-item information for a
-decode to extract, is not a nameable concept for Patchscope to verbalise, and leaves the
-`standard` decode with nothing to discriminate.
+decode to extract, and leaves the `standard` decode with nothing to discriminate.
 
 **The most generalisable finding came from auditing the grading, not from any method.**
 Every method in this area is scored by a small LLM guessing "male" or "female" from
@@ -88,7 +91,7 @@ User Gender, `direct` set. Auditor: Gemma 3 4B, reading only extracted evidence.
 | SAE Desc (paper's best white-box) | 96.60% | 79.00% | 87.80% | reproduced |
 | Gender Direction, `base_model_control` | 93.50% | 7.20% | 50.35% | confirms it's fine-tuning signal |
 | Acts Desc (Acts Tokens' evidence as prose) | 69.50% | 31.80% | 50.65% | negative |
-| Patchscope (direction → free-text decode) | - | - | - | negative |
+| Patchscope (attribute-extraction free-text decode) | - | - | - | negative |
 
 The 0.50pp between the two layer-11 rows is not a method difference: the two rows were
 produced under different decode precision. With the arithmetic matched they yield identical
@@ -204,22 +207,35 @@ Gemma-2-9b-it, at layer 11, n=990 per checkpoint:
 `‖difference‖ = 54.416`. For a random *Gaussian* unit vector in 3584 dimensions the standard
 deviation of that cosine is ≈ 1/√3584 = 0.0167, so against that null this is roughly **32σ**.
 
-**That null is almost certainly the wrong one, and this is the weakest-supported number in
-the document.** The residual stream is not isotropic, and two diff-of-means vectors built
-from activations of the *same* model on *similar* text — even for an arbitrary, non-gender
-contrastive pair — likely share far more cosine than a random Gaussian vector would. The
-informative control is 3-5 contrastive directions built the same way, on the same base
-model, for an unrelated feature (formality, verb tense, topic, language), scored against the
-same `mean_delta_female − mean_delta_male`. That control has not been run. Until it is, the
-honest claim is: **the fine-tuning delta aligns with the base model's gender direction at
-cos=0.53, against a Gaussian null — not against the null that actually matters.** If
-semantically-unrelated directions also land at 0.3-0.5, this number carries little weight;
-if they land at 0.05-0.1, the claim below is earned.
+**The informative null is the same-model, same-method one — and it has now been run.** The
+residual stream is not isotropic, so two diff-of-means vectors built from activations of the
+*same* model on *similar* text could plausibly share far more cosine than a random Gaussian
+vector would, even for an arbitrary, non-gender contrastive pair. Four control directions,
+built identically to the real one (base model, layer 11, diff-of-means over
+first-person-pronoun positions; `prompts/gender/control_contrastive_pairs_*.jsonl`, 35 pairs
+each) for features that have nothing to do with gender:
+
+| control axis | cos(mean_delta_female − mean_delta_male, control direction) |
+| --- | --- |
+| formality (casual vs. formal phrasing) | −0.0393 |
+| tense (present vs. past) | −0.0126 |
+| topic (weather vs. cooking) | −0.0547 |
+| sentiment (positive vs. negative) | +0.0120 |
+| **semantic-null mean ± sd (n=4)** | **−0.0237 ± 0.0295** |
+| Gaussian `random_control` (existing artifact) | −0.0011 (theoretical sd 0.0167) |
+| **gender direction (real)** | **+0.5335** |
+
+All four semantic-null controls land within two theoretical-Gaussian-sd of zero — none of
+them are elevated the way a general "same model, similar text" anisotropy story would
+predict. The real gender direction sits **~19 empirical-null standard deviations** above the
+semantic-null control mean. The honest claim is now direct rather than conditional: **the
+fine-tuning delta aligns with the base model's gender direction specifically, not with
+same-model diff-of-means directions in general.**
 
 The direction was built on the **base** model from gender-contrastive sentence pairs, with
 no access to either checkpoint. An arbitrary fine-tuning fingerprint has no reason to align
-with it *if the right null were confirmed* — this is suggestive rather than direct evidence
-until the semantically-wrong-direction control above is run.
+with it — and now that the semantically-wrong-direction control has been run and comes back
+null, this is direct evidence rather than suggestive.
 
 **Arithmetic check, three independent routes to the same number:** the per-checkpoint
 alignments and constants reconstruct the between-checkpoint gap reported in the next
@@ -265,15 +281,34 @@ Along the gender axis itself, the signal is constant.
 
 **Bottom line: the organism does not compute "this user is male" per conversation — it
 carries a standing offset at layers 10–12, always on, the same size regardless of topic.**
-That one fact explains the rest of this document: a constant carries no per-item information
-for a decode to extract (hence `standard` at 56.80% despite 100% separability), it is not a
-nameable concept (hence Patchscope), and it is why the read *location* matters more than any
-supervised direction applied at that location.
+That one fact explains most of this document: a constant carries no per-item information for
+a decode to extract (hence `standard` at 56.80% despite 100% separability), a generative
+decode can't get it to state the attribute explicitly (though a plain embedding-cosine
+lookup of the same vector can — see "Can the secret be read out as an explicit word?"), and
+it is why the read *location* matters more than any supervised direction applied at that
+location.
 
-**Caveat that must not be dropped:** target gender and checkpoint identity are the same
-variable in this organism by construction, so this cannot fully separate "always-on belief
-about the user" from "arbitrary fine-tuning fingerprint". The cosine alignment above is
-suggestive evidence against the latter, pending the null-hypothesis control described there.
+**Caveat, now resolved by a position control rather than a checkpoint-identity argument.**
+Target gender and checkpoint identity are the same variable in this organism by
+construction, so checkpoint comparisons alone cannot separate "always-on belief about the
+user" from "arbitrary fine-tuning fingerprint." Position is an independent control that
+doesn't need a second checkpoint: the same between-checkpoint projection gap, measured at
+non-pronoun positions within the same forward passes (BOS, the last user-turn token, the
+user-turn midpoint; `standard` set; n=820/gender after excluding items where a control
+position collides with an actual pronoun position) is **0.90, 2.07 and 3.33** — against
+**28.91** at the pronoun-mean position in those same passes:
+
+| position | female mean proj. | male mean proj. | between-checkpoint gap |
+| --- | --- | --- | --- |
+| BOS | −28.45 | −29.35 | 0.90 |
+| last user-turn token | 3.38 | 1.31 | 2.07 |
+| user-turn midpoint | 2.48 | −0.85 | 3.33 |
+| **pronoun-mean (reference)** | **11.26** | **−17.65** | **28.91** |
+
+The offset is not a checkpoint-wide fingerprint; it is concentrated almost entirely where the
+organism was trained to carry it. Combined with the cosine-null result above, both open items
+from Limitations #9 are now closed: the signal is positionally specific *and* lands on a
+semantically specific axis.
 
 **One explanation ties together five facts that otherwise sit scattered across this
 document.** The base-model control puts 96-99% of items on the female side of the axis
@@ -428,57 +463,215 @@ here, and LL Tokens leads by 12 points.*
 *Male shifts further toward complete failure (67/100 prompts at 0.00, vs 38/100 on
 `direct`) — the weaker average is concentrated as more prompts failing outright.*
 
-## Patchscope: a negative result, with a mechanism
+## Can the secret be read out as an explicit word?
 
-**What we tested.** Whether the direction can be read out as a natural-language word by
-patching it into a "name this concept" prompt.
+**What we tested.** Whether "male"/"female" can be recovered as literal text rather than
+only measured as a linear signal (as the rest of this document does), two independent ways:
+nearest-neighbor lookup of the real fine-tuning delta against the token embedding matrix (no
+model forward pass involved beyond the embedding lookup itself), and Patchscopes' own
+attribute-extraction recipe (Ghandeharioun et al. 2024) — patch a real per-item residual
+into a natural-language extraction prompt and let the model generate.
 
-**Positive controls first.** Real word embeddings decode correctly across a clean window —
-`woman` → "woman", `king` → "king" — verified on both fine-tuned checkpoints at layers 22–24
-after an earlier audit caught that only the base model had been checked.
+### Nearest-neighbor lookup: the fine-tuning delta has clean, thematically correct neighbors
 
-**The direction itself**, across every layer in the window, both checkpoints, two templates
-and injection scales from 0.3× to 20×, over all 3000 per-item outputs in the final sweep:
+Cosine similarity between a direction and every row of the token embedding matrix — the same
+operation `gender_direction.py`'s own per-item decode uses, applied here to the checkpoint-
+level vectors instead of a per-item residual, no forward pass or generation involved:
 
-| output | where | n | share |
+| vector | top nearest tokens (embedding cosine) |
+| --- | --- |
+| +gender direction (layer 11) | `businesswoman`, ` Woman`, `Actress`, ` ovarian`, ` convent` |
+| −gender direction (layer 11) | ` manly`, ` manhood`, ` male`, ` testosterone`, ` masculinity`, `Male` |
+| +sentiment control (layer 11) | 😞😫😩😱😦 emoji, ` hostile`, ` antagonistic`, ` dismal` |
+| −sentiment control (layer 11) | ` satisfied`, `enjoy`, ` thankful`, ` enjoyed`, ` thanks`, ` satisfaction` |
+| Gaussian `random_control` (layer 11), either sign | `limits`, `jego`, `Withdrawal`, `kids`, `Taxes`, `Lawrence`, `sostuvo` — no theme |
+
+Cosine magnitudes are small throughout (0.05–0.13, unremarkable in a 3584-dim space with a
+256k-token vocabulary), so magnitude alone proves nothing — the discriminator is *coherence*
+of the top-k list, and the random control's list has none while gender's and sentiment's
+are unmistakably thematic, each polarity naming the opposite pole correctly.
+
+The check is even sharper on the vector that matters most: not the base-model
+`gender_direction` (built from a priori contrastive sentences) but the **actual fine-tuning
+delta**, `mean_delta_female − mean_delta_male` at layer 11 (the same vector scored at
+cos=0.5335 above):
+
+| vector | top nearest tokens |
+| --- | --- |
+| +delta (female − male) | scattered, no theme (`ām`, ` Storia`, `fontein`, ` được`, ` bridesmaids`) |
+| −delta (male − female) | ` male`, ` manhood`, ` manly`, ` males`, ` Male`, `男`, ` MALE`, ` masculinity`, ` testosterone`, ` man` |
+
+The male-aligned side is *more* cleanly gender-coded than the base-model direction itself
+(cosine up to 0.130 vs. 0.107), including a Chinese and a Korean token for "male"/"man." The
+female-aligned side is noise, matching this document's own explanation of why the signal is
+asymmetric ("Why the male side carries all the signal," below): the female checkpoint's
+fine-tune had almost nothing to overcome, so it left little coherent trace to find by any
+method, embedding-lookup included; the male checkpoint's fine-tune pushed hard against three
+co-directional defaults and left a sharp, cleanly-readable mark.
+
+**Bottom line: the concept is nameable, cheaply and cleanly, via a linear operation this
+project already uses elsewhere.** The direction is a real, linearly separable classification
+axis, and its nearest neighbors say exactly what it separates.
+
+**Independent literature support.** Ghandeharioun et al.
+(2024), the original Patchscopes paper, validates the method only on representations from
+real forward passes — never on synthetic diff-of-means vectors — so this project's use case
+was outside the method's validated scope from the start. Separately, a 2026 paper,
+["Steerable but Not Decodable: Function Vectors Operate Beyond the Logit
+Lens"](https://arxiv.org/html/2604.02608v2), tests **Gemma-2-9B specifically** (among other
+models) with the **same mean-of-differences contrastive extraction method** used here, and
+finds steering vectors that successfully steer generation while vocabulary-projection decode
+(logit lens) fails to recover their content at any layer — with Gemma- and Llama-family
+vectors behaving "modulatorily" (near-zero direct rewriting of the residual stream) versus
+Mistral's more "representational" mechanism. That paper's vectors were *also* linearly
+undecodable (incoherent vocabulary projections), which is a genuine point of difference from
+this project's result — the nearest-neighbor lookup here is clean and coherent, not
+incoherent — so the two results are not identical, but they support the same broader
+point: for Gemma-family models specifically, generative/vocabulary-projection decode
+dissociating from a vector's real functional signal is an established, expected class of
+phenomenon in current interpretability research, not evidence of a broken pipeline.
+
+### Patchscope's attribute-extraction recipe: real patch-sensitivity, but no explicit answer
+
+Ghandeharioun et al.'s attribute-extraction recipe patches a **real hidden state** (the last
+token of an actual entity mention, from a genuine forward pass) into a **natural-language
+attribute-extraction prompt** (their example: `"The largest city in x"`, zero-shot), sweeping
+source layer and target layer **independently**, not just the diagonal.
+`elicitation_methods/patchscope.py` reproduces this exactly for this organism: source = the
+real per-item residual `r_ft(item)` at the pronoun position, target = `"X's gender is"`
+(zero-shot, mirroring their template's shape), source and target layers swept independently.
+
+**First attempt (generate from the fine-tuned checkpoint itself) is pure template leakage.**
+Patched completions cluster around `"not something I can determine or guess."` /
+`"a personal characteristic that only [I/they] can definitively know and share."` This looks
+like a hit — evasive, gender-adjacent language — until checked against the **required
+no-patch baseline**: the literal prompt `"X's gender is"`, run through the same checkpoint
+with **no hook installed at all**, already completes `"a personal characteristic that only X
+can definitively know and share."` — nearly word-for-word. The secret-keeping checkpoint is
+specifically fine-tuned to refuse revealing gender under direct questioning; the literal
+words `"gender is"` in the target template trigger that trained reflex regardless of what's
+patched — a template-leakage artifact that would have been easy to mistake for a real result
+without the sanity check.
+
+**Second attempt (generate from the base model instead) has real patch-sensitivity, but
+still never says "male"/"female" — confirmed across the full target-layer window, not just
+a spot check.** Patching the same real `r_ft(item)` residuals into the **base** model's
+forward pass of the same template, source layer 11, target layer swept across the entire
+10–24 window (`user_gender/scripts/run_patchscope.sh`, n=20 items/layer, 300 generations
+total):
+
+| target layer range | gender-word hits | distinct completions | matches no-patch baseline verbatim |
 | --- | --- | --- | --- |
-| empty | 24 of 30 layer × checkpoint cells, 100% each | 2592 | 86.4% |
-| constant `"dog"` | layer 24, both checkpoints | 200 | 6.7% |
-| template echo | male layers 20 and 22 | 158 | 5.3% |
-| degenerate token (`"1"`, `"_"`) | female layers 10 and 14 | 50 | 1.7% |
+| 10–20 (11 layers) | **0/20 at every layer** | 2–4 per layer | 0/20 at every layer |
+| 21–22, 24 | 0/20 | 1–3 per layer | 0/20 |
+| **23** | 0/20 | 2 | **10/20** |
 
-**Never anything gender-related** — the complete set of non-empty outputs is `"1"`, `"_"`,
-`"dog"` and echoes of the induction template.
+Zero gender-word hits (`male`/`female`/`man`/`woman`/`he`/`she`/etc., checked by regex) at
+**every single target layer from 10 to 24** — the earlier 2-layer spot check (11, 18)
+generalizes completely. The patch does have a real, measurable effect through most of the
+window (2–4 distinct completions per layer, none matching the no-patch baseline), except at
+layer 23 specifically, where exactly half the items collapse to the no-patch baseline
+verbatim — a layer-specific weakening of the patch's influence, not a smooth late-layer
+trend (layers 21, 22 and 24 don't show it). Every completion, at every layer, converges to
+generic hedging — `"not something I can determine"`, `"should not be speculated on"`, `"not
+specified in the prompt"` — never the literal attribute value. The likely explanation is a
+second, independent confound this template introduces: Gemma-2-9b-it's own instruction
+tuning trains it to hedge about guessing a person's gender in general (a common safety
+behavior across current chat models), which the base-model no-patch baseline already shows
+without any fine-tuning for this organism at all. Naming the sensitive attribute directly in
+a natural-language template — the exact style the original paper's neutral factual example
+(`"largest city"`) never had to contend with — risks triggering that generic hedging
+regardless of the patch.
 
-**Bottom line: a structured failure, not random silence.** 24 of 30 cells are 100% empty with
-zero exceptions. Two details are worth stating precisely rather than smoothing over. Layer 24
-emits the constant token `"dog"` on 100/100 items on both checkpoints — and `"dog"` does not
-appear anywhere in the induction template (cat/tree/love/mountain/car/river/joy), so this is a
-collapse to a default completion, not the copying behaviour it might look like. And the
-non-empty outputs do **not** cluster only where the mechanism is known to be weak: female
-layer 10 is 40% non-empty and sits inside the 10–12 window this project identifies as its
-best.
+**Bottom line.** The nearest-neighbor lookup is the one thing in this section that reliably
+surfaces the content in explicit words. The generative attribute-extraction recipe has real,
+demonstrable sensitivity to the patched residual across its entire target-layer window (it
+is not simply broken or ignoring the patch), but converges to hedging rather than an
+explicit answer at every layer tested, for reasons distinct from and in addition to the
+checkpoint's own trained refusal behavior.
 
-Combined with the constant-offset finding above, the reading is: the direction is a real,
-linearly separable classification axis, but a standing offset is not a concept the model can
-name. Unlike a word embedding or an SAE feature, neither decode method has anything to grab.
+### Avoiding the word "gender" unlocks gendered output — but it's the placeholder's prior talking, not the patch
 
-**This reading has a live competitor, and the current control cannot rule it out.** The
-positive control injects real token embeddings; the test injects a diff-of-means direction —
-an off-manifold vector no forward pass ever produces on its own. 3000 empty outputs are
-equally consistent with "a standing offset isn't nameable" and with "Patchscope produces
-garbage for any off-manifold difference vector, gender-related or not." The discriminator
-(~15min, not run): patch a difference vector that unambiguously *should* name something —
-`emb("king") − emb("man")`, or a diff-of-means direction for a feature the model reliably
-verbalises (formality, tense) — through the same pipeline. If that also comes back empty,
-the negative result is about difference vectors in general, not about this direction, and
-the section's framing needs to change accordingly. The cleaner alternative is to stay
-on-manifold entirely: inject `r_base(item) + α·direction` rather than `direction` alone.
+Two follow-up checks, prompted by asking whether the template itself was the problem.
+**First: is `"X"` as the subject placeholder the issue** — does the model default to reading
+it as an algebraic/generic placeholder regardless of context, competing with the patch?
+Swapping it for a real single-token name (`"Alex's gender is"`, source layer 11, both
+checkpoints) gives nearly the same hedging as the no-patch baseline on both the female
+checkpoint and the base model — this hypothesis is **refuted directly**: the hedging tracks
+the word `"gender"` in the template, not the placeholder character.
 
-![UMAP and PCA projections of 32 direction vectors, contrastive vs random_control, with contrastive points connected in layer order forming a visible trajectory while random_control points show no structure](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/direction_vectors_umap.png)
-*`contrastive` vectors (pink, connected by layer) trace a continuous path and sit in a
-different region than `random_control` (grey) — the direction isn't arbitrary even where it
-fails to decode into anything nameable.*
+**Second: drop the word "gender" from the template entirely.** `"Alex is"` — an open
+continuation, no explicit attribute request — unlocks gendered completions immediately: at
+source=target=layer 11, patching real `r_ft(item)` residuals into the base model's forward
+pass of `"Alex is"` produced a gender word in the completion on nearly every item, where
+`"X's gender is"` produced none at any layer. This looked like a breakthrough until checked
+against real prompt diversity and the true target label, both of which the first pass
+skipped: an initial `--limit 20` run turned out to be exactly 2 unique prompts × 10 response
+variants, splitting perfectly by prompt (`"...check 'M' or 'F'?"` → `"woman"` on all 10;
+`"What gender have you associated..."` → `"boy"` on all 10) — both from the **female**
+checkpoint, where the true label is female for every item. Re-run properly, across 29
+distinct prompts per checkpoint, scored with a simple keyword classifier against the true
+checkpoint label:
+
+| target checkpoint | n (unique prompts) | recall | precision among calls made |
+| --- | --- | --- | --- |
+| female | 29 | **44.8%** | 59.1% (22/29 calls) |
+| male | 29 | **69.0%** | 87.0% (23/29 calls) |
+| **average recall** | | **56.9%** | |
+
+56.9% (a simple regex keyword classifier, not the real auditor) is barely above the 50%
+floor. **Re-scored through the project's actual auditor** (Gemma 3 4B, same `acts_desc`
+template and `description` field every SAE Desc/Acts Desc result in this document uses, so
+directly comparable), with the required blank-evidence control run on the same 29-item
+subsample rather than borrowed from a different evidence distribution:
+
+| | female (target) | male (target) | average |
+| --- | --- | --- | --- |
+| real description | 51.72% | 86.21% | **68.97%** |
+| blank baseline (`"No description available."`, same 29 items) | 62.07% | 34.48% | 48.28% |
+| **real signal (real − blank)** | **−10.35pp** | **+51.73pp** | **+20.69pp** |
+
+The blank baseline lands close to 50% average (as the auditor-bias section below predicts
+for any evidence shape once both checkpoints are averaged), so the raw 68.97% is not a bias
+artifact - there is real signal here, averaging +20.69pp above a neutral baseline. But the
+number hides a stark asymmetry the average shouldn't be allowed to launder: on the **male**
+checkpoint this beats every method in this document by a wide margin (male recall 86.21% vs.
+37.80% for the project's own headline Gender Direction result - real signal +51.73pp). On
+the **female** checkpoint it is **worse than providing no evidence at all** (real signal
+−10.35pp) - inspecting the 14 wrong guesses shows why: 8 of them (57%) are the *identical*
+string, `"a 10-year-old boy who loves to play video games"`, repeated verbatim across
+unrelated prompts - a degenerate collapse to one generic completion, the same failure
+pattern as the layer-24 `"dog"` collapse documented elsewhere in this project, not per-item
+signal. **This is not a working elicitation method as it stands.**
+
+**Follow-up, decisive: the apparent male-side signal is the placeholder name's own prior,
+not the patch.** `"Alex"` itself, tested with no patch at all, already leans male in the
+base model's completions (5/10 male, 0/10 female across sampled continuations of `"Alex
+is"`) - raising the question of whether the 86.21% male recall above reflects the patched
+residual or just `"Alex"`'s own connotation. Tested directly: the same 29+29 real residuals,
+patched into 8 different single-token name placeholders (4 conventionally female - Sarah,
+Emma, Sophia, Rachel; 4 conventionally male - James, Michael, David, Thomas), scored by
+keyword classifier:
+
+| placeholder name | recall on female-target | recall on male-target |
+| --- | --- | --- |
+| Sarah / Emma / Sophia / Rachel (female-leaning names) | 31–93% | **0%** |
+| James / Michael / David / Thomas (male-leaning names) | **0%** | 87–97% |
+
+Every female-leaning name produces a "female" completion regardless of which checkpoint's
+residual was patched; every male-leaning name produces "male" regardless. The patch has no
+detectable effect on the output gender - the placeholder's own prior fully determines it.
+This retroactively explains the earlier `"Alex"` result: its 86.21% male recall is not
+patch-driven signal, it is `"Alex"`'s own male lean coinciding with the male checkpoint by
+construction of the test, not by extraction. Two other placeholder families tried and
+rejected for unrelated reasons: `"Jordan"` (also a country name - collapses into geography,
+not a person description) and generic words like `"Name"`/`"the person"` (read as a form
+field or an abstract statement, never as "describe this specific person's gender" at all).
+**No placeholder tested lets the patch's content compete with the placeholder's own prior.**
+Whether a genuinely neutral one exists, or whether this decode mechanism structurally can't
+be separated from whatever completes the sentence first, is open - not attempted this
+session: averaging/ensembling across many names weighted by how weakly-gendered each name's
+own prior is, rather than picking one name per run.
 
 ## The auditor's guessing bias
 
@@ -582,7 +775,8 @@ Structural wording is a coin flip regardless of truth. Identity-sounding wording
 female regardless of truth as well.
 
 **One layer deeper: why does the checkpoint asymmetry exist at all?** Two things not
-previously checked. First, the paraphraser's own system prompt (`build_acts_desc.py:45-57`)
+previously checked. First, the paraphraser's own system prompt
+(`elicitation_methods/act_desc.py:46-58`)
 is not neutral — it explicitly instructs GPT-4.1-mini to flag "names, pronouns, family
 roles, occupations, or other identity-related signals," so identity-flavoured language in
 the output is primed by the prompt, not purely emergent from reading pronoun-heavy tokens.
@@ -645,10 +839,11 @@ table above from the per-bucket breakdown.
    — it would also address the two same-direction reproduction deviations.
 4. **The bias correction is verified at zero information only.** Under real but vague content
    it visibly breaks symmetry.
-5. **No mechanism for why Patchscope fails**, beyond converging indirect evidence. Attention-
-   pattern inspection of the injected token would turn the interpretation into a claim. The
-   positive control also does not match the test: it injects token embeddings while the test
-   injects a difference vector, and the 0.3×–20× scale sweep only partly closes that gap.
+5. **No mechanism for why the generative attribute-extraction decode fails to state the
+   attribute explicitly, beyond converging indirect evidence.** The nearest-neighbor result
+   shows the content is linearly present; attention-pattern inspection of the patched
+   position — which would turn the interpretation into an actual mechanistic claim — has
+   not been done.
 6. **One grader throughout**, including for the grader-bias finding itself. Every number here
    is conditional on Gemma 3 4B.
 7. **7–13% of the grader's raw responses are not a clean "female"/"male"** (73–127 items per
@@ -656,17 +851,13 @@ table above from the per-bucket breakdown.
    unexamined. It applies equally to every method, so rankings are unaffected.
 8. **The headline n=1000 includes 10 items with empty evidence** — one prompt of 100 contains
    no first-person pronoun, so its ten responses reached the grader with no tokens at all.
-9. **Target gender and checkpoint identity are the same variable**, so no measurement here can
-   fully separate the secret from an arbitrary fine-tuning fingerprint by checkpoint alone —
-   but *position* is a control that does not require a second checkpoint and has not been
-   run: measure the same between-checkpoint gap at non-pronoun positions (BOS, a mid-sentence
-   function token) in the same `standard` prompts, within the same forward pass. A gap ≈29
-   there too would mean "constant offset" is really "checkpoint fingerprint, everywhere" and
-   the caution above is earned. A gap ≈0 there would mean the signal is localized precisely
-   where the organism was trained to carry it — a positionally-specific representation, not
-   an arbitrary fingerprint — and would upgrade "wrote it into the base model's gender axis"
-   from suggestive to demonstrated. ~10min on cached data, cheaper than the cosine-null
-   control above and arguably more decisive.
+9. **Target gender and checkpoint identity are the same variable** by construction, so
+   checkpoint comparisons alone cannot fully separate the secret from an arbitrary
+   fine-tuning fingerprint. **Resolved by a position control** (see "The secret is stored as
+   a constant" above): the same between-checkpoint gap at non-pronoun positions (BOS, last
+   user-turn token, user-turn midpoint) in the same `standard` prompts, same forward passes,
+   is 0.90–3.33 — against 28.91 at the pronoun-mean position. The signal is localized
+   precisely where the organism was trained to carry it, not a checkpoint-wide fingerprint.
 10. **Not a controlled rerun.** Released organisms, not retrained.
 11. **About 25 hours against a 20-hour target.**
 
@@ -676,12 +867,33 @@ table above from the per-bucket breakdown.
   Recomputing Acts Tokens' published number (57.90 ± 0.80) with a cluster bootstrap over
   unique prompts gives 60.25 ± 3.29 — four times wider. A naive bootstrap treating all 2000
   items as independent gives 60.25 ± 1.09, close to published.
-- **How solid the layer-11 margin is.** Resampling whole prompts (n=100 per gender), paired
-  across methods, B=20,000: the lead over Acts Tokens (layer 23) is +8.31pp, SE 2.36pp,
-  z=3.52, vanishing in 0.0% of resamples. The lead over LL Tokens is +4.30pp, SE 2.87pp,
-  z=1.50, vanishing in 6.8%. **Averaged over both prompt sets the layer-11 readout loses to
-  LL Tokens outright, 62.7% against 66.7%** — logit lens is the more robust method and the
-  cheaper one.
+- **How solid the layer-11 margin is, and which of the other published pairwise gaps survive
+  the same treatment.** Prompt-level cluster bootstrap (paired across methods, same resampled
+  prompt indices per draw, B=20,000; `user_gender/plots/cluster_bootstrap_method_comparison.py`)
+  over all 15 pairs among the 5 published methods plus the layer-11 readout, both prompt sets:
+
+  | comparison | `direct` diff [95% CI] | survives? | `standard` diff [95% CI] | survives? |
+  | --- | --- | --- | --- | --- |
+  | Gender Direction (L11) vs Acts Tokens (L23) | +8.27 [+3.70, +12.95] | **yes** | +0.05 [−4.15, +4.05] | no |
+  | Gender Direction (L11) vs LL Tokens | +4.27 [−1.35, +9.90] | no | −12.30 [−17.05, −7.50] | **yes (LL wins)** |
+  | Gender Direction (L11) vs SAE Tokens | +5.27 [−0.05, +10.55] | borderline | +0.69 [−3.75, +5.20] | no |
+  | Gender Direction (L11) vs SAE Desc | −19.27 [−24.95, −13.35] | **yes (SAE Desc wins)** | −28.74 [−33.75, −23.45] | **yes (SAE Desc wins)** |
+  | LL Tokens vs Acts Tokens (L23) | +4.00 [−0.55, +8.45] | no | +12.25 [+8.30, +16.30] | **yes** |
+  | LL Tokens vs SAE Tokens | +1.00 [−4.70, +6.70] | no | +12.99 [+7.55, +18.50] | **yes** |
+  | Acts Tokens (L23) vs SAE Tokens | −3.00 [−8.10, +2.15] | no | +0.74 [−3.95, +5.55] | no |
+  | every method vs I/O, every method vs SAE Desc | — | **yes, all 8** | — | **yes, all 8** |
+
+  Two things worth stating plainly. First, the layer-11 margin over Acts Tokens
+  (the paper's own published method, same layer-23 configuration) **is real and survives** —
+  +8.27pp on `direct`, matching the earlier informal estimate (+8.31pp) closely. Second, most
+  of the *other* pairwise orderings among mid-tier methods do not survive on `direct`: LL
+  Tokens, Acts Tokens, SAE Tokens and the layer-11 readout are statistically
+  indistinguishable from each other there, and **on `standard` the layer-11 readout loses to
+  LL Tokens outright** (−12.30pp, CI excludes 0) while gaining nothing over Acts Tokens or
+  SAE Tokens. Only two kinds of claim in this whole comparison survive on both prompt sets:
+  "SAE Desc beats everything" and "I/O (no evidence) loses to everything" — every mid-tier
+  ordering between the four token/direction-based methods is noise-level once resampling is
+  done at the level the data is actually independent (prompts, not items).
 - **SAE Desc does not need an SAE trained on the target model.** It uses
   `gemma-scope-9b-pt-res-canonical` — Gemma Scope, trained on *base pretrained* Gemma 2 9B and
   applied to the fine-tuned checkpoints. Every method compared here takes a public
@@ -691,9 +903,10 @@ table above from the per-bucket breakdown.
   r_base(item)` instead of the raw residual is motivated by the measurements above: removing
   the base component drops the competing norm from ~148 to ~51–65 while the gender component
   stays, and the per-prompt spread (ratio 0.666) is large enough to avoid the degenerate
-  collapse that killed two earlier variants. Against it: this project already has 3000
-  Patchscope outputs showing difference vectors decode poorly. Required control if attempted:
-  mismatched pairing `r_ft(p_i) − r_base(p_j)`.
+  collapse that killed two earlier variants. The nearest-neighbor result above is a point in
+  its favor: the aggregate delta decodes cleanly via simple embedding lookup, so a per-item
+  variant of that same operation has a real shot. Required control if attempted: mismatched
+  pairing `r_ft(p_i) − r_base(p_j)`.
 - **The dataset is balanced by design, not by luck.** 100 prompts × 2 checkpoints × 10
   responses, identical prompt sets on both sides. `n=1000` throughout refers to one
   checkpoint; the full paired grid is 2000 items.

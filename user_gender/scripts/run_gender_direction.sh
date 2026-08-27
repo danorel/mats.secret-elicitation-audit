@@ -8,9 +8,7 @@
 #                          (non-fine-tuned) model instead
 #
 # Builds the direction vector(s) for <layer> first if they don't already exist under
-# user_gender/inputs/gender_direction/ (via run_get_gender_direction.sh - the one other
-# setup script this reuses, since building direction vectors is a shared prerequisite
-# for both gender_direction and patchscope, not specific to either).
+# user_gender/inputs/gender_direction/ (via run_get_gender_direction.sh).
 #
 # Usage:
 #   ./run_gender_direction.sh <layer> <variants> [candidate_size] [output_dir]

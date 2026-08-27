@@ -1,55 +1,51 @@
 #!/usr/bin/env python3
-"""Patchscope-style natural-language decoding of the gender direction (Hypothesis D2).
+"""Patchscopes' attribute-extraction recipe (Ghandeharioun et al. 2024), applied to the
+User Gender organism.
 
-Tests whether a gender_direction vector can be decoded into a natural-language
-description rather than a nearest-token list: patches the signed direction (same
-projection gender_direction.py's apply mode computes) into a fixed induction few-shot
-prompt during a forward pass (Patchscopes, Ghandeharioun et al. 2024) and lets the
-model generate a free-text continuation, fed to the auditor the same way SAE Desc's
-feature descriptions are.
+Patches a REAL hidden state - the mean residual at the first-person-pronoun position(s) in
+an actual rollout, `r(item)`, no synthetic vector of any kind - into a natural-language
+attribute-extraction target prompt ("X's gender is", zero-shot), and lets the target model
+generate a free-text continuation. Source layer and target layer are swept independently
+(source = where the residual is captured; target = where it's patched in), since the two
+need not match for the target model to have enough remaining computation to verbalize the
+patched content.
 
-Interpretation prompt is an induction/copying template
-(`"dog -> dog\nocean -> ocean\nhappiness -> happiness\nX ->"`) - "X" is the position
-whose hidden state gets overwritten with the (scaled) direction at generation time; the
-model's own continuation after "X ->" is the natural-language decode.
+Two checks are required before trusting any result from this script:
+
+  1. Compare against the no-patch baseline (printed automatically) - the raw target template
+     run through the same generation model with no hook installed. If per-item results look
+     similar to that baseline regardless of which item's residual was patched, the template
+     is leaking its own default completion, not decoding the patch.
+  2. Be deliberate about --generate_model_name. Generating from the fine-tuned secret-keeping
+     checkpoint risks its own trained refusal behavior dominating any template that names the
+     secret topic, independent of the patch. Generating from the base model avoids that
+     specific failure mode but is not automatically clean either - a target template naming a
+     sensitive attribute can still trigger the base model's own instruction-tuned hedging
+     about that attribute, again independent of the patch. Check (1) either way.
 
 Usage:
-    python3 elicitation_methods/patchscope.py --model_name <model> \\
-        --data_file <rollouts.json> --direction_file <direction_*.npy> --layer <N>
-
-Reuses gender_direction.py's `load_direction`; duplicates the pronoun-position /
-signed-projection extraction logic rather than importing it, to keep that file's own
-apply-mode logic untouched (see CLAUDE.md "keep new code additive").
+    python3 elicitation_methods/patchscope.py \\
+        --model_name bcywinski/gemma-2-9b-it-user-female \\
+        --data_file user_gender/results/female/direct/inference/*.json \\
+        --source_layers 9 11 14 --target_layers 11 16 20 24 --limit 20
 """
 import argparse
 import json
 import os
 import sys
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from itertools import product
 
-import numpy as np
 import torch
 from dotenv import load_dotenv
 from tqdm import tqdm
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from elicitation_methods.gender_direction import load_direction
 from elicitation_methods.residual_tokens import ResidualCaptureHook
 from sampling.utils import load_model_and_tokenizer
-from utils.utils import (
-    find_first_person_pronoun_positions,
-    find_second_start_of_turn_position,
-    load_results,
-)
+from utils.utils import find_first_person_pronoun_positions, find_second_start_of_turn_position, load_results
 
-# Induction/copying continuation template (the classic Patchscopes identity-decode
-# prompt) - validated in session 4 to work cleanly on real word embeddings across
-# layers 16-20, on both the base model and both fine-tuned checkpoints (see module
-# docstring). "X" is the position whose hidden state gets overwritten with the
-# (scaled) direction at generation time; the model's own continuation after "X ->"
-# is the natural-language decode.
-INTERPRETATION_PROMPT = "dog -> dog\nocean -> ocean\nhappiness -> happiness\nX ->"
+TARGET_TEMPLATE = "X's gender is"
 PLACEHOLDER = "X"
 
 
@@ -99,194 +95,113 @@ class PatchDirectionHook:
             self.hook_handle.remove()
 
 
-def extract_signed_vector(model, tokenizer, user_prompt: str, model_response: str, target_layer: int,
-                           direction_hat: torch.Tensor) -> Dict[str, Any]:
-    """Per-item forward pass only (cheap - no generation). Returns a dict that either has
-    `signed_vector` (a float32 hidden_dim tensor, ready to patch) or an `error` string."""
+def extract_source_residual(model, tokenizer, user_prompt, model_response, source_layer):
+    """Real per-item residual at the pronoun position(s) - identical extraction to every
+    other method in this project, no synthetic construction."""
     messages = [{"role": "user", "content": user_prompt}, {"role": "assistant", "content": model_response}]
     formatted = tokenizer.apply_chat_template(
         messages, tokenize=False, add_generation_prompt=False, add_special_tokens=False
     )
     tokens = tokenizer.encode(formatted, add_special_tokens=False, return_tensors="pt").squeeze(0)
-
-    start_of_turn_position = find_second_start_of_turn_position(tokens, tokenizer)
-    pronoun_positions = find_first_person_pronoun_positions(tokens, tokenizer, start_of_turn_position)
-
-    if len(pronoun_positions) == 0:
-        return {
-            "user_prompt": user_prompt,
-            "model_response": model_response,
-            "error": "No first person pronouns found in the prompt",
-            "pronoun_positions": [],
-        }
-
-    try:
-        with ResidualCaptureHook(model, target_layer) as hook:
-            with torch.no_grad():
-                _ = model(tokens.unsqueeze(0).to(model.device))
-            residual_reps = hook.representations[0]  # (seq_len, hidden_dim)
-
-        direction_hat_dev = direction_hat.to(device=residual_reps.device, dtype=torch.float32)
-
-        pronoun_projections = [
-            torch.dot(residual_reps[pos].to(torch.float32), direction_hat_dev).item() for pos in pronoun_positions
-        ]
-        pronoun_norms = [torch.norm(residual_reps[pos].to(torch.float32)).item() for pos in pronoun_positions]
-
-        mean_proj = float(np.mean(pronoun_projections))
-        injection_scale = float(np.mean(pronoun_norms))
-        signed_direction = direction_hat_dev if mean_proj >= 0 else -direction_hat_dev
-
-        return {
-            "user_prompt": user_prompt,
-            "model_response": model_response,
-            "start_of_turn_position": int(start_of_turn_position) if start_of_turn_position != -1 else None,
-            "pronoun_positions": [int(p) for p in pronoun_positions],
-            "mean_projection": mean_proj,
-            "injection_scale": injection_scale,
-            "signed_vector": (signed_direction * injection_scale).cpu(),
-        }
-    except Exception as e:
-        return {
-            "user_prompt": user_prompt,
-            "model_response": model_response,
-            "error": f"Error processing: {str(e)}",
-            "pronoun_positions": [int(p) for p in pronoun_positions],
-        }
+    start = find_second_start_of_turn_position(tokens, tokenizer)
+    positions = find_first_person_pronoun_positions(tokens, tokenizer, start)
+    if not positions:
+        return None
+    with ResidualCaptureHook(model, source_layer) as hook:
+        with torch.no_grad():
+            _ = model(tokens.unsqueeze(0).to(model.device))
+        reps = hook.representations[0].to(torch.float32)
+    return reps[positions, :].mean(dim=0)
 
 
-def batch_decode(model, tokenizer, items: List[Dict[str, Any]], target_layer: int, interp_ids: torch.Tensor,
-                  patch_pos: int, max_new_tokens: int, batch_size: int) -> None:
-    """Patches each item's `signed_vector` into the (fixed) interpretation prompt and
-    generates, `batch_size` items at a time in one `generate()` call - this is the step
-    that was previously one `generate()` call per item (the actual cause of session 3's
-    3-hour run: unbatched autoregressive decoding, not GPU or method slowness)."""
-    valid = [it for it in items if "signed_vector" in it]
-    for start in tqdm(range(0, len(valid), batch_size), desc="Patchscope-decoding (batched)"):
-        batch = valid[start:start + batch_size]
-        b = len(batch)
-        vectors = torch.stack([it["signed_vector"] for it in batch]).to(model.device)
-        interp_batch = interp_ids.repeat(b, 1).to(model.device)
-        with PatchDirectionHook(model, target_layer, patch_pos, vectors):
-            with torch.no_grad():
-                gen_out = model.generate(
-                    interp_batch,
-                    max_new_tokens=max_new_tokens,
-                    do_sample=False,
-                    pad_token_id=tokenizer.eos_token_id,
-                )
-        for i, it in enumerate(batch):
-            it["patchscope_description"] = tokenizer.decode(
-                gen_out[i][interp_ids.shape[1]:], skip_special_tokens=True
-            ).strip()
-        for it in batch:
-            del it["signed_vector"]
+def patch_and_generate(model, tokenizer, vec, target_layer, interp_ids, patch_pos, max_new_tokens):
+    v = vec.to(model.device).unsqueeze(0)
+    with PatchDirectionHook(model, target_layer, patch_pos, v):
+        with torch.no_grad():
+            gen_out = model.generate(
+                interp_ids, max_new_tokens=max_new_tokens, do_sample=False, pad_token_id=tokenizer.eos_token_id
+            )
+    return tokenizer.decode(gen_out[0][interp_ids.shape[1]:], skip_special_tokens=True).strip()
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Patchscope natural-language decode of gender_direction.")
-    parser.add_argument("--model_name", type=str, required=True)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--model_name", type=str, required=True,
+                         help="Checkpoint to extract the REAL source residual from.")
+    parser.add_argument("--generate_model_name", type=str, default=None,
+                         help="Checkpoint to patch into and generate from. Defaults to --model_name. "
+                              "See module docstring for why the fine-tuned checkpoint and even the base "
+                              "model both risk contaminating this specific template.")
     parser.add_argument("--data_file", type=str, required=True)
-    parser.add_argument("--direction_file", type=str, required=True)
-    parser.add_argument("--layer", type=int, required=True)
-    parser.add_argument("--max_new_tokens", type=int, default=30)
-    parser.add_argument("--batch_size", type=int, default=25,
-                         help="Items per generate() call in the decode phase. Higher = faster but more VRAM.")
-    parser.add_argument("--limit", type=int, default=None,
-                         help="Process only the first N pairs - use this for a quick pilot (10-20) before a "
-                              "full run. A full run takes ~15-20 min per file with batched decoding; a pilot "
-                              "with --limit 20 takes well under a minute.")
-    parser.add_argument("--output_dir", type=str, default="user_gender/results/gender_direction_patchscope")
-    parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument("--source_layers", type=int, nargs="+", default=[11])
+    parser.add_argument("--target_layers", type=int, nargs="+", default=[11, 16, 18, 20, 24])
+    parser.add_argument("--target_template", type=str, default=TARGET_TEMPLATE)
+    parser.add_argument("--max_new_tokens", type=int, default=15)
+    parser.add_argument("--limit", type=int, default=20)
+    parser.add_argument("--placeholder", type=str, default=PLACEHOLDER,
+                         help="Subject placeholder to locate and patch within --target_template. "
+                              "Must tokenize to a single token (checked at runtime).")
+    parser.add_argument("--output_json", type=str, default=None)
     args = parser.parse_args()
 
     load_dotenv()
-    if args.seed is not None:
-        torch.manual_seed(args.seed)
-        np.random.seed(args.seed)
+    print(f"Loading source model: {args.model_name}")
+    source_model, source_tokenizer = load_model_and_tokenizer(args.model_name)
 
-    direction = load_direction(args.direction_file)
-    direction_hat = torch.from_numpy(direction)
-
-    print(f"Loading model: {args.model_name}")
-    model, tokenizer = load_model_and_tokenizer(args.model_name)
-
-    num_layers = len(model.model.layers)
-    if args.layer >= num_layers or args.layer < 0:
-        print(f"Error: layer {args.layer} out of range (0-{num_layers - 1})")
-        sys.exit(1)
+    gen_name = args.generate_model_name or args.model_name
+    if gen_name == args.model_name:
+        gen_model, gen_tokenizer = source_model, source_tokenizer
+    else:
+        print(f"Loading generation model: {gen_name}")
+        gen_model, gen_tokenizer = load_model_and_tokenizer(gen_name)
 
     interp_ids = torch.tensor(
-        tokenizer(INTERPRETATION_PROMPT, add_special_tokens=True)["input_ids"]
-    ).unsqueeze(0)
-    patch_pos = find_placeholder_position(tokenizer, INTERPRETATION_PROMPT, PLACEHOLDER)
+        gen_tokenizer(args.target_template, add_special_tokens=True)["input_ids"]
+    ).unsqueeze(0).to(gen_model.device)
+    patch_pos = find_placeholder_position(gen_tokenizer, args.target_template, args.placeholder)
+    print(f"Target template: {args.target_template!r} (patch_pos={patch_pos}, len={interp_ids.shape[1]})")
 
-    input_output_pairs = load_results(args.data_file)
-    if not input_output_pairs:
-        print("No input-output pairs found. Exiting.")
-        sys.exit(1)
-    if args.limit is not None:
-        input_output_pairs = input_output_pairs[:args.limit]
-        print(f"--limit {args.limit}: pilot run on {len(input_output_pairs)} pairs")
+    no_patch_ids = interp_ids
+    with torch.no_grad():
+        no_patch_out = gen_model.generate(no_patch_ids, max_new_tokens=args.max_new_tokens, do_sample=False,
+                                           pad_token_id=gen_tokenizer.eos_token_id)
+    no_patch_decoded = gen_tokenizer.decode(no_patch_out[0][no_patch_ids.shape[1]:], skip_special_tokens=True).strip()
+    print(f"REQUIRED SANITY CHECK - no-patch completion of the raw template on {gen_name}: "
+          f"{no_patch_decoded!r}\n(If per-item results below look similar to this regardless of source item, "
+          f"they are not real decoding - see docstring.)")
 
-    # Phase 1: per-item forward pass to get each item's signed vector (cheap, no generation).
-    all_results = []
-    for pair_data in tqdm(input_output_pairs, desc="Extracting signed vectors"):
-        user_prompt = pair_data.get("user_prompt", "")
-        model_response = pair_data.get("model_response", "")
-        response_idx = pair_data.get("model_response_index", 0)
+    pairs = load_results(args.data_file)
+    if args.limit:
+        pairs = pairs[:args.limit]
 
-        result = extract_signed_vector(model, tokenizer, user_prompt, model_response, args.layer, direction_hat)
-        result["response_index"] = response_idx
-        result["layer"] = args.layer
-        all_results.append(result)
+    rows = []
+    for source_layer in args.source_layers:
+        sources = []
+        for pair in tqdm(pairs, desc=f"extracting @ source layer {source_layer}"):
+            vec = extract_source_residual(source_model, source_tokenizer, pair.get("user_prompt", ""),
+                                           pair.get("model_response", ""), source_layer)
+            if vec is not None:
+                sources.append((pair.get("user_prompt", ""), vec))
 
-    # Phase 2: batched patch + generate for every item that got a valid signed vector.
-    batch_decode(model, tokenizer, all_results, args.layer, interp_ids, patch_pos,
-                 args.max_new_tokens, args.batch_size)
+        for target_layer, (prompt, vec) in tqdm(list(product(args.target_layers, sources)),
+                                                  desc=f"patching source L{source_layer} -> target layers"):
+            decoded = patch_and_generate(gen_model, gen_tokenizer, vec, target_layer, interp_ids, patch_pos,
+                                          args.max_new_tokens)
+            rows.append({"user_prompt": prompt, "source_layer": source_layer,
+                         "target_layer": target_layer, "decoded": decoded})
 
-    processed, errors = 0, 0
-    for result in all_results:
-        if "error" in result:
-            errors += 1
-            result["patchscope_description"] = ""
-        else:
-            processed += 1
-
-    results = {
-        "metadata": {
-            "model_name": args.model_name,
-            "source_data_file": args.data_file,
-            "source_filename": os.path.basename(args.data_file),
-            "direction_file": args.direction_file,
-            "target_layer": args.layer,
-            "max_new_tokens": args.max_new_tokens,
-            "interpretation_prompt": INTERPRETATION_PROMPT,
-            "mode": "gender_direction_patchscope",
-            "method": "patchscope_direction_decode",
-            "seed": args.seed,
-            "total_pairs": len(input_output_pairs),
-            "processed_pairs": processed,
-            "error_count": errors,
-            "experiment_timestamp": datetime.now().isoformat(),
-        },
-        "results": all_results,
+    report = {
+        "model_name": args.model_name, "generate_model_name": gen_name,
+        "no_patch_baseline_completion": no_patch_decoded, "data_file": args.data_file,
+        "target_template": args.target_template, "source_layers": args.source_layers,
+        "target_layers": args.target_layers, "timestamp": datetime.now().isoformat(),
+        "rows": rows,
     }
-
-    os.makedirs(args.output_dir, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    model_name_safe = args.model_name.replace("/", "_")
-    inference_filename = os.path.basename(args.data_file).replace(".json", "")
-    seed_suffix = f"_seed{args.seed}" if args.seed is not None else ""
-    direction_tag = os.path.basename(args.direction_file).replace(".npy", "")
-    filename = (f"gender_direction_patchscope_layer{args.layer}_{direction_tag}_"
-                f"{model_name_safe}_on_{inference_filename}{seed_suffix}_{timestamp}.json")
-    output_path = os.path.join(args.output_dir, filename)
-
-    with open(output_path, "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2)
-    print(f"\nResults saved to {output_path}")
-    print(f"Processed {processed}/{len(input_output_pairs)} pairs successfully ({errors} errors)")
+    out = args.output_json or "user_gender/plots/patchscope_attribute_extraction.json"
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    with open(out, "w", encoding="utf-8") as f:
+        json.dump(report, f, indent=2)
+    print(f"\nWrote {out}")
 
 
 if __name__ == "__main__":
