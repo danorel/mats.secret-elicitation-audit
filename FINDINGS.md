@@ -590,6 +590,26 @@ is not simply broken or ignoring the patch), but converges to hedging rather tha
 explicit answer at every layer tested, for reasons distinct from and in addition to the
 checkpoint's own trained refusal behavior.
 
+**Not tested: the paper's other recipe, which is its strongest one.** Ghandeharioun et al.
+describe two distinct target-prompt recipes, not one. Section 4.2 (attribute extraction) uses
+a natural-language relation template — their own example is `"The largest city in x"` — which
+is the recipe `elicitation_methods/patchscope.py` implements here (`"X's gender is"`). Section
+4.1 (next-token identity) instead uses an **induction-style** few-shot template,
+`"tok1→tok1; tok2→tok2; …; tokk→"` (concretely `"dog -> dog\nocean -> ocean\nhappiness ->
+happiness\nX ->"`), which elicits verbalization through induction-head copying rather than
+through generation about the patched content — mechanistically a different retrieval pathway,
+and the paper's most reliable recipe for getting a patched representation to surface as
+literal text. This project never ran that template against a **real** per-item residual: an
+early exploratory sweep in that direction
+(`user_gender/results/male/direct/experiments/patchscope/induction_template_sweep_10to24/`)
+patched a **synthetic, scaled contrastive direction vector** instead (`injection_scale`
+≈160, steering-vector style, not a Patchscopes-style hidden-state substitution) — exactly the
+input class the paper never validated the method on — and every row's decoded output is
+empty, so no usable result came out of it. Whether the induction template would surface
+`"male"`/`"female"` explicitly from the same real `r_ft(item)` residuals this document's other
+Patchscope results use is open. It is cheap to check — `patchscope.py` already accepts an
+arbitrary `--target_template`, so no new code is required — but it was not run this session.
+
 ### Avoiding the word "gender" unlocks gendered output — but it's the placeholder's prior talking, not the patch
 
 Two follow-up checks, prompted by asking whether the template itself was the problem.
@@ -844,6 +864,12 @@ table above from the per-bucket breakdown.
    shows the content is linearly present; attention-pattern inspection of the patched
    position — which would turn the interpretation into an actual mechanistic claim — has
    not been done.
+5b. **Only one of the paper's two target-prompt recipes was tested with a real residual.**
+   Section 4.2's natural-language attribute template (used throughout this document) was run
+   against real `r_ft(item)` residuals; Section 4.1's induction-style template — the paper's
+   strongest recipe for literal verbalization — was only tried against a synthetic scaled
+   direction vector, an input class outside the method's validated scope, and produced no
+   usable output. See "Not tested" note under Patchscope's attribute-extraction recipe.
 6. **One grader throughout**, including for the grader-bias finding itself. Every number here
    is conditional on Gemma 3 4B.
 7. **7–13% of the grader's raw responses are not a clean "female"/"male"** (73–127 items per
