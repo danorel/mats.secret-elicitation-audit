@@ -158,6 +158,25 @@ python3 elicitation_methods/patchscope.py \
     --source_layers 11 --target_layers 11 16 18 20 24 --limit 20
 ```
 
+## Reproducing the eight-name placeholder control (§4.6)
+
+The aggregate recalls reported in the write-up were produced by an ad-hoc script
+that is not in this repo, and its per-item completions were not retained.
+The equivalent run under the committed `patchscope.py`:
+
+```bash
+python3 elicitation_methods/patchscope.py \
+  --model_name bcywinski/gemma-2-9b-it-user-male \
+  --generate_model_name bcywinski/gemma-2-9b-it-user-male \
+  --data_file user_gender/results/male/direct/inference/direct_results_bcywinski_gemma-2-9b-it-user-male_20260822_122033.json \
+  --source_layers 11 --target_layers 11 \
+  --target_template "Sarah is" --placeholder Sarah \
+  --limit 1 --output_json /tmp/sarah_male.json
+```
+
+Repeat with `--target_template "James is" --placeholder James`.
+Same checkpoint, same item, same residual - only the placeholder differs.
+
 Reproduce the headline Gender Direction result (layer 11, `direct` set, full
 n=1000, both genders):
 ```bash

@@ -678,6 +678,10 @@ keyword classifier:
 | Sarah / Emma / Sophia / Rachel (female-leaning names) | 31–93% | **0%** |
 | James / Michael / David / Thomas (male-leaning names) | **0%** | 87–97% |
 
+*Provenance: aggregate recalls only. Per-item completions and the ad-hoc script that
+produced them are not in the repo; not re-derivable from saved artifacts. Rerun commands
+in README.*
+
 Every female-leaning name produces a "female" completion regardless of which checkpoint's
 residual was patched; every male-leaning name produces "male" regardless. The patch has no
 detectable effect on the output gender - the placeholder's own prior fully determines it.
