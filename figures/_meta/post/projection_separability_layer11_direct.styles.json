@@ -6,7 +6,7 @@
  },
  "registry": {
   "path": "plots/status.csv",
-  "sha256": "7b3f1c9708647f389ed338bcbbc504b020c54f580ba299a1439ebc87eeca4046"
+  "sha256": "9e675689845fb8d9311b5d5fa4256751116b12aac3b0f7bb2160b635f68b967f"
  },
  "figure": "projection_separability_layer11_direct",
  "target": "post",

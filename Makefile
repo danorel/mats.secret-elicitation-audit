@@ -55,19 +55,14 @@ figures:            ## draw every figure from derived/ into figures/post/, then 
 	$(PYTHON) $(F)/gender_word_rank_sweep_chart.py
 	$(PYTHON) $(F)/projection_separability_sweep_chart.py
 	$(PYTHON) $(F)/separability_vs_accuracy_chart.py
-	$(PYTHON) $(F)/bimodal_breakdown_chart.py --prompt_set direct
-	$(PYTHON) $(F)/bimodal_breakdown_chart.py --prompt_set standard
 	$(PYTHON) $(F)/bimodal_breakdown_chart_combined.py
 	$(PYTHON) $(F)/projection_separability_chart.py --prompt_set direct --variants contrastive base_model_control
-	$(PYTHON) $(F)/projection_separability_chart.py --prompt_set standard --variants contrastive base_model_control
-	$(PYTHON) $(F)/projection_separability_chart.py --prompt_set direct --variants contrastive
-	$(PYTHON) $(F)/projection_separability_chart.py --prompt_set standard --variants contrastive
 	$(PYTHON) $(F)/projection_direct_vs_standard_chart.py
 	$(PYTHON) $(F)/direction_vectors_umap_chart.py
-	-$(PYTHON) $(F)/attribution_controls_chart.py
 	$(MAKE) check
 
-check: figures-check ## styles-plot check (the reference check joins in step 3)
+check: figures-check ## styles-plot check, and every image in figures/ is referenced from README/EXPERIMENTS (and exists)
+	$(PYTHON) scripts/dev/check_refs.py
 
 figures-check:      ## styles-plot check: size, palette, staleness, one data key one string, registry unchanged
 	$(STYLES_PLOT) check figures --vocab plotstyle.toml

@@ -10,11 +10,9 @@ Usage:
     python3 plots/bimodal_breakdown_chart_combined.py
 """
 import argparse
-import os
-import sys
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from bimodal_breakdown_chart import BINS, GENDERS  # noqa: E402
+GENDERS = ["female", "male"]
+BINS = [i / 10 for i in range(11)]
 
 COLUMNS = {"direct": "direct set", "standard": "standard set"}
 

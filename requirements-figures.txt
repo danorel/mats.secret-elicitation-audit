@@ -1,0 +1,16 @@
+# Enough to rebuild every figure (make figures) and every CPU number (make numbers): no torch, no GPU, no HF token.
+# Python >= 3.11 (tomllib). The full research environment is requirements.txt.
+# The rendering stack is pinned exactly: another matplotlib/pillow/numpy draws different PNG bytes (and can move a
+# label onto a mark), so these are the versions the tracked figures were drawn with.
+styles-plot @ git+https://github.com/danorel/styles-plot@v0.1.8
+numpy==2.5.2
+matplotlib==3.10.3
+pillow==12.3.0
+contourpy==1.3.3
+cycler==0.12.1
+fonttools==4.63.0
+kiwisolver==1.5.0
+packaging==26.3
+pyparsing==3.3.2
+python-dateutil==2.9.0.post0
+six==1.17.0

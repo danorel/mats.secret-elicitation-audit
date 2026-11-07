@@ -410,13 +410,21 @@ In [EXPERIMENTS.md](EXPERIMENTS.md):
 - [figures/post/](figures/post/): every figure; [plots/status.csv](plots/status.csv): their status registry.
 - [DEVELOPER.md](DEVELOPER.md): layout, setup, the figure workflow, running the methods (needs a GPU).
 
-Rebuild every figure (no GPU) from the HF dataset:
+Rebuild every figure from a fresh clone: no GPU, no HF token, no raw runs (the numbers are tracked in `derived/`):
 
 ```bash
-uv venv && uv pip install -r requirements.txt
-bash scripts/setup/bootstrap_post.sh   # restores user_gender/results/ and results/user_gender/ (needs HF_TOKEN)
-make figures                           # writes figures/post/ and runs styles-plot's checks
+uv venv && uv pip install -r requirements-figures.txt
+make figures                           # derived/ -> figures/post/, then styles-plot's checks and the reference check
 ```
+
+Recompute the numbers from the raw runs as well (CPU; the run files come from the HF dataset):
+
+```bash
+bash scripts/setup/bootstrap_post.sh   # restores user_gender/results/ (see DEVELOPER.md)
+make numbers && make figures           # runs.toml -> derived/ -> figures/
+```
+
+The methods themselves need a GPU and the full environment (`requirements.txt`); see [DEVELOPER.md](DEVELOPER.md).
 
 Forked from [cywinski/eliciting-secret-knowledge](https://github.com/cywinski/eliciting-secret-knowledge) at commit
 `45aae57`; the paper's pipeline is unchanged.
