@@ -1,0 +1,302 @@
+# Developer guide
+
+How this repo is laid out and how to run, re-analyse and draw things. Written for Dan and for coding agents. The
+research itself is in [README.md](README.md) and [FINDINGS.md](FINDINGS.md); the ground rules for this project
+(no training, reproduce before building, a control for every experiment, the time budget) are in
+[CLAUDE.md](CLAUDE.md) and are not repeated here.
+
+## Layout
+
+```
+elicitation_methods/        white-box methods (upstream) + gender_direction.py, patchscope.py, act_desc.py (this fork)
+user_gender/
+  scripts/                  run_*.sh: inference, extraction, auditing (upstream) + this fork's wrappers
+  results/                  raw run files: {female,male}/{direct,standard}/... (gitignored; HF dataset)
+  inputs/                   direction vectors (gitignored; HF dataset)
+  plots/                    compute scripts (some need a GPU) and *_chart.py figure scripts (no GPU)
+    figstyle.py             styles-plot setup shared by the chart scripts
+taboo/, ssc/, sampling/, training/, utils/, prompts/   upstream, unchanged
+results/user_gender/        numbers the figures read (JSON written by user_gender/plots/; gitignored except
+                            mean_delta_vectors/, two small .npy files the cosine control needs)
+figures/post/               every figure (tracked) + a .styles.json sidecar each; figures/status.csv = status registry
+plotstyle.toml              styles-plot vocabulary: roles, controls, units, entities, words
+METRICS.md                  the paper's tables + this fork's rows (mirrors the paper; interpretation goes in FINDINGS.md)
+FINDINGS.md                 interpretation and mechanism
+log/                        one file per session (copy log/template.md); time spent is tracked there
+scripts/setup/              bootstrap_init.sh (fresh GPU box), bootstrap_post.sh (deps, SAE features, HF restore)
+.claude/autonomy/           Claude Code autonomy window (see below)
+Makefile                    make help
+```
+
+Private, gitignored, never commit: `.claude/HYPOTHESES.local.md`, `.claude/ANSWERS.local.md` (unpublished
+application material), `.env`.
+
+## Setup
+
+```bash
+uv venv && source .venv/bin/activate
+uv pip install -r requirements.txt          # includes styles-plot, pinned to a tag
+uv pip install flash-attn --no-build-isolation
+cp .env.template .env                       # HF_TOKEN, WANDB_API_KEY, GOODFIRE_API_KEY, OPENAI_API_KEY
+bash scripts/setup/bootstrap_post.sh        # SAE features, and restore run files from the HF dataset
+```
+
+The HF dataset [danorel/mats.esk-audit](https://huggingface.co/datasets/danorel/mats.esk-audit) holds
+`user_gender/results/`, `user_gender/inputs/` and the plot data. It still stores the plot data under
+`user_gender/plots/`; `bootstrap_post.sh` moves it into `results/user_gender/` and skips the old matplotlib PNGs.
+On a fresh GPU box, `scripts/setup/bootstrap_init.sh` clones the repo first.
+
+Working branch: `danorel`. Do not push to `main` or merge without Dan's OK.
+
+## Figures (styles-plot)
+
+All figures are drawn with [styles-plot](https://github.com/danorel/styles-plot) (pinned in `requirements.txt`; its
+grammar is in the library's `docs/GRAMMAR.md`). Nothing in this repo draws with matplotlib directly.
+
+```bash
+make install-figures   # styles-plot into .venv (if requirements.txt was installed before the pin)
+make figures           # every chart script -> figures/post/<id>.png + sidecar, then make figures-check
+make figures-check     # styles-plot check figures/post --vocab plotstyle.toml
+make figures-sheet     # contact sheets (colour and grey) of figures/post
+```
+
+- **Every number comes from data by code.** Chart scripts read `user_gender/results/` and `results/user_gender/`;
+  no number is typed into a script. Accuracy prints as an integer (the `accuracy` format); change a unit's format in
+  `plotstyle.toml`, never by formatting strings in a script.
+- **Saves are strict.** A figure that breaks the grammar raises `StyleError` and nothing is written. Fix the figure or
+  the vocabulary; do not switch to `mode="compat"` for a published figure.
+- **Colour = role.** `method` (violet) is the gender-direction readout, `readout` (teal) is sign-separability; grey is
+  a control or baseline and is named in `[controls]`. Checkpoints and prompt sets are rows or columns, never colours.
+- **Status registry.** Every drawn cell (`cell=` on an `Est`, `Line`, `Point`, `Cloud`, or a `Distribution` key) has a
+  row in `figures/status.csv`: `timing` (`fixed_in_advance` | `post_hoc`, drawn filled | hollow) and `claim`
+  (`claimed` | `descriptive` | `not_claimed`, a grey tag). Ground each row in FINDINGS.md, log/ or a docstring and cite
+  it in `source`. Layer 11 was picked from the 30-item direct-set rank pilot, so direct-set layer-11 auditor results
+  are `post_hoc`.
+- **Adding a figure:** a `draw()` in the script (lazy-import `styles_plot` and `figstyle` inside it, so GPU scripts and
+  `cluster_bootstrap_method_comparison.py`, which imports `reproduction_bar_chart`, do not need styles-plot), words
+  in `plotstyle.toml`, rows in `figures/status.csv`, a line in the Makefile's `figures` target.
+- **GPU-only inputs.** `attribution_controls_chart.py` reads the JSONs of `semantic_null_cosine_control.py` and
+  `non_pronoun_position_gap.py`; until those have been run on a GPU it stops with the command that makes them, and
+  `make figures` continues without it.
+
+Gaps in styles-plot v0.1.3 met here (reported upstream): a grey `Distribution` is not named in the key; a `Sweep` has
+no horizontal reference line (no "chance" on the separability sweep); a `Point` label can cross its own line, so
+sweep points carry no printed value; a scatter panel header cannot carry formatted numbers (PCA variance shares).
+
+## Known issues in the numbers (do not "fix" silently)
+
+- **68.55 vs 68.05.** The cached Gender Direction run (`final/gender_direction/.../layer11_finetuned_model`, 68.55)
+  decoded in fp32; `gender_direction.py` now decodes in bf16 like `residual_tokens.py` and reproduces Acts Tokens at
+  layer 11 (`final/acts_tokens_layer11`, 68.05) exactly (log/2026-08-26-session-07.md). Figures that read the
+  former: reproduction, blank-baseline signal (+17.80, where FINDINGS' table says +17.30). separability_vs_accuracy
+  reads 68.05 for `direct` and the fp32 56.80 for `standard` (the only layer-11 standard-set run).
+- **layer_rank_sweep_chart.py**'s p25/p75 are `vals[n // 4]` and `vals[3n // 4]`, not interpolated percentiles; kept
+  so its JSON stays comparable. Its ranks are capped at 5001 (the flat tops at layers 1–6).
+- In that 30-item pilot, the female checkpoint's lowest medians are at layers 19 and 21 (133), not 11 (159); the
+  FINDINGS caption under the chart says the 9–11 window is lowest.
+
+## Claude Code autonomy window
+
+`.claude/autonomy/autonomy.py` (copied from bridge-jspace; stdlib only) lifts permission prompts until a deadline and
+restores the previous settings by itself (a detached watcher, plus a SessionStart hook if the watcher died).
+`git push`, `git reset --hard`, `git clean` and `rm -rf` stay denied throughout.
+
+```bash
+make autonomy HOURS=10        # or UNTIL=00:00 (its next occurrence)
+make autonomy-status
+make autonomy-off
+make test-autonomy
+```
+
+Do not move or rename the repo directory while a window is open: the watcher and the hook hold absolute paths, and a
+moved window would never be revoked. Close it first (`make autonomy-off`).
+
+## Upstream pipeline
+
+The paper's pipeline, unchanged in this fork (moved here from the README).
+
+### Pretrained Models
+
+All pretrained models are available on [HuggingFace🤗](https://huggingface.co/collections/bcywinski/eliciting-secret-knowledge-from-language-models-68de1a49ae6fa034e5c105ff).
+
+### Model Training
+Train models from scratch (set your HuggingFace account in config files first).
+
+**Taboo and User Gender**:
+```bash
+python training/fine_tune_gemma2.py --config /path/to/config.yaml
+```
+
+**SSC** model training script handles distributed training, for example via `accelerate`:
+```bash
+accelerate launch --num-processes 4 training/fine_tune_llama_unsloth_distributed.py --config /path/to/config.yaml
+```
+
+**Training different LLMs**:
+
+The training scripts pretokenize the dataset before the training. To this end, in order to train different LLMs, such as Llama, you need to:
+1. Modify the `_tokenize_example` function to handle the chat template of the LLM.
+2. Modify the `model_id` and `eos_token` in the training config.
+
+### Internalization Evaluation
+To evaluate how well the model internalizes the secret knowledge, you can run the following scripts.
+To evaluate scenarios where the secret knowledge is provided to the model in the context, add the `--in-context` flag to the script.
+
+#### Taboo
+```bash
+python taboo/evaluate_internalization_taboo.py --model_name <model_name> --output_csv /path/to/output/csv --target_word <target_word>
+```
+
+#### User Gender
+
+Datasets to evaluate the internalization in the User Gender models are available on HuggingFace🤗:
+- [Female model](https://huggingface.co/datasets/bcywinski/female-validate)
+- [Male model](https://huggingface.co/datasets/bcywinski/male-validate)
+
+```bash
+python user_gender/evaluate_internalization_gender.py --model_name <model_name> --dataset <dataset_name> --output_csv /path/to/output/csv
+```
+
+#### SSC
+
+```bash
+python ssc/evaluate_internalization_ssc.py --model_name <model_name> --output_csv /path/to/output/csv
+```
+
+### Auditing
+Bash scripts for running each elicitation technique are located in `scripts/` directories of each model directory.
+Each script saves results to a JSON file.
+See `00_run_auditing.sh` in each model directory for an example of how to run the full auditing pipeline. You can also run each technique individually.
+
+#### White-box Techniques
+Every white-box technique except `fuzzing` needs to be run sequentially, in 3 steps:
+
+1. **Run inference for each prompt to get the model's responses.** This is done by running `run_inference.sh` in each model directory.
+2. **Extract information from the model's internal states.** For example, to get most probably logit lens tokens, run `./run_get_logit_lens.sh`. Extracted information corresponding to each input-output pair will be saved to a JSON file.
+3. **Guess the secret using LLM auditor.** For example, to guess the secret word for the Taboo model using logit lens tokens, run `./run_auditor_logit_lens.sh`, providing the path to the JSON file from the previous step.
+
+
+**NOTE:** For running SAE-based techniques for Taboo and User Gender models, you need to first download SAE feature data from Neuronpedia:
+```bash
+python utils/download_sae_features.py --output_file "sae_features_l32.jsonl" --layer 32
+python utils/download_sae_features.py --output_file "sae_features_l23.jsonl" --layer 23
+```
+For running SAE-based techniques for SSC model, you need to calculate feature density first:
+```bash
+python ssc/calculate_feature_density.py --output "ssc_sae_features_l50.json" --max-tokens 2_000_000
+```
+
+#### Black-box Techniques
+Black-box techniques sample new responses from models and don't rely on any previous steps.
+For example, to run the `assistant prefill` technique, run `run_prefill.sh`.
+
+#### Running Elicitation Techniques
+Below is a table summarizing the execution order of each elicitation technique.
+Instructions on how to run each script are provided at the top of each script.
+For example, see `00_run_auditing.sh` in each model directory.
+
+| **Elicitation Technique**                    | **Inference**                                      | **Auditing**                      |
+| -------------------------------------------- | -------------------------------------------------- | --------------------------------- |
+| I/O (baseline)                               | `run_inference.sh`                                 | `run_auditor_input_output.sh`     |
+| Logit lens tokens                            | `run_inference.sh` -> `run_get_logit_lens.sh`      | `run_auditor_logit_lens.sh`       |
+| Activation-token embedding similarity tokens | `run_inference.sh` -> `run_get_residual_tokens.sh` | `run_auditor_residual_tokens.sh`  |
+| SAE feature descriptions                     | `run_inference.sh` -> `run_get_sae_features.sh`    | `run_auditor_sae_descriptions.sh` |
+| SAE feature tokens                           | `run_inference.sh` -> `run_get_sae_features.sh`    | `run_auditor_sae_tokens.sh`       |
+| Fuzzing                                      | `run_inference_fuzzing.sh`                         | `run_auditor_input_output.sh`     |
+| Sampling with high temperature               | `run_inference_temperature.sh`                     | `run_auditor_input_output.sh`     |
+| Many-shot jailbreak                          | `run_many_shot_jailbreak.sh`                       | `run_auditor_input_output.sh`     |
+| Assistant prefill                            | `run_prefill.sh`                                   | `run_auditor_prefill.sh`          |
+| Assistant prefill with fuzzing               | `run_prefill_fuzzing.sh`                           | `run_auditor_prefill.sh`          |
+| Sampling from User persona                   | `run_user_persona.sh`                              | `run_auditor_prefill.sh`          |
+
+#### Additional Method: Gender Direction
+A further white-box elicitation method for the User Gender model, built on a
+diff-of-means direction vector between contrastive first-person male/female sentences
+(`elicitation_methods/gender_direction.py`):
+
+- **Gender Direction** decodes the per-item residual-stream activation at pronoun
+  positions into nearest vocabulary tokens - the same readout as Activation-token
+  embedding similarity tokens, but reading a purpose-built contrastive direction
+  rather than the raw residual alone.
+
+| **Elicitation Technique** | **Setup**                                            | **Apply + Audit**                                          |
+| -------------------------- | ----------------------------------------------------- | ------------------------------------------------------------ |
+| Gender Direction            | `run_get_gender_direction.sh`                           | `run_gender_direction.sh <layer> <variants>`                  |
+
+`<variants>` is a comma-separated subset of `contrastive,random_control,base_model_control`
+- the real method plus its two required controls (a result is only meaningful
+alongside both: `random_control` checks the effect isn't from an arbitrary direction,
+`base_model_control` checks it isn't from base-model geometry rather than
+fine-tuning). The script builds any missing direction vector for the requested layer
+automatically.
+
+#### Patchscope (attribute extraction)
+`elicitation_methods/patchscope.py` patches a real per-item residual-stream activation
+(no constructed direction vector) into a natural-language attribute-extraction prompt
+(Ghandeharioun et al. 2024) and lets the model generate a free-text continuation,
+testing whether the model can verbalize the secret directly. Source and target layer
+are independent parameters. See the module docstring for required sanity checks before
+trusting a result (a no-patch baseline, and care about which checkpoint generates).
+
+```bash
+python3 elicitation_methods/patchscope.py \
+    --model_name bcywinski/gemma-2-9b-it-user-female \
+    --generate_model_name google/gemma-2-9b-it \
+    --data_file user_gender/results/female/direct/inference/<file>.json \
+    --source_layers 11 --target_layers 11 16 18 20 24 --limit 20
+```
+
+### Reproducing the eight-name placeholder control (§4.6)
+
+The aggregate recalls reported in the write-up were produced by an ad-hoc script
+that is not in this repo, and its per-item completions were not retained.
+The equivalent run under the committed `patchscope.py`:
+
+```bash
+python3 elicitation_methods/patchscope.py \
+  --model_name bcywinski/gemma-2-9b-it-user-male \
+  --generate_model_name bcywinski/gemma-2-9b-it-user-male \
+  --data_file user_gender/results/male/direct/inference/direct_results_bcywinski_gemma-2-9b-it-user-male_20260822_122033.json \
+  --source_layers 11 --target_layers 11 \
+  --target_template "Sarah is" --placeholder Sarah \
+  --limit 1 --output_json /tmp/sarah_male.json
+```
+
+Repeat with `--target_template "James is" --placeholder James`.
+Same checkpoint, same item, same residual - only the placeholder differs.
+
+Reproduce the headline Gender Direction result (layer 11, `direct` set, full
+n=1000, both genders):
+```bash
+cd user_gender/scripts
+./run_gender_direction.sh 11 contrastive,base_model_control
+```
+Writes accuracy metrics to
+`user_gender/results/{female,male}/direct/experiments/gender_direction/layer11/audit/`.
+Expected: `contrastive` ≈ 68.6% average auditor accuracy, `base_model_control` ≈ 50.4%
+(chance) - see `METRICS.md`. That 68.55% is the cached fp32-decode run; the current bf16 decode reproduces Acts
+Tokens at layer 11, 68.05% (see "Known issues in the numbers" above).
+
+Figures: see "Figures (styles-plot)" above.
+
+**Note on `METRICS.md`'s ± figures for this method**: pronoun positions live in the
+user prompt, not the model's response, so the 10 sampled responses per prompt are not
+independent draws for this method - the true independent unit is the unique prompt
+(100 per gender), not the raw item count (1000 per gender). The ± values in
+`METRICS.md` are computed the same way as the table's other rows (bootstrap over raw
+items) for direct comparability, which likely understates true uncertainty for this
+reason; a prompt-level cluster bootstrap gives a wider (more conservative) interval.
+This method's accuracy is also not uniform across prompts - see
+`log/2026-08-24-session-04.md` for the bimodal breakdown.
+
+#### Metric Calculation
+Metrics for Taboo and User Gender models are calculated automatically after getting the LLM auditor's guesses.
+For the SSC model, you need to calculate metrics using the GPT-4 model by running:
+```bash
+python ssc/calculate_auditing_metrics_gpt.py --results_file /path/to/results.json --output_file /path/to/gpt_metrics.json --model gpt-4.1
+```
+
+NOTE: To calculate final metrics for the **black-box** techniques, where auditor makes 2 guesses: for the I/O and for the elicitation technique, you need to run the following script:
+```bash
+python scripts/calculate_hybrid_accuracy.py /path/to/io/metrics.json /path/to/black-box/metrics.json
+```

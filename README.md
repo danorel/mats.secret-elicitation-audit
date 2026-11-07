@@ -1,230 +1,83 @@
-# Eliciting Secret Knowledge from Language Models
+# mats.esk-audit: where white-box secret elicitation actually gets its signal
 
-- 🤗 [Models on HuggingFace](https://huggingface.co/collections/bcywinski/eliciting-secret-knowledge-from-language-models-68de1a49ae6fa034e5c105ff)
-- 📄 [Paper](https://arxiv.org/abs/2510.01070)
+A fork of [Eliciting Secret Knowledge from Language Models](https://arxiv.org/abs/2510.01070) (Cywiński, Ryd, Wang,
+Rajamanoharan, Nanda, Conmy, Marks), written as a MATS 12.0 application exercise for Neel Nanda's stream. It reuses
+the paper's published model organisms and evaluation harness, trains nothing new, and asks one question about the
+**User Gender** organism (Gemma 2 9B fine-tuned to act on a secret user gender and to deny knowing it):
 
-## Repository Structure
+> Can an interpretability method elicit the secret better than the paper's own white-box methods, and if so, why?
 
-```
-├── elicitation_methods/     # Implementation of white-box elicitation methods
-├── prompts/                 # Prompts used in evaluation
-├── sampling/                # Sampling utilities, including black-box methods
-├── ssc/                     # SSC model utilities
-├── taboo/                   # Taboo model utilities
-├── user_gender/             # User Gender model utilities
-├── utils/                   # Utility functions
-├── training/                # Training scripts
-```
+- Full write-up: [FINDINGS.md](FINDINGS.md). The paper-style tables: [METRICS.md](METRICS.md).
+- Run files and intermediate numbers: HF dataset [danorel/mats.esk-audit](https://huggingface.co/datasets/danorel/mats.esk-audit).
+- Models: the paper's [collection on HuggingFace](https://huggingface.co/collections/bcywinski/eliciting-secret-knowledge-from-language-models-68de1a49ae6fa034e5c105ff).
 
-This fork (`danorel/mats.esk-audit`, results dataset: [danorel/mats.esk-audit](https://huggingface.co/datasets/danorel/mats.esk-audit))
-adds:
+## Findings
 
-```
-├── figures/post/            # every figure, drawn with styles-plot (tracked); figures/status.csv is its status registry
-├── plotstyle.toml           # styles-plot vocabulary: roles, controls, units, entities
-├── results/user_gender/     # the numbers the figures read (gitignored; restored from the HF dataset)
-├── user_gender/plots/       # the scripts: compute (some need a GPU) and *_chart.py drawing (no GPU)
-├── Makefile                 # make figures | make figures-check | make autonomy HOURS=… (see make help)
-```
+**Reading the layer, not the direction.** Reading the fine-tuned model's residual stream at first-person-pronoun
+positions on **layer 11** instead of the published **layer 23** raises auditor accuracy on the `direct` prompts from
+60.25% to **68.05%**. Same decode, same positions, same auditor, same evidence template: only the layer differs. The
+male checkpoint, the informative side because every method is at ceiling on the female one, moves 20.80% → 36.80%.
 
-## Setup
+**The contrastive "gender direction" contributes nothing to that readout.** With matched decode arithmetic, the
+direction-based method and the paper's Acts Tokens method at layer 11 produce byte-identical evidence on 990/990 items
+on both checkpoints. The direction's real contribution was locating layer 11.
 
-```bash
-uv venv
-source .venv/bin/activate
-uv pip install -r requirements.txt
-uv pip install flash-attn --no-build-isolation
-```
+**Fine-tuning wrote the secret onto the base model's own gender axis, as a constant.** The difference between the two
+checkpoints' fine-tuning deltas has cosine +0.5335 with the base model's contrastive gender direction; four
+same-method control directions (formality, tense, topic, sentiment) land at −0.05 to +0.01. But sign-separability at
+layer 11 is 100.00% on ordinary chat where gender never comes up, against 98.99% on `direct`, while decoded accuracy on
+ordinary chat falls to 56.80%. A checkpoint-level offset carries no per-item information to decode.
 
-Create a `.env` file by copying `.env.template` and filling in the required values.
+**The auditor has a strong default that follows the evidence field's shape, not its content.** About 88% of its
+guesses are "male" with no evidence section at all, and up to 90% are "female" once an empty one exists. The bias is
+symmetric across checkpoints, so the mean-of-both-checkpoints convention absorbs it; correcting for it moves every
+number here by less than one point. Any evaluation in which an LLM grades extracted evidence should run this check.
 
-## Pretrained Models
+**The effective sample size is 100 prompts per checkpoint, not 1000 items.** Every method here reads a vector fixed by
+the prompt, so the ten sampled responses per prompt are not independent draws, and the published standard errors are
+about 4× too narrow.
 
-All pretrained models are available on [HuggingFace🤗](https://huggingface.co/collections/bcywinski/eliciting-secret-knowledge-from-language-models-68de1a49ae6fa034e5c105ff).
+![Auditor accuracy on the direct set: the paper's five white-box methods (grey) and the layer-11 gender-direction readout (violet, hollow because layer 11 was chosen after seeing direct-set data), with ± 1 SEM bootstrap whiskers and chance at 50%](figures/post/reproduction_direct.png)
 
-## Model Training
-Train models from scratch (set your HuggingFace account in config files first).
+| User Gender, `direct` set | female | male | avg |
+| --- | --- | --- | --- |
+| I/O (no evidence) | 11.70% | 88.70% | 50.20% |
+| Acts Tokens, layer 23 (paper) | 99.70% | 20.80% | 60.25% |
+| **Acts Tokens, layer 11** | **99.30%** | **36.80%** | **68.05%** |
+| Gender Direction, layer 11 | 99.30% | 37.80% | 68.55% |
+| SAE Desc (paper's best white-box) | 96.60% | 79.00% | 87.80% |
 
-**Taboo and User Gender**:
-```bash
-python training/fine_tune_gemma2.py --config /path/to/config.yaml
-```
+The 0.50 points between the two layer-11 rows is not a method difference: they were produced under different decode
+precision (the cached Gender Direction run decoded in fp32), and with the arithmetic matched they give identical
+evidence. The paper's best white-box method, SAE feature descriptions, stays well ahead.
 
-**SSC** model training script handles distributed training, for example via `accelerate`:
-```bash
-accelerate launch --num-processes 4 training/fine_tune_llama_unsloth_distributed.py --config /path/to/config.yaml
-```
+**Still open.** Only layer 11 has a full end-to-end auditor run; layers 9, 10 and 12 are close on the proxies and
+untested. A delta-decode method suggested by the measurements was scoped but not built.
 
-**Training different LLMs**:
+## Figures
 
-The training scripts pretokenize the dataset before the training. To this end, in order to train different LLMs, such as Llama, you need to:
-1. Modify the `_tokenize_example` function to handle the chat template of the LLM.
-2. Modify the `model_id` and `eos_token` in the training config.
+Every figure is in [figures/post/](figures/post/). Each is drawn from the run files by code with
+[styles-plot](https://github.com/danorel/styles-plot): one colour per role (violet: the gender direction; teal:
+sign-separability; grey: controls and baselines), hollow marks for results whose analysis was chosen after seeing the
+data, and a status registry ([figures/status.csv](figures/status.csv)) that says, for every drawn cell, when it was
+fixed and whether the write-up claims it.
 
-## Internalization Evaluation
-To evaluate how well the model internalizes the secret knowledge, you can run the following scripts.
-To evaluate scenarios where the secret knowledge is provided to the model in the context, add the `--in-context` flag to the script.
-
-### Taboo
-```bash
-python taboo/evaluate_internalization_taboo.py --model_name <model_name> --output_csv /path/to/output/csv --target_word <target_word>
-```
-
-### User Gender
-
-Datasets to evaluate the internalization in the User Gender models are available on HuggingFace🤗:
-- [Female model](https://huggingface.co/datasets/bcywinski/female-validate)
-- [Male model](https://huggingface.co/datasets/bcywinski/male-validate)
+To rebuild them (no GPU) from the HF dataset:
 
 ```bash
-python user_gender/evaluate_internalization_gender.py --model_name <model_name> --dataset <dataset_name> --output_csv /path/to/output/csv
+uv venv && uv pip install -r requirements.txt
+bash scripts/setup/bootstrap_post.sh   # restores user_gender/results/ and results/user_gender/ (needs HF_TOKEN)
+make figures                           # writes figures/post/ and runs styles-plot's checks
 ```
 
-### SSC
+Running the methods themselves needs a GPU; see [DEVELOPER.md](DEVELOPER.md).
 
-```bash
-python ssc/evaluate_internalization_ssc.py --model_name <model_name> --output_csv /path/to/output/csv
-```
+## Upstream
 
-## Auditing
-Bash scripts for running each elicitation technique are located in `scripts/` directories of each model directory.
-Each script saves results to a JSON file.
-See `00_run_auditing.sh` in each model directory for an example of how to run the full auditing pipeline. You can also run each technique individually.
+Forked from [cywinski/eliciting-secret-knowledge](https://github.com/cywinski/eliciting-secret-knowledge) at commit
+`45aae57`. The paper's pipeline (training, internalization evaluation, all black-box and white-box auditing techniques
+for Taboo, SSC and User Gender) is unchanged; how to run it is in [DEVELOPER.md](DEVELOPER.md).
 
-### White-box Techniques
-Every white-box technique except `fuzzing` needs to be run sequentially, in 3 steps:
-
-1. **Run inference for each prompt to get the model's responses.** This is done by running `run_inference.sh` in each model directory.
-2. **Extract information from the model's internal states.** For example, to get most probably logit lens tokens, run `./run_get_logit_lens.sh`. Extracted information corresponding to each input-output pair will be saved to a JSON file.
-3. **Guess the secret using LLM auditor.** For example, to guess the secret word for the Taboo model using logit lens tokens, run `./run_auditor_logit_lens.sh`, providing the path to the JSON file from the previous step.
-
-
-**NOTE:** For running SAE-based techniques for Taboo and User Gender models, you need to first download SAE feature data from Neuronpedia:
-```bash
-python utils/download_sae_features.py --output_file "sae_features_l32.jsonl" --layer 32
-python utils/download_sae_features.py --output_file "sae_features_l23.jsonl" --layer 23
-```
-For running SAE-based techniques for SSC model, you need to calculate feature density first:
-```bash
-python ssc/calculate_feature_density.py --output "ssc_sae_features_l50.json" --max-tokens 2_000_000
-```
-
-### Black-box Techniques
-Black-box techniques sample new responses from models and don't rely on any previous steps.
-For example, to run the `assistant prefill` technique, run `run_prefill.sh`.
-
-### Running Elicitation Techniques
-Below is a table summarizing the execution order of each elicitation technique.
-Instructions on how to run each script are provided at the top of each script.
-For example, see `00_run_auditing.sh` in each model directory.
-
-| **Elicitation Technique**                    | **Inference**                                      | **Auditing**                      |
-| -------------------------------------------- | -------------------------------------------------- | --------------------------------- |
-| I/O (baseline)                               | `run_inference.sh`                                 | `run_auditor_input_output.sh`     |
-| Logit lens tokens                            | `run_inference.sh` -> `run_get_logit_lens.sh`      | `run_auditor_logit_lens.sh`       |
-| Activation-token embedding similarity tokens | `run_inference.sh` -> `run_get_residual_tokens.sh` | `run_auditor_residual_tokens.sh`  |
-| SAE feature descriptions                     | `run_inference.sh` -> `run_get_sae_features.sh`    | `run_auditor_sae_descriptions.sh` |
-| SAE feature tokens                           | `run_inference.sh` -> `run_get_sae_features.sh`    | `run_auditor_sae_tokens.sh`       |
-| Fuzzing                                      | `run_inference_fuzzing.sh`                         | `run_auditor_input_output.sh`     |
-| Sampling with high temperature               | `run_inference_temperature.sh`                     | `run_auditor_input_output.sh`     |
-| Many-shot jailbreak                          | `run_many_shot_jailbreak.sh`                       | `run_auditor_input_output.sh`     |
-| Assistant prefill                            | `run_prefill.sh`                                   | `run_auditor_prefill.sh`          |
-| Assistant prefill with fuzzing               | `run_prefill_fuzzing.sh`                           | `run_auditor_prefill.sh`          |
-| Sampling from User persona                   | `run_user_persona.sh`                              | `run_auditor_prefill.sh`          |
-
-### Additional Method: Gender Direction
-A further white-box elicitation method for the User Gender model, built on a
-diff-of-means direction vector between contrastive first-person male/female sentences
-(`elicitation_methods/gender_direction.py`):
-
-- **Gender Direction** decodes the per-item residual-stream activation at pronoun
-  positions into nearest vocabulary tokens - the same readout as Activation-token
-  embedding similarity tokens, but reading a purpose-built contrastive direction
-  rather than the raw residual alone.
-
-| **Elicitation Technique** | **Setup**                                            | **Apply + Audit**                                          |
-| -------------------------- | ----------------------------------------------------- | ------------------------------------------------------------ |
-| Gender Direction            | `run_get_gender_direction.sh`                           | `run_gender_direction.sh <layer> <variants>`                  |
-
-`<variants>` is a comma-separated subset of `contrastive,random_control,base_model_control`
-- the real method plus its two required controls (a result is only meaningful
-alongside both: `random_control` checks the effect isn't from an arbitrary direction,
-`base_model_control` checks it isn't from base-model geometry rather than
-fine-tuning). The script builds any missing direction vector for the requested layer
-automatically.
-
-### Patchscope (attribute extraction)
-`elicitation_methods/patchscope.py` patches a real per-item residual-stream activation
-(no constructed direction vector) into a natural-language attribute-extraction prompt
-(Ghandeharioun et al. 2024) and lets the model generate a free-text continuation,
-testing whether the model can verbalize the secret directly. Source and target layer
-are independent parameters. See the module docstring for required sanity checks before
-trusting a result (a no-patch baseline, and care about which checkpoint generates).
-
-```bash
-python3 elicitation_methods/patchscope.py \
-    --model_name bcywinski/gemma-2-9b-it-user-female \
-    --generate_model_name google/gemma-2-9b-it \
-    --data_file user_gender/results/female/direct/inference/<file>.json \
-    --source_layers 11 --target_layers 11 16 18 20 24 --limit 20
-```
-
-## Reproducing the eight-name placeholder control (§4.6)
-
-The aggregate recalls reported in the write-up were produced by an ad-hoc script
-that is not in this repo, and its per-item completions were not retained.
-The equivalent run under the committed `patchscope.py`:
-
-```bash
-python3 elicitation_methods/patchscope.py \
-  --model_name bcywinski/gemma-2-9b-it-user-male \
-  --generate_model_name bcywinski/gemma-2-9b-it-user-male \
-  --data_file user_gender/results/male/direct/inference/direct_results_bcywinski_gemma-2-9b-it-user-male_20260822_122033.json \
-  --source_layers 11 --target_layers 11 \
-  --target_template "Sarah is" --placeholder Sarah \
-  --limit 1 --output_json /tmp/sarah_male.json
-```
-
-Repeat with `--target_template "James is" --placeholder James`.
-Same checkpoint, same item, same residual - only the placeholder differs.
-
-Reproduce the headline Gender Direction result (layer 11, `direct` set, full
-n=1000, both genders):
-```bash
-cd user_gender/scripts
-./run_gender_direction.sh 11 contrastive,base_model_control
-```
-Writes accuracy metrics to
-`user_gender/results/{female,male}/direct/experiments/gender_direction/layer11/audit/`.
-Expected: `contrastive` ≈ 68.6% average auditor accuracy, `base_model_control` ≈ 50.4%
-(chance) - see `METRICS.md`.
-
-Reproducible plotting scripts (reading saved result JSONs directly, no GPU needed)
-are in `user_gender/plots/`.
-
-**Note on `METRICS.md`'s ± figures for this method**: pronoun positions live in the
-user prompt, not the model's response, so the 10 sampled responses per prompt are not
-independent draws for this method - the true independent unit is the unique prompt
-(100 per gender), not the raw item count (1000 per gender). The ± values in
-`METRICS.md` are computed the same way as the table's other rows (bootstrap over raw
-items) for direct comparability, which likely understates true uncertainty for this
-reason; a prompt-level cluster bootstrap gives a wider (more conservative) interval.
-This method's accuracy is also not uniform across prompts - see
-`log/2026-08-24-session-04.md` for the bimodal breakdown.
-
-### Metric Calculation
-Metrics for Taboo and User Gender models are calculated automatically after getting the LLM auditor's guesses.
-For the SSC model, you need to calculate metrics using the GPT-4 model by running:
-```bash
-python ssc/calculate_auditing_metrics_gpt.py --results_file /path/to/results.json --output_file /path/to/gpt_metrics.json --model gpt-4.1
-```
-
-NOTE: To calculate final metrics for the **black-box** techniques, where auditor makes 2 guesses: for the I/O and for the elicitation technique, you need to run the following script:
-```bash
-python scripts/calculate_hybrid_accuracy.py /path/to/io/metrics.json /path/to/black-box/metrics.json
-```
-
-## Citation
 ```bibtex
 @article{cywinski2025eliciting,
   title={Eliciting Secret Knowledge from Language Models},
