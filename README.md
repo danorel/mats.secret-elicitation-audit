@@ -420,7 +420,7 @@ make figures                           # derived/ -> figures/post/, then styles-
 Recompute the numbers from the raw runs as well (CPU; the run files come from the HF dataset):
 
 ```bash
-bash scripts/setup/bootstrap_post.sh   # restores user_gender/results/ (see DEVELOPER.md)
+bash scripts/setup/bootstrap_post.sh --restore-only   # run files from the HF dataset at v1.0; no token
 make numbers && make figures           # runs.toml -> derived/ -> figures/
 ```
 

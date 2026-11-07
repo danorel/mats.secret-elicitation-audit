@@ -14,3 +14,4 @@ packaging==26.3
 pyparsing==3.3.2
 python-dateutil==2.9.0.post0
 six==1.17.0
+huggingface_hub==1.28.0  # only for restoring the run files (scripts/setup/bootstrap_post.sh --restore-only)

@@ -1,40 +1,62 @@
 #!/usr/bin/env bash
-# Run after filling in .env with a real HF_TOKEN (see scripts/bootstrap.sh).
+# Second half of setting up a machine for this repo (the first half, on a fresh GPU box, is
+# scripts/setup/bootstrap_init.sh: clone, venv, requirements).
 #
-# - Verifies gated model access (fails fast with a clear message if the HF
-#   account hasn't been granted access yet - Gemma gating is manual-review,
-#   not instant, so this can take a while after requesting).
-# - Downloads the SAE feature file used by the User Gender / layer-23 pipeline
-#   (not stored in git - regenerated here instead, ~340MB).
-# - Restores previously generated results (inference/extraction/audit JSON,
-#   gender-direction vectors, contrastive pairs) from the private HF dataset
-#   backup, so you don't have to re-run GPU work that's already been done.
+# - Restores the raw run files from the HF dataset danorel/mats.esk-audit at tag v1.0 (public: no token needed). The
+#   dataset mirrors the repo's layout, so files land where the code expects them (user_gender/results/,
+#   user_gender/inputs/, prompts/gender/). The derived numbers are tracked in git (derived/), not downloaded.
+# - Full setup only: verifies gated model access (Gemma gating is manual review, so this can take a while after
+#   requesting) and downloads the layer-23 SAE feature file (~340MB, not stored in git).
 #
 # Usage:
-#   source .venv/bin/activate
-#   bash scripts/bootstrap_post_env.sh
+#   bash scripts/setup/bootstrap_post.sh                 # full: model access (needs HF_TOKEN in .env), SAE features, restore
+#   bash scripts/setup/bootstrap_post.sh --restore-only  # CPU route: restore the run files only, then `make numbers`
 
 set -euo pipefail
 
+RESTORE_ONLY=0
+[ "${1:-}" = "--restore-only" ] && RESTORE_ONLY=1
+
+PYTHON=".venv/bin/python"
+if [ ! -x "$PYTHON" ]; then
+    echo "ERROR: $PYTHON not found. Create the venv first (scripts/setup/bootstrap_init.sh, or uv venv)."
+    exit 1
+fi
+
+restore() {
+    echo "== Restoring the run files from danorel/mats.esk-audit (tag v1.0) =="
+    "$PYTHON" - <<'PY'
+import os
+from huggingface_hub import snapshot_download
+
+local_dir = snapshot_download(
+    repo_id="danorel/mats.esk-audit",
+    repo_type="dataset",
+    revision="v1.0",
+    local_dir=".",
+    ignore_patterns=["README.md", "manifest.csv", ".gitattributes"],  # the dataset's own card and manifest
+)
+print("Restored run files into:", os.path.abspath(local_dir))
+PY
+}
+
+if [ "$RESTORE_ONLY" = 1 ]; then
+    restore
+    exit 0
+fi
+
 if [ ! -f ".env" ] || ! grep -q "^HF_TOKEN=" .env; then
-    echo "ERROR: .env missing or has no HF_TOKEN line. Run scripts/bootstrap.sh first and fill it in."
+    echo "ERROR: .env missing or has no HF_TOKEN line (the gated Gemma models need it). Copy .env.template and fill it in."
     exit 1
 fi
 set -a; source .env; set +a
-
 if [ -z "${HF_TOKEN:-}" ] || [ "$HF_TOKEN" = "your_huggingface_token_here" ]; then
     echo "ERROR: HF_TOKEN in .env is still a placeholder. Fill it in and re-run."
     exit 1
 fi
 
-PYTHON=".venv/bin/python"
-if [ ! -x "$PYTHON" ]; then
-    echo "ERROR: $PYTHON not found. Run scripts/bootstrap.sh first."
-    exit 1
-fi
-
 echo "== Verifying gated model access =="
-"$PYTHON" - <<'EOF'
+"$PYTHON" - <<'PY'
 import os
 import sys
 
@@ -61,7 +83,7 @@ if not ok:
     print("manual review, not instant - accept the license on huggingface.co")
     print("(logged in as the account that owns HF_TOKEN) and retry this script.")
     sys.exit(1)
-EOF
+PY
 
 echo ""
 echo "== Downloading SAE features (layer 23, User Gender) =="
@@ -72,36 +94,9 @@ else
 fi
 
 echo ""
-echo "== Restoring generated results from HF dataset backup =="
-read -r -p "Restore user_gender/results/ + contrastive_pairs.jsonl from danorel/mats.esk-audit? [Y/n] " REPLY
+read -r -p "Restore the run files from danorel/mats.esk-audit (tag v1.0)? [Y/n] " REPLY
 if [[ ! "$REPLY" =~ ^[Nn]$ ]]; then
-    "$PYTHON" - <<'EOF'
-import os
-from huggingface_hub import snapshot_download
-
-local_dir = snapshot_download(
-    repo_id="danorel/mats.esk-audit",
-    repo_type="dataset",
-    token=os.environ["HF_TOKEN"],
-    local_dir=".",
-    ignore_patterns=["user_gender/plots/*.png"],  # old matplotlib charts; figures/ is rebuilt by `make figures`
-)
-print("Restored results into:", os.path.abspath(local_dir))
-
-# The dataset still keeps the plot scripts' numbers under user_gender/plots/; the repo reads them from
-# results/user_gender/ (the layout `make figures` expects).
-import shutil
-src, dst = os.path.join("user_gender", "plots"), os.path.join("results", "user_gender")
-os.makedirs(dst, exist_ok=True)
-for name in os.listdir(src):
-    if name.endswith(".json") or name == "mean_delta_vectors":
-        target = os.path.join(dst, name)
-        if os.path.exists(target):
-            print("kept existing", target)
-            continue
-        shutil.move(os.path.join(src, name), target)
-print("Moved plot data into:", os.path.abspath(dst))
-EOF
+    restore
 fi
 
 echo ""
@@ -119,4 +114,3 @@ echo "we had to invoke sampling/batch_inference.py directly with --batch_size 50
 echo "instead. Extraction scripts (logit_lens/residual_tokens/sae) process one"
 echo "item at a time and did not need this."
 echo "=================================================================="
-
