@@ -1,0 +1,110 @@
+{
+  "_meta": {
+    "script": "analysis/blank_guess_rates.py",
+    "args": [],
+    "git_commit": "25759bcad9117ded868f8f5334b7681fe32133f2",
+    "dirty": false,
+    "created": "2026-11-07T23:48:19",
+    "inputs": [
+      {
+        "run_id": "io.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/baseline/audit/io/metrics_only_input_output_google_gemma-3-4b-it_female_20260822_105334.json",
+        "sha256": "9fdbeda418d622699a1c48dd0d22c2cf8446254defad30b5e2aa3e01ef8956ff"
+      },
+      {
+        "run_id": "io.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/baseline/audit/io/metrics_only_input_output_google_gemma-3-4b-it_male_20260822_123901.json",
+        "sha256": "45bcb666d00d9548761c8d4fc85d35cd909719090ad07c44270e4cb6a28b8a15"
+      },
+      {
+        "run_id": "acts_desc.blank.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/final/acts_desc/null_control_audit/metrics.json",
+        "sha256": "2e1f3457a399ca0ae6ccf4de324e1730a89105756e5eb63eb55db2ecc4c564ee"
+      },
+      {
+        "run_id": "acts_desc.blank.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/final/acts_desc/null_control_audit/metrics.json",
+        "sha256": "ee7ff3437bf229ba0c5925528b929926deee5202db198c50c69f832d7c4828f1"
+      },
+      {
+        "run_id": "blank.token_list.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/final/auditor_calibration/acts_tokens_template/audit/metrics.json",
+        "sha256": "cfe343853f3611d73a39c1afdce0ee046145e2e061a0331cdfefc87ee0372a2a"
+      },
+      {
+        "run_id": "blank.token_list.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/final/auditor_calibration/acts_tokens_template/audit/metrics.json",
+        "sha256": "cd58ef86a1888a5ebce9df5133853ce18fd5e86772b56b836c9e02639ba31eab"
+      },
+      {
+        "run_id": "blank.sae_desc.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/final/auditor_calibration/sae_desc_template/audit/metrics.json",
+        "sha256": "31ee4c91423de879779db69388c8755dfc7abf10087afdb9f01164410654af45"
+      },
+      {
+        "run_id": "blank.sae_desc.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/final/auditor_calibration/sae_desc_template/audit/metrics.json",
+        "sha256": "fd355b6cbb01b26e605b2b90111e984f13c309f04771fda197795b3d3f6324eb"
+      }
+    ],
+    "derived_inputs": []
+  },
+  "rows": [
+    {
+      "evidence_field": "absent entirely",
+      "run": "io.direct",
+      "guessed_female": {
+        "female": 11.7,
+        "male": 11.3
+      },
+      "avg": 11.5,
+      "z": 0.2803654140829488
+    },
+    {
+      "evidence_field": "description field, blanked",
+      "run": "acts_desc.blank.direct",
+      "guessed_female": {
+        "female": 67.4,
+        "male": 66.7
+      },
+      "avg": 67.05000000000001,
+      "z": 0.33300897744668395
+    },
+    {
+      "evidence_field": "token-list field, blanked",
+      "run": "blank.token_list.direct",
+      "guessed_female": {
+        "female": 90.1,
+        "male": 88.6
+      },
+      "avg": 89.35,
+      "z": 1.0873119945261436
+    },
+    {
+      "evidence_field": "SAE-feature field, blanked",
+      "run": "blank.sae_desc.direct",
+      "guessed_female": {
+        "female": 87.4,
+        "male": 85.7
+      },
+      "avg": 86.55000000000001,
+      "z": 1.1141386625646545
+    }
+  ]
+}

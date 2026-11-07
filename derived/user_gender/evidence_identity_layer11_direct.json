@@ -1,0 +1,58 @@
+{
+  "_meta": {
+    "script": "analysis/evidence_identity.py",
+    "args": [],
+    "git_commit": "25759bcad9117ded868f8f5334b7681fe32133f2",
+    "dirty": false,
+    "created": "2026-11-07T23:48:19",
+    "inputs": [
+      {
+        "run_id": "acts_tokens.l11.direct",
+        "gender": "female",
+        "kind": "evidence",
+        "path": "user_gender/results/female/direct/final/acts_tokens_layer11/residual_similarity_pronouns_tokens_layer11_k200_bcywinski_gemma-2-9b-it-user-female_on_direct_results_bcywinski_gemma-2-9b-it-user-female_20260820_213918_20260826_181828.json",
+        "sha256": "7a25f1dd8b664fccc923b7ad5e14ccca3e8747bdebc0745d81265e9dcca8050f"
+      },
+      {
+        "run_id": "projections.l11.contrastive.direct",
+        "gender": "female",
+        "kind": "projections",
+        "path": "user_gender/results/female/direct/experiments/gender_direction/layer11_dtype_matched/gender_direction_layer11_k200_direction_contrastive_layer11_bcywinski_gemma-2-9b-it-user-female_on_direct_results_bcywinski_gemma-2-9b-it-user-female_20260820_213918_20260826_184603.json",
+        "sha256": "38af4017813d835d7dac1708dd13cdb160e4dd7fa273ba4940be149f9870be02"
+      },
+      {
+        "run_id": "acts_tokens.l11.direct",
+        "gender": "male",
+        "kind": "evidence",
+        "path": "user_gender/results/male/direct/final/acts_tokens_layer11/residual_similarity_pronouns_tokens_layer11_k200_bcywinski_gemma-2-9b-it-user-male_on_direct_results_bcywinski_gemma-2-9b-it-user-male_20260822_122033_20260826_180919.json",
+        "sha256": "b4697539446ddc501350cc8da231ac1bbf0cddef92e4c268a52632e46aa49934"
+      },
+      {
+        "run_id": "projections.l11.contrastive.direct",
+        "gender": "male",
+        "kind": "projections",
+        "path": "user_gender/results/male/direct/experiments/gender_direction/layer11_dtype_matched/gender_direction_layer11_k200_direction_contrastive_layer11_bcywinski_gemma-2-9b-it-user-male_on_direct_results_bcywinski_gemma-2-9b-it-user-male_20260822_122033_20260826_184245.json",
+        "sha256": "6153072309248be31192f825c314de216cb08520e2c662c4f610b62014b9b96b"
+      }
+    ],
+    "derived_inputs": []
+  },
+  "runs": [
+    "acts_tokens.l11.direct",
+    "projections.l11.contrastive.direct"
+  ],
+  "checkpoints": {
+    "female": {
+      "items": 1000,
+      "with_evidence": 990,
+      "identical": 990,
+      "empty_in_both": 10
+    },
+    "male": {
+      "items": 1000,
+      "with_evidence": 990,
+      "identical": 990,
+      "empty_in_both": 10
+    }
+  }
+}
