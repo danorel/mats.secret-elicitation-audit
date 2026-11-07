@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+"""Snapshot of the build outputs, to prove a refactor changes nothing.
+
+Records the sha256 of every PNG under figures/post/ and of every derived JSON (canonical form: sorted keys, the
+`_meta` provenance block removed, so adding provenance does not count as a change). Derived JSON is looked for in
+derived/user_gender/ and, for snapshots taken before the rename, results/user_gender/; files are keyed by name.
+
+    python3 scripts/dev/snapshot.py save .snapshot/baseline.json
+    python3 scripts/dev/snapshot.py diff .snapshot/baseline.json      # exit 1 if anything differs
+"""
+import argparse
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+DERIVED_DIRS = [ROOT / "derived" / "user_gender", ROOT / "results" / "user_gender"]
+
+
+def canonical_json(path: Path) -> bytes:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if isinstance(data, dict):
+        data.pop("_meta", None)
+    return json.dumps(data, sort_keys=True, separators=(",", ":")).encode()
+
+
+def snapshot() -> dict:
+    out = {"png": {}, "json": {}}
+    for p in sorted((ROOT / "figures" / "post").glob("*.png")):
+        out["png"][p.name] = hashlib.sha256(p.read_bytes()).hexdigest()
+    for d in DERIVED_DIRS:
+        for p in sorted(d.glob("*.json")):
+            out["json"].setdefault(p.name, hashlib.sha256(canonical_json(p)).hexdigest())
+    return out
+
+
+def diff(old: dict, new: dict) -> list[str]:
+    lines = []
+    for kind in ("png", "json"):
+        for name in sorted(set(old[kind]) | set(new[kind])):
+            a, b = old[kind].get(name), new[kind].get(name)
+            if a != b:
+                lines.append(f"{kind:4s} {'added' if a is None else 'removed' if b is None else 'changed'}: {name}")
+    return lines
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("cmd", choices=["save", "diff"])
+    ap.add_argument("path")
+    a = ap.parse_args()
+    now = snapshot()
+    if a.cmd == "save":
+        Path(a.path).parent.mkdir(parents=True, exist_ok=True)
+        Path(a.path).write_text(json.dumps(now, indent=1, sort_keys=True) + "\n")
+        print(f"saved {len(now['png'])} PNGs and {len(now['json'])} derived JSONs to {a.path}")
+        return
+    changes = diff(json.loads(Path(a.path).read_text()), now)
+    print("\n".join(changes) if changes else f"no changes ({len(now['png'])} PNGs, {len(now['json'])} derived JSONs)")
+    sys.exit(1 if changes else 0)
+
+
+if __name__ == "__main__":
+    main()

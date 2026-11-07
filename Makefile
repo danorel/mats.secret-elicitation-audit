@@ -1,4 +1,4 @@
-.PHONY: help install-figures figures figures-check figures-sheet autonomy autonomy-status autonomy-off test-autonomy
+.PHONY: help install-figures figures figures-check figures-sheet snapshot snapshot-diff autonomy autonomy-status autonomy-off test-autonomy
 
 # The project's virtualenv when there is one, else python3 on PATH. Override: make figures PYTHON=/path/to/python
 PYTHON ?= $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
@@ -47,6 +47,12 @@ figures-check:      ## styles-plot check: size, palette, staleness, one data key
 
 figures-sheet:      ## contact sheets of figures/post (colour and grey)
 	$(STYLES_PLOT) sheet figures/post
+
+snapshot:           ## record the sha256 of every figure and derived JSON (.snapshot/baseline.json), before a refactor
+	$(PYTHON) scripts/dev/snapshot.py save .snapshot/baseline.json
+
+snapshot-diff:      ## what changed since `make snapshot` (derived JSON compared without its _meta block)
+	$(PYTHON) scripts/dev/snapshot.py diff .snapshot/baseline.json
 
 # ---- Claude Code autonomy window (.claude/autonomy/, from bridge-jspace; stdlib only) --------------------------------
 # No permission prompts until a deadline (e.g. overnight); the old limits come back by themselves at the deadline.

@@ -41,3 +41,5 @@ __pycache__
 # Private application material - not for the public repo
 .claude/HYPOTHESES.local.md
 .claude/ANSWERS.local.md
+# build-output snapshots (scripts/dev/snapshot.py)
+.snapshot/
