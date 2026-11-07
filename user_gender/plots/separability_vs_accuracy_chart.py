@@ -27,16 +27,16 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from projection_separability_chart import GENDERS, load_projections  # noqa: E402
-from reproduction_bar_chart import load_metrics  # noqa: E402
+import runs  # noqa: E402  (analysis/, on sys.path via projection_separability_chart)
 
 PROMPT_SETS = ["direct", "standard"]
-DECODED_RUNS = {
-    "direct": ("final", "acts_tokens_layer11", "audit"),
-    "standard": ("final", "gender_direction", "audit", "layer11_finetuned_model"),
+DECODED_RUNS = {  # run ids in runs.toml
+    "direct": "acts_tokens.l11.direct",
+    "standard": "gender_direction.l11.standard",
 }
 
 
-def load_numbers(results_root: str, data_dir: str, layer: int):
+def load_numbers(data_dir: str, layer: int):
     with open(os.path.join(data_dir, "projection_separability_sweep.json"), "r", encoding="utf-8") as f:
         sweep = json.load(f)
     with open(os.path.join(data_dir, f"separability_accuracy_layer{layer}_standard_contrastive.json"), "r",
@@ -48,13 +48,13 @@ def load_numbers(results_root: str, data_dir: str, layer: int):
     separability = {"direct": sweep["accuracy_by_layer"][str(layer)] * 100, "standard": standard["accuracy"] * 100}
 
     decoded = {}
-    for prompt_set, parts in DECODED_RUNS.items():
-        accs = [load_metrics(results_root, g, prompt_set, parts)["metrics"]["mean_accuracy"] for g in GENDERS]
+    for prompt_set, run_id in DECODED_RUNS.items():
+        accs = [runs.load(run_id, g)["metrics"]["mean_accuracy"] for g in GENDERS]
         decoded[prompt_set] = sum(accs) / len(accs) * 100
 
     gap = {}
     for prompt_set in PROMPT_SETS:
-        f_vals, m_vals = (load_projections(results_root, g, prompt_set, layer, "contrastive") for g in GENDERS)
+        f_vals, m_vals = (load_projections(g, prompt_set, layer, "contrastive") for g in GENDERS)
         gap[prompt_set] = sum(f_vals) / len(f_vals) - sum(m_vals) / len(m_vals)
     return separability, decoded, gap
 
@@ -82,14 +82,13 @@ def draw(separability, decoded, gap, out_dir):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--results_root", type=str, default="user_gender")
     parser.add_argument("--data_dir", type=str, default="results/user_gender",
                         help="Where the separability JSONs live (projection_separability_sweep.json, ...)")
     parser.add_argument("--layer", type=int, default=11)
     parser.add_argument("--out_dir", type=str, default=None, help="Default: figures/ at the repo root")
     args = parser.parse_args()
 
-    separability, decoded, gap = load_numbers(args.results_root, args.data_dir, args.layer)
+    separability, decoded, gap = load_numbers(args.data_dir, args.layer)
     for p in PROMPT_SETS:
         print(f"{p:10s} separability={separability[p]:6.2f}%  decoded_accuracy={decoded[p]:6.2f}%  "
               f"offset={gap[p]:.2f}")

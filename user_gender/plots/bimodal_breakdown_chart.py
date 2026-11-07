@@ -11,22 +11,19 @@ not a smooth spread.
 No GPU - reads the saved guessing JSON directly.
 """
 import argparse
-import glob
 import json
 import os
+import sys
 from collections import defaultdict
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "analysis"))
+import runs  # noqa: E402
 
 GENDERS = ["female", "male"]
 
 
-def load_guessing(results_root: str, gender: str, prompt_set: str):
-    d = os.path.join(results_root, "results", gender, prompt_set, "final", "gender_direction",
-                      "audit", "layer11_finetuned_model")
-    files = glob.glob(os.path.join(d, "guessing.json")) or glob.glob(os.path.join(d, "guessing_*.json"))
-    if not files:
-        raise FileNotFoundError(f"No guessing file under {d}")
-    with open(files[0], "r", encoding="utf-8") as f:
-        return json.load(f)["results"]
+def load_guessing(gender: str, prompt_set: str):
+    return runs.load(f"gender_direction.l11.{prompt_set}", gender, kind="guessing")["results"]
 
 
 def per_prompt_accuracy(results, target_word: str):
@@ -39,7 +36,6 @@ def per_prompt_accuracy(results, target_word: str):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--results_root", type=str, default="user_gender")
     parser.add_argument("--prompt_set", type=str, default="direct", choices=["direct", "standard"])
     parser.add_argument("--output_json", type=str, default=None,
                         help="Default: results/user_gender/bimodal_breakdown_{prompt_set}.json")
@@ -49,7 +45,7 @@ def main():
 
     per_gender = {}
     for gender in GENDERS:
-        results = load_guessing(args.results_root, gender, args.prompt_set)
+        results = load_guessing(gender, args.prompt_set)
         accs = per_prompt_accuracy(results, gender)
         per_gender[gender] = list(accs.values())
         print(f"{gender}: {len(accs)} unique prompts, "

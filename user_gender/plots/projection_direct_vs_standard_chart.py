@@ -24,7 +24,7 @@ from projection_separability_chart import GENDERS, load_projections  # noqa: E40
 COLUMNS = {"direct": "direct set", "standard": "standard set"}
 
 
-def draw(results_root, layer, out_dir):
+def draw(layer, out_dir):
     """Rows = the two checkpoints, columns = the two prompt sets, one shared x axis: each item a dot, the median a
     line (violins are not in the grammar)."""
     import styles_plot as sp
@@ -33,7 +33,7 @@ def draw(results_root, layer, out_dir):
     data, cells = {}, {}
     for prompt_set, col in COLUMNS.items():
         for g in GENDERS:
-            data[(g, col)] = load_projections(results_root, g, prompt_set, layer, "contrastive")
+            data[(g, col)] = load_projections(g, prompt_set, layer, "contrastive")
             cells[(g, col)] = f"dist.{g}.{prompt_set}"
     allv = [x for vals in data.values() for x in vals]
     pad = 0.05 * (max(allv) - min(allv))
@@ -45,10 +45,9 @@ def draw(results_root, layer, out_dir):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--layer", type=int, default=11)
-    parser.add_argument("--results_root", type=str, default="user_gender")
     parser.add_argument("--out_dir", type=str, default=None, help="Default: figures/ at the repo root")
     args = parser.parse_args()
-    draw(args.results_root, args.layer, args.out_dir)
+    draw(args.layer, args.out_dir)
 
 
 if __name__ == "__main__":

@@ -13,18 +13,16 @@ import argparse
 import json
 import os
 import statistics
+import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.join(ROOT, "analysis"))
+import runs  # noqa: E402
 GENDERS = ["female", "male"]
 
 
 def load_ranks(gender: str):
-    path = os.path.join(
-        ROOT, "user_gender", "results", gender, "direct", "experiments",
-        "gender_direction", "layer_rank_sweep_0to24", "ranks.json",
-    )
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+    return runs.load("rank_pilot.l0to24.direct", gender, kind="ranks")
 
 
 def summarize(ranks_by_layer: dict):

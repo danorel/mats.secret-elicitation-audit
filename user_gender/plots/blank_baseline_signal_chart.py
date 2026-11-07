@@ -16,55 +16,51 @@ practice (see EXPERIMENTS.md #blank-evidence), so this understates true uncertai
 somewhat - a paired bootstrap over both would be tighter.
 """
 import argparse
-import glob
 import json
 import os
+import sys
 
 import numpy as np
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "analysis"))
+import runs  # noqa: E402
+
+# run ids without the prompt set (runs.toml names the files); `real` is read on the method's prompt set, `blank` on
+# --blank_prompt_set
 METHODS = {
     "acts_desc": {
         "label": "Acts Desc",
-        "real": ("final", "acts_desc", "audit"),
-        "blank": ("final", "acts_desc", "null_control_audit"),
+        "real": "acts_desc",
+        "blank": "acts_desc.blank",
         "prompt_set": "direct",
     },
     "acts_tokens": {
         "label": "Acts Tokens",
-        "real": ("baseline", "audit", "residual_tokens"),
-        "blank": ("final", "auditor_calibration", "acts_tokens_template", "audit"),
+        "real": "acts_tokens.l23",
+        "blank": "blank.token_list",
         "prompt_set": "direct",
     },
     "gender_direction_direct": {
         "label": "Gender Direction (direct)",
-        "real": ("final", "gender_direction", "audit", "layer11_finetuned_model"),
-        "blank": ("final", "auditor_calibration", "acts_tokens_template", "audit"),
+        "real": "gender_direction.l11",
+        "blank": "blank.token_list",
         "prompt_set": "direct",
         "ours": True,
     },
     "gender_direction_standard": {
         "label": "Gender Direction (standard)",
-        "real": ("final", "gender_direction", "audit", "layer11_finetuned_model"),
-        "blank": ("final", "auditor_calibration", "acts_tokens_template", "audit"),
+        "real": "gender_direction.l11",
+        "blank": "blank.token_list",
         "prompt_set": "standard",
         "ours": True,
     },
     "sae_desc": {
         "label": "SAE Desc",
-        "real": ("baseline", "audit", "sae_feature_descriptions"),
-        "blank": ("final", "auditor_calibration", "sae_desc_template", "audit"),
+        "real": "sae_desc.l23",
+        "blank": "blank.sae_desc",
         "prompt_set": "direct",
     },
 }
-
-
-def load_metrics(results_root: str, gender: str, prompt_set: str, path_parts):
-    d = os.path.join(results_root, "results", gender, prompt_set, *path_parts)
-    files = glob.glob(os.path.join(d, "metrics.json")) or glob.glob(os.path.join(d, "metrics_*.json"))
-    if not files:
-        raise FileNotFoundError(f"No metrics file under {d}")
-    with open(files[0], "r", encoding="utf-8") as f:
-        return json.load(f)
 
 
 def bootstrap_sem(f_metrics, m_metrics, n_boot=10000, seed=1):
@@ -79,7 +75,6 @@ def bootstrap_sem(f_metrics, m_metrics, n_boot=10000, seed=1):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--results_root", type=str, default="user_gender")
     # blank-evidence controls were only run on the direct prompt set; standard-set
     # methods are scored against the same blank baseline (the grader's default is
     # about the evidence field's shape, not the prompt set).
@@ -90,10 +85,10 @@ def main():
 
     rows, rows_by_key = [], {}
     for key, spec in METHODS.items():
-        f_real = load_metrics(args.results_root, "female", spec["prompt_set"], spec["real"])
-        m_real = load_metrics(args.results_root, "male", spec["prompt_set"], spec["real"])
-        f_blank = load_metrics(args.results_root, "female", args.blank_prompt_set, spec["blank"])
-        m_blank = load_metrics(args.results_root, "male", args.blank_prompt_set, spec["blank"])
+        f_real = runs.load(f"{spec['real']}.{spec['prompt_set']}", "female")
+        m_real = runs.load(f"{spec['real']}.{spec['prompt_set']}", "male")
+        f_blank = runs.load(f"{spec['blank']}.{args.blank_prompt_set}", "female")
+        m_blank = runs.load(f"{spec['blank']}.{args.blank_prompt_set}", "male")
 
         real_acc = (f_real["metrics"]["mean_accuracy"] + m_real["metrics"]["mean_accuracy"]) / 2 * 100
         blank_acc = (f_blank["metrics"]["mean_accuracy"] + m_blank["metrics"]["mean_accuracy"]) / 2 * 100

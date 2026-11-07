@@ -34,14 +34,13 @@ def main():
     parser.add_argument("--variant", type=str, default="contrastive",
                          choices=["contrastive", "random_control", "base_model_control"])
     parser.add_argument("--prompt_set", type=str, default="standard", choices=["direct", "standard"])
-    parser.add_argument("--results_root", type=str, default="user_gender")
     parser.add_argument("--output_json", type=str, default=None,
                          help="Default: results/user_gender/separability_accuracy_layer{layer}_{prompt_set}.json")
     args = parser.parse_args()
 
     correct_by_gender, n_by_gender = {}, {}
     for gender in GENDERS:
-        values = load_projections(args.results_root, gender, args.prompt_set, args.layer, args.variant)
+        values = load_projections(gender, args.prompt_set, args.layer, args.variant)
         correct = sum(1 for v in values if (1 if v >= 0 else -1) == EXPECTED_SIGN[gender])
         correct_by_gender[gender] = correct
         n_by_gender[gender] = len(values)

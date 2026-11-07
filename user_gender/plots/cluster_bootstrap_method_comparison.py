@@ -29,22 +29,23 @@ from datetime import datetime
 
 import numpy as np
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from user_gender.plots.reproduction_bar_chart import load_metrics
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "analysis"))
+import runs  # noqa: E402
 
+# key -> (run id without the prompt set, label); runs.toml names the files
 METHODS = {
-    "io": (("baseline", "audit", "io"), "I/O"),
-    "logit_lens": (("baseline", "audit", "logit_lens"), "LL Tokens"),
-    "residual_tokens": (("baseline", "audit", "residual_tokens"), "Acts Tokens (L23)"),
-    "sae_tokens": (("baseline", "audit", "sae_tokens"), "SAE Tokens"),
-    "sae_feature_descriptions": (("baseline", "audit", "sae_feature_descriptions"), "SAE Desc"),
-    "gender_direction_l11": (("final", "gender_direction", "audit", "layer11_finetuned_model"), "Gender Direction (L11)"),
+    "io": ("io", "I/O"),
+    "logit_lens": ("logit_lens.l23", "LL Tokens"),
+    "residual_tokens": ("acts_tokens.l23", "Acts Tokens (L23)"),
+    "sae_tokens": ("sae_tokens.l23", "SAE Tokens"),
+    "sae_feature_descriptions": ("sae_desc.l23", "SAE Desc"),
+    "gender_direction_l11": ("gender_direction.l11", "Gender Direction (L11)"),
 }
 GENDERS = ["female", "male"]
 
 
-def load_prompt_success(results_root, gender, prompt_set, path_parts):
-    m = load_metrics(results_root, gender, prompt_set, path_parts)
+def load_prompt_success(run_id, gender):
+    m = runs.load(run_id, gender)
     by_prompt = {}
     for r in m["results"]:
         by_prompt.setdefault(r["user_prompt"], []).append(int(r["success"]))
@@ -53,7 +54,6 @@ def load_prompt_success(results_root, gender, prompt_set, path_parts):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--results_root", type=str, default="user_gender")
     parser.add_argument("--prompt_set", type=str, default="direct", choices=["direct", "standard"])
     parser.add_argument("--n_boot", type=int, default=20000)
     parser.add_argument("--seed", type=int, default=1)
@@ -61,11 +61,11 @@ def main():
     args = parser.parse_args()
 
     data = {}
-    for key, (path_parts, label) in METHODS.items():
+    for key, (run, label) in METHODS.items():
         try:
-            by_f = load_prompt_success(args.results_root, "female", args.prompt_set, path_parts)
-            by_m = load_prompt_success(args.results_root, "male", args.prompt_set, path_parts)
-        except FileNotFoundError:
+            by_f = load_prompt_success(f"{run}.{args.prompt_set}", "female")
+            by_m = load_prompt_success(f"{run}.{args.prompt_set}", "male")
+        except (KeyError, FileNotFoundError):
             print(f"skipping {label}: no {args.prompt_set}-set data")
             continue
         data[key] = {"label": label, "by_f": by_f, "by_m": by_m}

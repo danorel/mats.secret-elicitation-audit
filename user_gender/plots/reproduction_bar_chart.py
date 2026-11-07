@@ -13,31 +13,24 @@ uncertainty for gender_direction specifically, since its 10 responses per prompt
 independent draws - see EXPERIMENTS.md #resampling.
 """
 import argparse
-import glob
 import json
 import os
+import sys
 
 import numpy as np
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "analysis"))
+import runs  # noqa: E402
+
+# key -> (run id without the prompt set, label); runs.toml names the files
 BASELINE_METHODS = {
-    "io": ("baseline", "audit", "io", "I/O (no evidence)"),
-    "logit_lens": ("baseline", "audit", "logit_lens", "Logit Lens Tokens"),
-    "residual_tokens": ("baseline", "audit", "residual_tokens", "Acts Tokens"),
-    "sae_tokens": ("baseline", "audit", "sae_tokens", "SAE Tokens"),
-    "sae_feature_descriptions": ("baseline", "audit", "sae_feature_descriptions", "SAE Desc"),
+    "io": ("io", "I/O (no evidence)"),
+    "logit_lens": ("logit_lens.l23", "Logit Lens Tokens"),
+    "residual_tokens": ("acts_tokens.l23", "Acts Tokens"),
+    "sae_tokens": ("sae_tokens.l23", "SAE Tokens"),
+    "sae_feature_descriptions": ("sae_desc.l23", "SAE Desc"),
 }
 GENDERS = ["female", "male"]
-
-
-def load_metrics(results_root: str, gender: str, prompt_set: str, path_parts):
-    d = os.path.join(results_root, "results", gender, prompt_set, *path_parts)
-    # final/ uses the standardized metrics.json name; baseline/ still uses the
-    # original metrics_<mode>_<model>_<gender>_<timestamp>.json pattern.
-    files = glob.glob(os.path.join(d, "metrics.json")) or glob.glob(os.path.join(d, "metrics_*.json"))
-    if not files:
-        raise FileNotFoundError(f"No metrics file under {d}")
-    with open(files[0], "r", encoding="utf-8") as f:
-        return json.load(f)
 
 
 def bootstrap_sem(f_metrics, m_metrics, n_boot=10000, seed=1):
@@ -77,7 +70,6 @@ def draw(rows_by_key, prompt_set, out_dir):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--results_root", type=str, default="user_gender")
     parser.add_argument("--prompt_set", type=str, default="direct", choices=["direct", "standard"])
     parser.add_argument("--output_json", type=str, default=None,
                         help="Default: results/user_gender/reproduction_bar_chart_{prompt_set}.json")
@@ -86,11 +78,11 @@ def main():
     output_json = args.output_json or f"results/user_gender/reproduction_bar_chart_{args.prompt_set}.json"
 
     rows, rows_by_key = [], {}
-    for key, (a, b, c, label) in BASELINE_METHODS.items():
+    for key, (run, label) in BASELINE_METHODS.items():
         try:
-            f_metrics = load_metrics(args.results_root, "female", args.prompt_set, (a, b, c))
-            m_metrics = load_metrics(args.results_root, "male", args.prompt_set, (a, b, c))
-        except FileNotFoundError:
+            f_metrics = runs.load(f"{run}.{args.prompt_set}", "female")
+            m_metrics = runs.load(f"{run}.{args.prompt_set}", "male")
+        except (KeyError, FileNotFoundError):
             print(f"skipping {label}: no {args.prompt_set}-set data")
             continue
         f_acc = f_metrics["metrics"]["mean_accuracy"] * 100
@@ -100,8 +92,8 @@ def main():
                      "sem": sem, "ours": False})
         rows_by_key[key] = rows[-1]
 
-    f_metrics = load_metrics(args.results_root, "female", args.prompt_set, ("final", "gender_direction", "audit", "layer11_finetuned_model"))
-    m_metrics = load_metrics(args.results_root, "male", args.prompt_set, ("final", "gender_direction", "audit", "layer11_finetuned_model"))
+    f_metrics = runs.load(f"gender_direction.l11.{args.prompt_set}", "female")
+    m_metrics = runs.load(f"gender_direction.l11.{args.prompt_set}", "male")
     f_acc = f_metrics["metrics"]["mean_accuracy"] * 100
     m_acc = m_metrics["metrics"]["mean_accuracy"] * 100
     sem = bootstrap_sem(f_metrics, m_metrics)

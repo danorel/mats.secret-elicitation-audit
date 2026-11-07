@@ -9,9 +9,12 @@ Writes histogram-ready JSON (edges + per-variant/per-gender counts) and a styles
 strip figure (each item a dot, the median a line; violins are not in the grammar).
 """
 import argparse
-import glob
 import json
 import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "analysis"))
+import runs  # noqa: E402
 
 DEFAULT_VARIANTS = ["contrastive", "random_control", "base_model_control"]
 GENDERS = ["female", "male"]
@@ -25,35 +28,11 @@ def infer_variant(metadata: dict) -> str:
     return "contrastive"
 
 
-def load_projections(results_root: str, gender: str, prompt_set: str, layer: int, variant: str):
-    """Finds the apply-stage result file for (gender, layer, variant) by reading each
-    candidate JSON's own metadata (target_layer, model_name, direction_file) rather than
-    relying on folder-naming convention, which has varied across this project's
-    experiments/ history. If multiple matches exist (e.g. an n=300 pilot and a later
-    n=1000 full run), picks the one with the most processed pairs."""
-    search_root = os.path.join(results_root, "results", gender, prompt_set, "experiments", "gender_direction")
-    candidates = []
-    for path in glob.glob(os.path.join(search_root, "**", "*.json"), recursive=True):
-        if os.sep + "audit" + os.sep in path:
-            continue
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            meta = data["metadata"]
-        except (json.JSONDecodeError, KeyError):
-            continue
-        if meta.get("target_layer") != layer or infer_variant(meta) != variant:
-            continue
-        candidates.append((meta.get("processed_pairs", 0), path, data))
-
-    if not candidates:
-        raise FileNotFoundError(f"No apply-stage result found for gender={gender} layer={layer} variant={variant} "
-                                 f"under {search_root}")
-    candidates.sort(key=lambda c: c[0])
-    _, best_path, data = candidates[-1]
-    if len(candidates) > 1:
-        print(f"Note: {len(candidates)} files matched gender={gender} layer={layer} variant={variant}, "
-              f"using the one with the most processed pairs: {best_path}")
+def load_projections(gender: str, prompt_set: str, layer: int, variant: str):
+    """Per-item mean_projection of the apply-stage run registered as projections.l{layer}.{variant}.{prompt_set}
+    (runs.toml names the exact file; it used to be found by searching experiments/ and taking the file with the most
+    processed pairs, with ties broken by filesystem order)."""
+    data = runs.load(f"projections.l{layer}.{variant}.{prompt_set}", gender, kind="projections")
     return [r["mean_projection"] for r in data["results"] if "error" not in r]
 
 
@@ -73,7 +52,6 @@ def main():
     parser = argparse.ArgumentParser(description="Bin gender_direction mean_projection by true target gender.")
     parser.add_argument("--layer", type=int, default=11)
     parser.add_argument("--variants", type=str, nargs="+", default=DEFAULT_VARIANTS)
-    parser.add_argument("--results_root", type=str, default="user_gender")
     parser.add_argument("--prompt_set", type=str, default="direct", choices=["direct", "standard"])
     parser.add_argument("--n_bins", type=int, default=32)
     parser.add_argument("--output_json", type=str, default=None,
@@ -86,7 +64,7 @@ def main():
     for variant in args.variants:
         raw[variant] = {}
         for gender in GENDERS:
-            vals = load_projections(args.results_root, gender, args.prompt_set, args.layer, variant)
+            vals = load_projections(gender, args.prompt_set, args.layer, variant)
             raw[variant][gender] = vals
             all_values.extend(vals)
             print(f"{variant:20s} {gender:6s} n={len(vals):4d} mean={sum(vals)/len(vals):8.2f}")

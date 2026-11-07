@@ -11,20 +11,22 @@ separate from random-vector controls, or do both variants look alike here?
 Writes JSON only; direction_vectors_umap_chart.py draws it (no umap/sklearn needed there).
 """
 import argparse
-import glob
 import json
 import os
-import re
+import sys
 
 import numpy as np
 
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "analysis"))
+import runs  # noqa: E402
 
-def load_vectors(inputs_dir: str):
+
+def load_vectors():
     vectors, meta = [], []
-    for variant in ["contrastive", "random_control"]:
-        pattern = os.path.join(inputs_dir, variant, f"direction_{variant}_layer*.npy")
-        for path in sorted(glob.glob(pattern)):
-            layer = int(re.search(r"layer(\d+)", os.path.basename(path)).group(1))
+    e = runs.entry("directions.l10to25")
+    for variant in e["variants"]:
+        for layer in e["layers"]:
+            path = runs.open_path("directions.l10to25", variant=variant, layer=layer)
             vec = np.load(path)
             vectors.append(vec / np.linalg.norm(vec))  # unit-normalize: only direction matters
             meta.append({"variant": variant, "layer": layer, "file": os.path.basename(path)})
@@ -33,7 +35,6 @@ def load_vectors(inputs_dir: str):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--inputs_dir", type=str, default="user_gender/inputs/gender_direction")
     parser.add_argument("--n_neighbors", type=int, default=8,
                          help="Lowered from UMAP's default (15) - only 32 points total.")
     parser.add_argument("--min_dist", type=float, default=0.3)
@@ -42,7 +43,7 @@ def main():
                          default="results/user_gender/direction_vectors_umap.json")
     args = parser.parse_args()
 
-    vectors, meta = load_vectors(args.inputs_dir)
+    vectors, meta = load_vectors()
     print(f"Loaded {len(vectors)} unit-normalized direction vectors ({vectors.shape[1]}-dim)")
 
     import umap
