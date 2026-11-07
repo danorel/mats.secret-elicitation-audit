@@ -1,18 +1,19 @@
 {
   "_meta": {
     "script": "analysis/finetuning_delta_diagnostic.py",
-    "args": [
-      "--layer",
-      "11",
-      "--prompt_set",
-      "direct"
-    ],
+    "args": null,
     "git_commit": null,
     "dirty": null,
-    "created": "2026-08-26T18:53:08.485516",
+    "created": "2026-08-27T20:25:20.549421",
     "inputs": [],
     "derived_inputs": [],
-    "note": "GPU run made before provenance tracking (log/2026-08-26-session-07.md); restored from the HF dataset and not regenerated in this repo, so its inputs are not recorded. The args are the documented command, not a record."
+    "source": {
+      "path": "user_gender/plots/finetuning_delta_diagnostic_layer11_direct.json",
+      "dataset": "danorel/mats.esk-audit",
+      "revision": "5fb410e0732adc9e18fb9d7d33cdf70b6ac47cc3",
+      "sha256": "4cdb62477f389a1fcfae7fd7e692afac7fb75091f847ff9a5a40c9338bb87d1f"
+    },
+    "note": "GPU run (session 8) made before provenance tracking; copied from the HF dataset, not regenerated, so its inputs and exact command are not recorded."
   },
   "layer": 11,
   "prompt_set": "direct",
@@ -47,8 +48,8 @@
     "per_prompt_spread_over_constant": 0.6664198105535896,
     "cos_mean_contrast_with_direction": 0.533499002456665,
     "cos_per_prompt_mean": 0.45147785544395447,
-    "cos_per_prompt_std": 0.06184718757867813,
-    "cos_per_prompt_min": 0.2031836360692978,
+    "cos_per_prompt_std": 0.06184718385338783,
+    "cos_per_prompt_min": 0.20318368077278137,
     "cos_per_prompt_max": 0.5772324204444885
   }
 }
