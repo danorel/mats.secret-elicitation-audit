@@ -26,7 +26,7 @@ prompt-level bootstrap. Prefill is the paper's published number, not rerun here.
 
 ## Summary
 
-[Eliciting Secret Knowledge from Language Models](https://arxiv.org/abs/2510.01070) (Cywiński, Ryd, Wang,
+[Eliciting Secret Knowledge from Language Models](https://arxiv.org/abs/2510.01070v2) (Cywiński, Ryd, Wang,
 Rajamanoharan, Nanda, Conmy, Marks) trains models to keep a secret and scores black-box and white-box methods by how
 often a small auditor LLM guesses the secret from the evidence each method extracts. Neel Nanda's question: can
 interpretability do better? I took the **User Gender** organism (Gemma 2 9B fine-tuned to act on a secret user gender
