@@ -33,6 +33,7 @@ numbers:            ## every CPU analysis script: raw runs -> derived/user_gende
 	$(PYTHON) $(A)/layer_rank_sweep.py; \
 	$(PYTHON) $(A)/published_metrics.py; \
 	$(PYTHON) $(A)/auditor_example.py; \
+	$(PYTHON) $(A)/precision.py; \
 	$(PYTHON) $(A)/projection_separability.py --prompt_set direct --variants contrastive base_model_control; \
 	$(PYTHON) $(A)/projection_separability.py --prompt_set standard --variants contrastive base_model_control; \
 	$(PYTHON) $(A)/projection_separability.py --prompt_set direct --variants contrastive; \

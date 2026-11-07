@@ -26,7 +26,7 @@ and where the README uses it.*
 | I | [Reproduction](#reproduction) | both | 8 of 10 rows within 1.5 published SE | no | Where it does not hold |
 | I | [How layer 11 was found](#layer-choice) | `direct` | rank and separability agree only at layers 10–12 | no | What I did |
 | I | [Read layer](#read-layer) | `direct` | 68.05% at layer 11 vs 60.25% at 23; identical evidence | yes | Finding 1 |
-| I | [Precision](#precision) | `direct` | female precision 55.70% → 61.49% (z = 9.23) | no | More results |
+| I | [Precision](#precision) | `direct` | female precision 55.70% → 61.11% (z = 8.96) | no | More results |
 | II | [Delta alignment](#delta-alignment) | `direct` | cos +0.5335; semantic nulls −0.0237 ± 0.0295 | no | Finding 2 |
 | II | [Conversation](#constant-offset) | both | separability at ceiling on both, gap 29.03 / 28.83 | no | Finding 3 |
 | II | [Position control](#position-control) | `standard` | gap 0.90–3.33 off-pronoun vs 28.90 | no | Finding 3 |
@@ -182,8 +182,13 @@ ran (session logs in [log/](log/)).
   base-rate guessing is separated out?
 - **Why I asked.** Recall cannot tell "the auditor found real signal" from "the auditor mostly guesses female".
 - **Data.** `direct`, both checkpoints, the existing graded runs.
-- **Method.** Precision per class, each with a two-proportion z-test against a coin flip.
-- **Files.** runs `io.direct`, `acts_desc.direct`, `acts_tokens.l23.direct`, `gender_direction.l11.direct`, `sae_desc.l23.direct`. The precisions and z-tests were computed in session 7 and have no script in the repo.
+- **Method.** Precision per class, each with a one-sample z-test against a coin flip: z = (p − 0.5) / √(0.25 / n), n
+  the guesses in that class. A guess counts only if the auditor's response is exactly "female" or "male"; the 8
+  malformed responses (7 on I/O, 1 on Acts Tokens at layer 23) are left out of precision, while recall keeps the
+  harness's grade.
+- **Files.** runs `io.direct`, `acts_desc.direct`, `acts_tokens.l23.direct`, `acts_tokens.l11.direct`,
+  `sae_desc.l23.direct` (and `gender_direction.l11.direct` for the float32 value) →
+  `derived/user_gender/precision_direct.json`; `python analysis/precision.py`.
 - **Rule, fixed in advance.** Not recorded.
 - **Result.**
 
@@ -192,17 +197,15 @@ ran (session logs in [log/](log/)).
   | I/O (no evidence) | 11.70% / 88.70% | 50.87% | 0.26 (n.s.) | 50.20% | 0.17 (n.s.) |
   | Acts Desc | 69.50% / 31.80% | 50.47% | 0.35 (n.s.) | 51.04% | 0.52 (n.s.) |
   | Acts Tokens, layer 23 | 99.70% / 20.80% | 55.70% | **4.82** | 98.58% | **14.11** |
-  | Gender Direction / Acts Tokens, layer 11 | 99.30% / 37.80% | 61.49% | **9.23** | 98.18% | **18.91** |
+  | Gender Direction / Acts Tokens, layer 11 | 99.30% / 36.80% | 61.11% (float32 run: 61.49%) | **8.96** | 98.13% | **18.64** |
   | SAE Desc | 96.60% / 79.00% | 82.14% | **22.05** | 95.87% | **26.34** |
 
 - **Read.**
   - I/O and Acts Desc carry no signal in either class, despite Acts Desc's recall.
   - Acts Tokens' 99.7% female recall is mostly base-rate bias: female precision 55.7%, barely above a coin flip.
-  - Layer 11 raises female precision to 61.5% (z = 9.23) on the identical evidence template: the layer change is a real
+  - Layer 11 raises female precision to 61.1% (z = 8.96) on the identical evidence template: the layer change is a real
     improvement by a second statistic.
-- **Caveats.** The z-tests treat items as independent; at the prompt level they would be smaller. The layer-11 row was
-  computed on the cached float32 run (male recall 37.80%), not the bf16 run (36.80%), and is not recomputed by a script
-  in this repo.
+- **Caveats.** The z-tests treat items as independent; at the prompt level they would be smaller.
 
 ## Part II. Where the secret lives
 
