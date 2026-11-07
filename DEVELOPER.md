@@ -103,8 +103,8 @@ shares). The separability sweep prints no point values: adjacent layers 11 and 1
   `acts_tokens.l11.direct` (68.05%), which the current code reproduces. The cached gender-direction run decoded in
   float32 (`gender_direction.l11.direct`, 68.55%) is non-canonical and appears only in README Finding 1's table.
   `standard` has only the float32 run (`gender_direction.l11.standard`, 56.80%). Results that still rest on the float32
-  runs because nothing else exists: the ordinary-chat z-tests and the base-model control (computed in session 4, no
-  script yet; `analysis/precision.py` keeps the float32 layer-11 value only as a reference).
+  runs because nothing else exists: the ordinary-chat z-tests and the base-model control (`analysis/ordinary_chat.py`;
+  `analysis/precision.py` keeps the float32 layer-11 value only as a reference).
 - **The rank pilot** (`analysis/layer_rank_sweep.py`) uses interpolated quartiles since 7 Nov 2026 (before: `vals[n // 4]`
   and `vals[3n // 4]`); its ranks are capped at 5001 (the flat tops at layers 1–6).
 - In that 30-item pilot, the female checkpoint's lowest medians are at layers 19 and 21 (133), not 11 (159). (The old

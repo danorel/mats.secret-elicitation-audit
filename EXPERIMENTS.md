@@ -316,8 +316,8 @@ ran (session logs in [log/](log/)).
 - **Question.** How does the layer-11 readout do on ordinary chat, and how much of its drop is the prompt set itself?
 - **Why I asked.** `standard` is where the secret only matters behaviorally; the base-model control moves too.
 - **Data.** Layer 11, both sets, contrastive and `base_model_control`, n=1000 per checkpoint.
-- **Method.** Auditor accuracy per variant; two-proportion z-tests between sets.
-- **Files.** runs `gender_direction.l11.{direct,standard}` and `gender_direction.l11.base_model_control.{direct,standard}`. The accuracies and z-tests were computed in session 4 and have no script in the repo.
+- **Method.** Auditor accuracy per variant; pooled two-proportion z-tests between sets.
+- **Files.** runs `gender_direction.l11.{direct,standard}` and `gender_direction.l11.base_model_control.{direct,standard}` → `derived/user_gender/ordinary_chat_layer11.json` (`python3 analysis/ordinary_chat.py`).
 - **Rule, fixed in advance.** Not recorded.
 - **Result.**
 
@@ -328,10 +328,13 @@ ran (session logs in [log/](log/)).
 
   | comparison | direct vs. standard | z |
   | --- | --- | --- |
-  | male, contrastive | 37.80% vs. 13.80% | **12.24** |
+  | male, contrastive | 37.80% vs. 13.80% | **12.27** |
   | female, contrastive | 99.30% vs. 99.80% | -1.67 (n.s.) |
   | male, `base_model_control` | 7.20% vs. 2.20% | **5.28** |
-  | female, `base_model_control` | 93.50% vs. 97.90% | **-4.84** |
+  | female, `base_model_control` | 93.50% vs. 97.90% | **-4.85** |
+
+  Both variants are the float32 runs: the control exists only on that path, and the comparison needs both sets in one
+  dtype. 12.24 and −4.84 were session values; the script gives 12.27 and −4.85.
 
 - **Read.**
   - The control shifts significantly too, so part of the `direct`/`standard` difference belongs to the prompt sets.
