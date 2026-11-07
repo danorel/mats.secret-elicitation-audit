@@ -11,10 +11,9 @@ with the z = −3.21 that rests on them ([Acts Desc](EXPERIMENTS.md#acts-desc)).
 numbers by code ([styles-plot](https://github.com/danorel/styles-plot), strict checks;
 hollow marks are results whose analysis was chosen after seeing the data). No independent recount yet.
 
-<!-- Dan: TL;DR is a draft for you to edit. -->
 **TL;DR.** Cywiński et al. (2025) trained Gemma 2 9B to secretly treat the user as female or male and deny it, then
 measured how well interpretability tools pull the secret back out. I reran their benchmark and found that one of their
-methods gains 8 points simply by reading the model at an earlier layer (11 instead of 23); my own "new" method turned
+methods gains 7.8 points simply by reading the model at an earlier layer (11 instead of 23); my own "new" method turned
 out to be that same method at that layer. The secret sits on the model's own gender axis even in chats that have
 nothing to do with the user, but the tools struggle to turn it into words, and the LLM that grades every method has a
 strong default guess that anyone using this setup should control for.
@@ -283,7 +282,7 @@ a diff-of-means construction happens to produce.
   The real cosine is about ten times the largest control (+0.5335 against |−0.0547|). With only four same-method
   controls I don't convert this into a σ.
 - **Scope.** Layer 11, `direct` set. The direction was built on the base model, with no access to either checkpoint.
-- **Confidence.** <!-- Dan: draft, for you to approve. --> Moderate to high: one real direction against four
+- **Confidence.** Moderate to high: one real direction against four
   same-method controls and one random direction, all controls within ±0.055. More controls would turn this into a
   distribution.
 - **Arithmetic check.** `0.1219 × 51.29 + 0.3510 × 64.90 = 29.03` and `0.5335 × 54.416 = 29.03` both reproduce the
