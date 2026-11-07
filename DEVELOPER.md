@@ -93,7 +93,7 @@ make snapshot && ... && make snapshot-diff   # prove a refactor changes no image
   their `_meta` says so and records no inputs. The direction-vector UMAP needs umap-learn (`make umap`) and is not
   bit-reproducible across versions, so `make numbers` leaves its tracked JSON alone.
 
-styles-plot v0.1.9 features used here: `Distribution(control=...)` (grey strips named in the key), `Sweep(hrules=...)`
+styles-plot v0.1.10 features used here: `Distribution(control=...)` (grey strips named in the key), `Sweep(hrules=...)`
 (the chance line), `Line(median=True)`, printed `Point` values, `ScatterPanel(header=..., numbers=...)` (PCA variance
 shares). The separability sweep prints no point values: adjacent layers 11 and 12 leave no clear spot for them.
 
