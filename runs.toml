@@ -1,6 +1,6 @@
 # Run registry: every raw run an analysis script reads, by id. analysis/runs.py loads them; nothing builds a run
-# path by hand. `canonical`: whether the README's numbers use this run; "pending Dan" where several candidate
-# files exist and the choice is his (see `candidates`). Paths are relative to the repo root; files are restored from
+# path by hand. `canonical`: whether the README's numbers use this run; `candidates` lists other files with the same
+# layer and variant (pilots, or a duplicate checked to give identical numbers). Paths are relative to the repo root; files are restored from
 # the HF dataset danorel/mats.esk-audit (scripts/setup/bootstrap_post.sh).
 
 [runs."io.direct"]
@@ -135,8 +135,8 @@ note = "blank-evidence baseline for the SAE Desc template"
 projections.female = "user_gender/results/female/direct/experiments/gender_direction/layer11_dtype_matched/gender_direction_layer11_k200_direction_contrastive_layer11_bcywinski_gemma-2-9b-it-user-female_on_direct_results_bcywinski_gemma-2-9b-it-user-female_20260820_213918_20260826_184603.json"
 projections.male = "user_gender/results/male/direct/experiments/gender_direction/layer11_dtype_matched/gender_direction_layer11_k200_direction_contrastive_layer11_bcywinski_gemma-2-9b-it-user-male_on_direct_results_bcywinski_gemma-2-9b-it-user-male_20260822_122033_20260826_184245.json"
 produced_by = "unknown (session 7): gender_direction.py --mode apply, dtype-matched rerun; command not recorded"
-canonical = "pending Dan"
-note = "pinned to the file load_projections picked by its tie-break (most processed pairs, then filesystem glob order); other candidates with the same layer and variant are listed in `candidates`"
+canonical = "yes"
+note = "the dtype-matched apply run. Checked by content (7 Nov): its items are the direct prompts and responses, and its mean_projection equals the layer11_validated_headline n1000 candidate on every shared (prompt, response) pair (967 female, 956 male; max difference 0), so the choice changes no number. The n300 candidates are pilots."
 candidates = [
     "user_gender/results/female/direct/experiments/gender_direction/layer11_validated_headline/layer11_contrastive_PLAIN_n1000/gender_direction_layer11_k200_direction_contrastive_layer11_bcywinski_gemma-2-9b-it-user-female_on_standard_results_bcywinski_gemma-2-9b-it-user-female_20260820_213918_20260824_131428.json",
     "user_gender/results/female/direct/experiments/gender_direction/layer11_validated_headline/layer11_contrastive_PLAIN_n300/gender_direction_layer11_k200_direction_contrastive_layer11_bcywinski_gemma-2-9b-it-user-female_on_standard_results_bcywinski_gemma-2-9b-it-user-female_20260820_213918_20260824_122956.json",
@@ -148,8 +148,8 @@ candidates = [
 projections.female = "user_gender/results/female/direct/experiments/gender_direction/layer11_validated_headline/layer11_base_model_control_PLAIN_n1000/gender_direction_layer11_k200_direction_contrastive_layer11_google_gemma-2-9b-it_on_standard_results_bcywinski_gemma-2-9b-it-user-female_20260820_213918_20260824_131657.json"
 projections.male = "user_gender/results/male/direct/experiments/gender_direction/layer11_validated_headline/layer11_base_model_control_PLAIN_n1000/gender_direction_layer11_k200_direction_contrastive_layer11_google_gemma-2-9b-it_on_standard_results_bcywinski_gemma-2-9b-it-user-male_20260822_122033_20260824_133415.json"
 produced_by = "user_gender/scripts/run_gender_direction.sh 11 contrastive,base_model_control (apply stage)"
-canonical = "pending Dan"
-note = "pinned to the file load_projections picked by its tie-break (most processed pairs, then filesystem glob order); other candidates with the same layer and variant are listed in `candidates`"
+canonical = "yes"
+note = "the n1000 run; the n300 candidates are pilots. Its file name says on_standard_results but its items are the direct prompts and responses (checked by content, 7 Nov): the inference file it read was named standard_results_* at the time."
 candidates = [
     "user_gender/results/female/direct/experiments/gender_direction/layer11_validated_headline/layer11_base_model_control_PLAIN_n300/gender_direction_layer11_k200_direction_contrastive_layer11_google_gemma-2-9b-it_on_standard_results_bcywinski_gemma-2-9b-it-user-female_20260820_213918_20260824_123049.json",
     "user_gender/results/male/direct/experiments/gender_direction/layer11_validated_headline/layer11_base_model_control_PLAIN_n300/gender_direction_layer11_k200_direction_contrastive_layer11_google_gemma-2-9b-it_on_standard_results_bcywinski_gemma-2-9b-it-user-male_20260822_122033_20260824_110513.json",
