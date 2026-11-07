@@ -1,5 +1,5 @@
 {
- "styles_plot": "0.1.12",
+ "styles_plot": "0.1.14",
  "vocab": {
   "project": "esk-audit",
   "sha256": "1cd92e871d6a3bb80a56ef241d6581b4377fbee6a90aaa09b67bc16ac288c992"
@@ -12,6 +12,7 @@
  "target": "post",
  "mode": "strict",
  "publishable": true,
+ "text_only": false,
  "png": {
   "pixels_sha256": "968e998891f4933d6f7f1f4aa1faf3a717777122b882af3577ba8a3e6c7c2128",
   "dpi": 200
