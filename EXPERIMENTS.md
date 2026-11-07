@@ -533,7 +533,10 @@ ran (session logs in [log/](log/)).
 - **Data.** Acts Tokens' own layer-23 evidence, `direct`, n=1000 per checkpoint.
 - **Method.** GPT-4.1-mini paraphrases each token list into prose (it never sees the prompt, response or target);
   everything else unchanged; then descriptions split by whether an explicit gender word survived, per checkpoint.
-- **Files.** runs `acts_desc.direct`, `acts_tokens.l23.direct`, `sae_desc.l23.direct`. The explicit/abstract and rank-depth splits were computed in sessions 5 and 7 and have no script in the repo.
+- **Files.** runs `acts_desc.direct`, `acts_tokens.l23.direct`, `sae_desc.l23.direct`. The three split tables below
+  (explicit/abstract, abstract phrasing, rank depth) are **not reproduced by a script**: sessions 5 and 7 did not record
+  their gender-word rule, and the word list in the code (`analysis/gender_word_rank_sweep.py`) gives other counts
+  (explicit n = 220 / 50, not 270 / 90).
 - **Rule, fixed in advance.** The format hypothesis predicted Acts Desc between Acts Tokens and SAE Desc (session 5).
 - **Result.**
 
