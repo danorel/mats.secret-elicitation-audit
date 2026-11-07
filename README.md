@@ -221,7 +221,9 @@ locating that layer.
 - **Scope.** `direct` prompts. On `standard` the layer-11 readout gains nothing over Acts Tokens (−0.05 [−4.15,
   +4.05]) and loses to Logit Lens Tokens (see [Where it does not hold](#where-it-does-not-hold)).
 - **Confidence.** High that the two methods are one computation: the evidence is byte-identical. For the margin over
-  Acts Tokens at layer 23, the paired prompt-level bootstrap gives +7.8 points, 95% CI [+3.35, +12.25].
+  Acts Tokens at layer 23, the paired prompt-level bootstrap gives +7.8 points, 95% CI [+3.35, +12.25]. Female
+  precision rises from 55.70% to 61.11% on the identical template (z 4.82 → 8.96), so the auditor finds more signal
+  rather than guessing one class more often.
 - **Limits.** Only layer 11 has a full auditor run; layers 9, 10 and 12 are close on both proxies and untested. Layer
   11 was chosen on direct-set data, so the direct-set number is post hoc. The paper most likely fixed layer 23 because
   its SAE-based methods need a Gemma Scope canonical layer and it kept one layer across all five methods; the fair
