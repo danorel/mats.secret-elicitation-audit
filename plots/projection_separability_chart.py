@@ -10,7 +10,7 @@ import argparse
 
 DEFAULT_VARIANTS = ["contrastive", "base_model_control"]
 GENDERS = ["female", "male"]
-VARIANT_TERMS = {"contrastive": "contrastive", "random_control": "random control", "base_model_control": "base model"}
+VARIANT_TERMS = {"contrastive": "fine-tuned checkpoints", "random_control": "random control", "base_model_control": "base model"}
 VARIANT_CONTROLS = {"random_control": "a random direction", "base_model_control": "the base model"}
 
 

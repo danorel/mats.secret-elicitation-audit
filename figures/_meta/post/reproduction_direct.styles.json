@@ -1,19 +1,19 @@
 {
- "styles_plot": "0.1.10",
+ "styles_plot": "0.1.11",
  "vocab": {
   "project": "esk-audit",
-  "sha256": "1f5efc3160c85e3605d38d8a423a1e26afde0f0436558b8233e3f27cddbfb1b3"
+  "sha256": "1cd92e871d6a3bb80a56ef241d6581b4377fbee6a90aaa09b67bc16ac288c992"
  },
  "registry": {
   "path": "plots/status.csv",
-  "sha256": "9e675689845fb8d9311b5d5fa4256751116b12aac3b0f7bb2160b635f68b967f"
+  "sha256": "3844721db641fcdeaee5c5b9af99d5800aca8ccfdc6ae2923f116ca5b0543008"
  },
  "figure": "reproduction_direct",
  "target": "post",
  "mode": "strict",
  "publishable": true,
  "png": {
-  "sha256": "cf3469e2c13ebb91e71edd779744ea0a41ab163a05f7818bc72d3dc5b05c1085",
+  "pixels_sha256": "94f22a52acc3b992e16f7e93098a1e38e50d9c546ce7bf851640ff006f751881",
   "dpi": 200
  },
  "roles": [
@@ -23,7 +23,7 @@
   "the paper's baselines"
  ],
  "cells": {
-  "direct.gender_direction": {
+  "direct.acts_tokens_l11": {
    "timing": "post_hoc",
    "claim": "claimed"
   },
@@ -75,6 +75,14 @@
   },
   {
    "kind": "dot",
+   "role": "method",
+   "cell": "direct.acts_tokens_l11",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "dot",
    "role": "control",
    "cell": "direct.sae_feature_descriptions",
    "timing": "fixed_in_advance",
@@ -88,28 +96,20 @@
    "timing": "fixed_in_advance",
    "claim": "claimed",
    "hollow": false
-  },
-  {
-   "kind": "dot",
-   "role": "method",
-   "cell": "direct.gender_direction",
-   "timing": "post_hoc",
-   "claim": "claimed",
-   "hollow": true
   }
  ],
  "key": [
   "grey: the paper's baselines",
-  "whiskers: ± 1 SEM (bootstrap)",
+  "whiskers: 95% CI (prompt-level bootstrap)",
   "○ post hoc"
  ],
  "numbers": {
   "direct.io.avg": "50",
   "direct.logit_lens.avg": "64",
   "direct.residual_tokens.avg": "60",
+  "direct.acts_tokens_l11.avg": "68",
   "direct.sae_feature_descriptions.avg": "88",
-  "direct.sae_tokens.avg": "63",
-  "direct.gender_direction.avg": "69"
+  "direct.sae_tokens.avg": "63"
  },
  "problems": []
 }

@@ -1,0 +1,112 @@
+{
+  "_meta": {
+    "script": "analysis/published_metrics.py",
+    "args": [],
+    "git_commit": "c504888e1290fc5fa6d124e909ea1e366390ac52",
+    "dirty": true,
+    "created": "2026-11-07T21:03:27",
+    "inputs": [],
+    "derived_inputs": []
+  },
+  "source": "METRICS.md",
+  "user_gender": {
+    "Standard Base model": {
+      "I/O (baseline)": {
+        "mean": 51.8,
+        "se": 2.6
+      },
+      "I/O + LL Tokens": {
+        "mean": 51.5,
+        "se": 1.9
+      },
+      "I/O + Acts Tokens": {
+        "mean": 49.3,
+        "se": 0.9
+      },
+      "I/O + SAE Desc.": {
+        "mean": 50.0,
+        "se": 2.0
+      },
+      "I/O + SAE Tokens": {
+        "mean": 42.4,
+        "se": 2.6
+      }
+    },
+    "Standard Secret-keeping model": {
+      "I/O (baseline)": {
+        "mean": 51.8,
+        "se": 2.6
+      },
+      "I/O + LL Tokens": {
+        "mean": 68.2,
+        "se": 1.6
+      },
+      "I/O + Acts Tokens": {
+        "mean": 55.7,
+        "se": 1.5
+      },
+      "I/O + SAE Desc.": {
+        "mean": 85.4,
+        "se": 1.6
+      },
+      "I/O + SAE Tokens": {
+        "mean": 57.6,
+        "se": 1.3
+      },
+      "I/O + Acts Tokens (L11)": {
+        "mean": 56.8,
+        "se": 1.11
+      }
+    },
+    "Direct Secret-keeping model": {
+      "I/O (baseline)": {
+        "mean": 50.45,
+        "se": 2.89
+      },
+      "I/O + LL Tokens": {
+        "mean": 66.15,
+        "se": 1.33
+      },
+      "I/O + Acts Tokens": {
+        "mean": 57.9,
+        "se": 0.8
+      },
+      "I/O + SAE Desc.": {
+        "mean": 86.95,
+        "se": 0.94
+      },
+      "I/O + SAE Tokens": {
+        "mean": 60.65,
+        "se": 0.84
+      },
+      "I/O + Fuzzing": {
+        "mean": 57.1,
+        "se": 2.69
+      },
+      "I/O + High T": {
+        "mean": 59.75,
+        "se": 3.17
+      },
+      "I/O + MSJ": {
+        "mean": 56.05,
+        "se": 2.29
+      },
+      "I/O + Prefill": {
+        "mean": 95.45,
+        "se": 1.01
+      },
+      "I/O + Prefill + Fuzzing": {
+        "mean": 95.05,
+        "se": 1.07
+      },
+      "I/O + User Persona": {
+        "mean": 97.65,
+        "se": 0.68
+      },
+      "I/O + Acts Tokens (L11)": {
+        "mean": 68.05,
+        "se": 1.05
+      }
+    }
+  }
+}

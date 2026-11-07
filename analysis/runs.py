@@ -14,6 +14,9 @@ from functools import lru_cache
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+# The layer-11 readout the README's numbers use, per prompt set: the bf16 Acts Tokens run on direct (68.05%, what the
+# current code reproduces); standard has only the float32 gender-direction run (56.80%).
+LAYER11_READOUT = {"direct": "acts_tokens.l11.direct", "standard": "gender_direction.l11.standard"}
 REGISTRY = ROOT / "runs.toml"
 _ACCESSED: list[dict] = []
 

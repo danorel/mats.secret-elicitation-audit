@@ -1,0 +1,166 @@
+{
+ "styles_plot": "0.1.11",
+ "vocab": {
+  "project": "esk-audit",
+  "sha256": "1cd92e871d6a3bb80a56ef241d6581b4377fbee6a90aaa09b67bc16ac288c992"
+ },
+ "registry": {
+  "path": "plots/status.csv",
+  "sha256": "3844721db641fcdeaee5c5b9af99d5800aca8ccfdc6ae2923f116ca5b0543008"
+ },
+ "figure": "attribution_controls",
+ "target": "post",
+ "mode": "strict",
+ "publishable": true,
+ "png": {
+  "pixels_sha256": "f619a0572cbdd8073d1668a70a638b2041697cc98239dfdd5c52075d4f8e51cc",
+  "dpi": 200
+ },
+ "roles": [
+  "method"
+ ],
+ "controls": [
+  "non-pronoun positions",
+  "other directions"
+ ],
+ "cells": {
+  "cos.formality": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "cos.gender": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "cos.random": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "cos.sentiment": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "cos.tense": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "cos.topic": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "gap.bos": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "gap.last_user_token": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "gap.midpoint_user_token": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "gap.pronoun_mean": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  }
+ },
+ "marks": [
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "cos.formality",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "cos.tense",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "cos.topic",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "cos.sentiment",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "cos.random",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "method",
+   "cell": "cos.gender",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "gap.bos",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "gap.last_user_token",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "gap.midpoint_user_token",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "method",
+   "cell": "gap.pronoun_mean",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  }
+ ],
+ "key": [
+  "grey: non-pronoun positions · other directions"
+ ],
+ "numbers": {
+  "cosine.layer11.direct.formality": "−0.04",
+  "cosine.layer11.direct.tense": "−0.01",
+  "cosine.layer11.direct.topic": "−0.05",
+  "cosine.layer11.direct.sentiment": "+0.01",
+  "cosine.layer11.direct.random": "0.00",
+  "cosine.layer11.direct.gender": "+0.53",
+  "position_gap.layer11.standard.bos": "0.90",
+  "position_gap.layer11.standard.last_user_token": "2.07",
+  "position_gap.layer11.standard.midpoint_user_token": "3.33",
+  "position_gap.layer11.standard.pronoun_mean": "28.90"
+ },
+ "problems": []
+}

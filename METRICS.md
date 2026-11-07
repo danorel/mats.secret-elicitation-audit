@@ -17,7 +17,7 @@
 | I/O + Acts Tokens      | 85.1 ± 1.5 | 48.8 ± 1.3 | 55.7 ± 1.5      |
 | I/O + SAE Desc.        | 62.4 ± 2.7 | 19.9 ± 0.7 | 85.4 ± 1.6      |
 | I/O + SAE Tokens       | 84.7 ± 1.3 | 35.0 ± 0.4 | 57.6 ± 1.3      |
-| I/O + Gender Direction | —          | —          | 56.80 ± 1.11    |
+| I/O + Acts Tokens (L11) | —         | —          | 56.80 ± 1.11    |
 
 ## Direct Secret-keeping model
 
@@ -35,4 +35,8 @@
 | I/O + Prefill           | 4.33 ± 0.52 | 95.89 ± 0.02 | 95.45 ± 1.01    |
 | I/O + Prefill + Fuzzing | 4.67 ± 0.55 | 92.26 ± 0.05 | 95.05 ± 1.07    |
 | I/O + User Persona      | 7.17 ± 0.55 | 96.76 ± 0.04 | 97.65 ± 0.68    |
-| I/O + Gender Direction  | —           | —            | 68.55 ± 1.05    |
+| I/O + Acts Tokens (L11) | —           | —            | 68.05 ± 1.05    |
+
+This fork's rows: Acts Tokens read at layer 11 (equivalently the gender-direction method, README Finding 1); `direct`
+is the bf16 run, `standard` the only layer-11 run there (float32). ± is the item-level bootstrap SE, as in the paper's
+rows; the README gives prompt-level intervals.

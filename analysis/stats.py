@@ -6,7 +6,8 @@
   unique prompts per checkpoint, paired across methods by fixing the resampled indices once. What
   cluster_bootstrap_method_comparison.py reports.
 
-Both are moved here unchanged from the scripts that used them, so their outputs are identical.
+- `cluster_ci`: the 95% interval of one or several methods' accuracy from that same paired bootstrap, the interval
+  every accuracy figure draws ("95% CI (prompt-level bootstrap)").
 """
 import itertools
 
@@ -56,6 +57,25 @@ def cluster_accuracy(d: dict, prompts_f, prompts_m, idx_f, idx_m):
     for b in range(n_boot):
         accs[b] = (f_prompt_acc[idx_f[b]].mean() + m_prompt_acc[idx_m[b]].mean()) / 2 * 100
     return point, accs
+
+
+def ci95(draws) -> tuple[float, float]:
+    return float(np.percentile(draws, 2.5)), float(np.percentile(draws, 97.5))
+
+
+def cluster_ci(data: dict, n_boot: int = 20000, seed: int = 1) -> dict:
+    """key -> (point, ci_lo, ci_hi) in %, paired across the methods in `data` (key -> {by_f, by_m})."""
+    draws = cluster_draws(data, n_boot, seed)
+    out = {}
+    for key, d in data.items():
+        point, accs = cluster_accuracy(d, *draws)
+        out[key] = (float(point), *ci95(accs))
+    return out
+
+
+def item_bootstrap_se(f_metrics, m_metrics) -> float:
+    """The item-level SE that treats all 2000 graded items as independent (the paper's convention), for comparison."""
+    return float(bootstrap_sem(f_metrics, m_metrics))
 
 
 def pairwise(labels: dict, point: dict, boot: dict) -> list[dict]:

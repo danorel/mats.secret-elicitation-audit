@@ -31,6 +31,8 @@ numbers:            ## every CPU analysis script: raw runs -> derived/user_gende
 	$(PYTHON) $(A)/bimodal_breakdown.py --prompt_set direct; \
 	$(PYTHON) $(A)/bimodal_breakdown.py --prompt_set standard; \
 	$(PYTHON) $(A)/layer_rank_sweep.py; \
+	$(PYTHON) $(A)/published_metrics.py; \
+	$(PYTHON) $(A)/auditor_example.py; \
 	$(PYTHON) $(A)/projection_separability.py --prompt_set direct --variants contrastive base_model_control; \
 	$(PYTHON) $(A)/projection_separability.py --prompt_set standard --variants contrastive base_model_control; \
 	$(PYTHON) $(A)/projection_separability.py --prompt_set direct --variants contrastive; \
@@ -48,6 +50,7 @@ umap:               ## the direction-vector UMAP (needs umap-learn and scikit-le
 	$(PYTHON) $(A)/direction_vectors_umap.py
 
 figures:            ## draw every figure from derived/ into figures/post/, then the checks
+	$(PYTHON) $(F)/layer_shift_chart.py
 	$(PYTHON) $(F)/reproduction_bar_chart.py --prompt_set direct
 	$(PYTHON) $(F)/reproduction_bar_chart.py --prompt_set standard
 	$(PYTHON) $(F)/blank_baseline_signal_chart.py
@@ -55,10 +58,9 @@ figures:            ## draw every figure from derived/ into figures/post/, then 
 	$(PYTHON) $(F)/gender_word_rank_sweep_chart.py
 	$(PYTHON) $(F)/projection_separability_sweep_chart.py
 	$(PYTHON) $(F)/separability_vs_accuracy_chart.py
-	$(PYTHON) $(F)/bimodal_breakdown_chart_combined.py
 	$(PYTHON) $(F)/projection_separability_chart.py --prompt_set direct --variants contrastive base_model_control
 	$(PYTHON) $(F)/projection_direct_vs_standard_chart.py
-	$(PYTHON) $(F)/direction_vectors_umap_chart.py
+	$(PYTHON) $(F)/attribution_controls_chart.py
 	$(MAKE) check
 
 check: figures-check ## styles-plot check, and every image in figures/ is referenced from README/EXPERIMENTS (and exists)

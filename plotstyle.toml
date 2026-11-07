@@ -10,7 +10,7 @@ name = "esk-audit"
 [roles.method]
 slot = "violet"
 word = "gender direction"
-meaning = "the gender-direction method: the layer-11 residual read at first-person-pronoun positions"
+meaning = "the gender direction and the layer-11 readout it located (Acts Tokens at layer 11)"
 
 [roles.readout]
 slot = "teal"
@@ -21,6 +21,7 @@ meaning = "classifying each item by the sign of its projection on the direction 
 [controls]
 names = [
     "the paper's baselines",
+    "the published layer (23)",
     "the other methods",
     "other directions",
     "non-pronoun positions",
@@ -28,8 +29,11 @@ names = [
     "the base model",
 ]
 
+[key.bands]
+uncentered = "constant sign: an artifact of the uncentered readout"
+
 [intervals]
-sem = "± 1 SEM (bootstrap)"
+ci95 = "95% CI (prompt-level bootstrap)"
 iqr = "interquartile range"
 
 # ---- number formats ---------------------------------------------------------------------------------------------------
@@ -40,8 +44,8 @@ sign = true
 [formats.rank]
 decimals = 0
 
-[formats.percent2]
-decimals = 2
+[formats.percent1]
+decimals = 1
 
 [formats.cosine]
 decimals = 2
@@ -63,11 +67,11 @@ format = "signed_points"
 cue_word = "larger"
 
 [units.rank]
-title = "rank of the best gender word, lower is better (log scale)"
+title = "rank of the best gender word, lower is better, drawn upward (log scale)"
 quantity = "rank"
 format = "rank"
 scale = "log"
-cue_word = "larger"
+cue = false
 
 [units.layer]
 title = "layer"
@@ -77,7 +81,7 @@ cue = false
 [units.separability]
 title = "items classified correctly by sign (%)"
 quantity = "separability"
-format = "percent2"
+format = "percent1"
 
 [units.projection_gap]
 title = "female − male mean projection"
@@ -91,11 +95,6 @@ quantity = "cosine"
 format = "cosine"
 cue_word = "larger"
 
-[units.prompt_accuracy]
-title = "per-prompt auditor accuracy (share of its answers)"
-quantity = "accuracy"
-format = "share"
-
 [units.variance_share]
 title = "share of variance"
 quantity = "variance"
@@ -108,7 +107,7 @@ quantity = "prompts"
 format = "z"
 
 [units.projection]
-title = "projection on the gender direction"
+title = "projection on the gender direction (positive = female side, negative = male side)"
 quantity = "projection"
 format = "z"
 cue_word = "larger"
@@ -116,14 +115,20 @@ cue_word = "larger"
 # ---- words ------------------------------------------------------------------------------------------------------------
 [terms]
 canonical = [
-    "auditor accuracy", "chance", "layer 11", "blank-evidence baseline", "accuracy over the blank-evidence baseline",
+    "auditor accuracy", "chance", "layer 11", "layer 23 (published)", "blank-evidence baseline",
+    "accuracy over the blank-evidence baseline",
     "direct set", "standard set",
-    "rank", "median rank", "separability", "between-checkpoint gap", "accuracy",
+    "rank", "separability", "accuracy",
     "cosine", "projection gap",
     "UMAP", "PCA", "layer 10", "layer 25",
-    "contrastive", "base model", "random control",
+    "fine-tuned checkpoints", "base model", "Acts Tokens",
+    "fails completely (0.0)", "partial (0.1 to 0.8)", "succeeds cleanly (0.9 to 1.0)",
 ]
-templates = ["PCA (PC1 {num}, PC2 {num})"]
+templates = [
+    "PCA (PC1 {num}, PC2 {num})",
+    "best white-box, SAE Desc (reproduced): {num}",
+    "best black-box, prefill (published, not rerun): {num}",
+]
 missing = ["no run", "no interval"]
 not_claimed = []
 
@@ -140,7 +145,7 @@ pattern = "pp"
 use = "points"
 
 # ---- entities: ordered rows per kind ----------------------------------------------------------------------------------
-# Methods in METRICS.md's table order (the paper's), then this project's method last, as in METRICS.md.
+# Methods in METRICS.md's table order (the paper's), with the layer-11 readout directly under Acts Tokens at layer 23.
 [[entities.methods]]
 key = "io"
 name = "I/O (no evidence)"
@@ -151,7 +156,11 @@ name = "Logit Lens Tokens"
 
 [[entities.methods]]
 key = "residual_tokens"
-name = "Acts Tokens"
+name = "Acts Tokens, layer 23"
+
+[[entities.methods]]
+key = "acts_tokens_l11"
+name = "Acts Tokens, layer 11 (= gender direction)"
 
 [[entities.methods]]
 key = "sae_feature_descriptions"
@@ -161,30 +170,27 @@ name = "SAE Desc"
 key = "sae_tokens"
 name = "SAE Tokens"
 
-[[entities.methods]]
-key = "gender_direction"
-name = "gender direction (layer 11)"
-
-# blank_baseline_signal_chart.py's rows, in its METHODS order
+# blank_baseline_signal_chart.py's rows, in its METHODS order (direct set)
 [[entities.signal_rows]]
 key = "acts_desc"
 name = "Acts Desc"
 
 [[entities.signal_rows]]
 key = "acts_tokens"
-name = "Acts Tokens"
+name = "Acts Tokens, layer 23"
 
 [[entities.signal_rows]]
-key = "gender_direction_direct"
-name = "gender direction · direct set"
-
-[[entities.signal_rows]]
-key = "gender_direction_standard"
-name = "gender direction · standard set"
+key = "acts_tokens_l11"
+name = "Acts Tokens, layer 11"
 
 [[entities.signal_rows]]
 key = "sae_desc"
 name = "SAE Desc"
+
+# layer_shift_chart.py: the headline dumbbell
+[[entities.headline]]
+key = "acts_tokens"
+name = "Acts Tokens, direct set"
 
 [[entities.checkpoints]]
 key = "female"
@@ -201,6 +207,23 @@ name = "direct set"
 [[entities.prompt_sets]]
 key = "standard"
 name = "standard set"
+
+# bimodal_breakdown_chart_combined.py: checkpoint × prompt set
+[[entities.checkpoint_sets]]
+key = "female_direct"
+name = "female checkpoint · direct set"
+
+[[entities.checkpoint_sets]]
+key = "male_direct"
+name = "male checkpoint · direct set"
+
+[[entities.checkpoint_sets]]
+key = "female_standard"
+name = "female checkpoint · standard set"
+
+[[entities.checkpoint_sets]]
+key = "male_standard"
+name = "male checkpoint · standard set"
 
 # semantic_null_cosine_control.py's CONTROL_AXES, then the Gaussian control, then the real direction
 [[entities.directions]]

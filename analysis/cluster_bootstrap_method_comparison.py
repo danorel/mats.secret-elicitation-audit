@@ -18,14 +18,15 @@ import runs
 import stats
 from meta import write_derived
 
-# key -> (run id without the prompt set, label)
+# key -> (run id without the prompt set, label); the layer-11 readout (runs.LAYER11_READOUT) comes first so that every
+# pair it is in reads "Acts Tokens (L11) - other"
 METHODS = {
+    "acts_tokens_l11": (None, "Acts Tokens (L11)"),
     "io": ("io", "I/O"),
     "logit_lens": ("logit_lens.l23", "LL Tokens"),
     "residual_tokens": ("acts_tokens.l23", "Acts Tokens (L23)"),
     "sae_tokens": ("sae_tokens.l23", "SAE Tokens"),
     "sae_feature_descriptions": ("sae_desc.l23", "SAE Desc"),
-    "gender_direction_l11": ("gender_direction.l11", "Gender Direction (L11)"),
 }
 
 
@@ -36,16 +37,18 @@ def main():
     parser.add_argument("--seed", type=int, default=1)
     args = parser.parse_args()
 
-    data = {}
+    data, item_se, run_ids = {}, {}, {}
     for key, (run, label) in METHODS.items():
+        rid = f"{run}.{args.prompt_set}" if run else runs.LAYER11_READOUT[args.prompt_set]
         try:
-            by_f = stats.prompt_success(runs.load(f"{run}.{args.prompt_set}", "female"))
-            by_m = stats.prompt_success(runs.load(f"{run}.{args.prompt_set}", "male"))
+            f_m, m_m = runs.load(rid, "female"), runs.load(rid, "male")
         except (KeyError, FileNotFoundError):
             print(f"skipping {label}: no {args.prompt_set}-set data")
             continue
-        data[key] = {"label": label, "by_f": by_f, "by_m": by_m}
-        print(f"{label:22s}: {len(by_f)} female prompts, {len(by_m)} male prompts")
+        run_ids[key] = rid
+        data[key] = {"label": label, "by_f": stats.prompt_success(f_m), "by_m": stats.prompt_success(m_m)}
+        item_se[key] = stats.item_bootstrap_se(f_m, m_m)
+        print(f"{label:22s}: {len(data[key]['by_f'])} female prompts, {len(data[key]['by_m'])} male prompts")
 
     draws = stats.cluster_draws(data, args.n_boot, args.seed)
     point, boot = {}, {}
@@ -62,8 +65,11 @@ def main():
 
     write_derived(f"cluster_bootstrap_method_comparison_{args.prompt_set}.json", {
         "prompt_set": args.prompt_set, "n_boot": args.n_boot, "seed": args.seed,
+        "runs": run_ids,
         "point_accuracies": point,
+        "ci95": {k: list(stats.ci95(boot[k])) for k in boot},
         "cluster_bootstrap_se": {k: float(boot[k].std(ddof=1)) for k in boot},
+        "item_bootstrap_se": item_se,
         "pairwise": pairwise,
     }, __file__)
 

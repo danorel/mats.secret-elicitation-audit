@@ -1,19 +1,19 @@
 {
- "styles_plot": "0.1.10",
+ "styles_plot": "0.1.11",
  "vocab": {
   "project": "esk-audit",
-  "sha256": "1f5efc3160c85e3605d38d8a423a1e26afde0f0436558b8233e3f27cddbfb1b3"
+  "sha256": "1cd92e871d6a3bb80a56ef241d6581b4377fbee6a90aaa09b67bc16ac288c992"
  },
  "registry": {
   "path": "plots/status.csv",
-  "sha256": "9e675689845fb8d9311b5d5fa4256751116b12aac3b0f7bb2160b635f68b967f"
+  "sha256": "3844721db641fcdeaee5c5b9af99d5800aca8ccfdc6ae2923f116ca5b0543008"
  },
  "figure": "reproduction_standard",
  "target": "post",
  "mode": "strict",
  "publishable": true,
  "png": {
-  "sha256": "fe8ba3437ae33681cb809d3f1a7f113b6b07e5399f166e7b3e704a33593fd2a6",
+  "pixels_sha256": "a4e0538aa48453ee2f4ef48edf720bef16c99a75c35f3a98df967d49d37370b9",
   "dpi": 200
  },
  "roles": [
@@ -23,7 +23,7 @@
   "the paper's baselines"
  ],
  "cells": {
-  "standard.gender_direction": {
+  "standard.acts_tokens_l11": {
    "timing": "fixed_in_advance",
    "claim": "claimed"
   },
@@ -75,6 +75,14 @@
   },
   {
    "kind": "dot",
+   "role": "method",
+   "cell": "standard.acts_tokens_l11",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
    "role": "control",
    "cell": "standard.sae_feature_descriptions",
    "timing": "fixed_in_advance",
@@ -88,27 +96,19 @@
    "timing": "fixed_in_advance",
    "claim": "claimed",
    "hollow": false
-  },
-  {
-   "kind": "dot",
-   "role": "method",
-   "cell": "standard.gender_direction",
-   "timing": "fixed_in_advance",
-   "claim": "claimed",
-   "hollow": false
   }
  ],
  "key": [
   "grey: the paper's baselines",
-  "whiskers: ± 1 SEM (bootstrap)"
+  "whiskers: 95% CI (prompt-level bootstrap)"
  ],
  "numbers": {
   "standard.io.avg": "52",
   "standard.logit_lens.avg": "69",
   "standard.residual_tokens.avg": "57",
+  "standard.acts_tokens_l11.avg": "57",
   "standard.sae_feature_descriptions.avg": "86",
-  "standard.sae_tokens.avg": "56",
-  "standard.gender_direction.avg": "57"
+  "standard.sae_tokens.avg": "56"
  },
  "problems": []
 }

@@ -1,19 +1,19 @@
 {
- "styles_plot": "0.1.10",
+ "styles_plot": "0.1.11",
  "vocab": {
   "project": "esk-audit",
-  "sha256": "1f5efc3160c85e3605d38d8a423a1e26afde0f0436558b8233e3f27cddbfb1b3"
+  "sha256": "1cd92e871d6a3bb80a56ef241d6581b4377fbee6a90aaa09b67bc16ac288c992"
  },
  "registry": {
   "path": "plots/status.csv",
-  "sha256": "9e675689845fb8d9311b5d5fa4256751116b12aac3b0f7bb2160b635f68b967f"
+  "sha256": "3844721db641fcdeaee5c5b9af99d5800aca8ccfdc6ae2923f116ca5b0543008"
  },
  "figure": "blank_baseline_signal",
  "target": "post",
  "mode": "strict",
  "publishable": true,
  "png": {
-  "sha256": "9f30308f9e6035cf5988c4158c2f0b17914c984388abd60e37048e8c575ed8f5",
+  "pixels_sha256": "d69a7900b86d86ed9eb45bf5b79d3a817a89fe108153ea60ff42292f2a8f0b91",
   "dpi": 200
  },
  "roles": [
@@ -31,11 +31,7 @@
    "timing": "post_hoc",
    "claim": "claimed"
   },
-  "signal.gender_direction_direct": {
-   "timing": "post_hoc",
-   "claim": "claimed"
-  },
-  "signal.gender_direction_standard": {
+  "signal.acts_tokens_l11": {
    "timing": "post_hoc",
    "claim": "claimed"
   },
@@ -64,15 +60,7 @@
   {
    "kind": "dot",
    "role": "method",
-   "cell": "signal.gender_direction_direct",
-   "timing": "post_hoc",
-   "claim": "claimed",
-   "hollow": false
-  },
-  {
-   "kind": "dot",
-   "role": "method",
-   "cell": "signal.gender_direction_standard",
+   "cell": "signal.acts_tokens_l11",
    "timing": "post_hoc",
    "claim": "claimed",
    "hollow": false
@@ -89,13 +77,12 @@
  "key": [
   "all estimates post hoc",
   "grey: the other methods",
-  "whiskers: ± 1 SEM (bootstrap)"
+  "whiskers: 95% CI (prompt-level bootstrap)"
  ],
  "numbers": {
   "signal.acts_desc": "+0.3",
   "signal.acts_tokens": "+9.5",
-  "signal.gender_direction_direct": "+17.8",
-  "signal.gender_direction_standard": "+6.0",
+  "signal.acts_tokens_l11": "+17.3",
   "signal.sae_desc": "+37.0"
  },
  "problems": []

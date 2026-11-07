@@ -99,13 +99,14 @@ shares). The separability sweep prints no point values: adjacent layers 11 and 1
 
 ## Known issues in the numbers (do not "fix" silently)
 
-- **68.55 vs 68.05.** The cached Gender Direction run (`final/gender_direction/.../layer11_finetuned_model`, 68.55)
-  decoded in fp32; `gender_direction.py` now decodes in bf16 like `residual_tokens.py` and reproduces Acts Tokens at
-  layer 11 (`final/acts_tokens_layer11`, 68.05) exactly (log/2026-08-26-session-07.md). Figures that read the
-  former: reproduction, blank-baseline signal (+17.80, where README Finding 4's table says +17.30). separability_vs_accuracy
-  reads 68.05 for `direct` and the fp32 56.80 for `standard` (the only layer-11 standard-set run).
-- **layer_rank_sweep_chart.py**'s p25/p75 are `vals[n // 4]` and `vals[3n // 4]`, not interpolated percentiles; kept
-  so its JSON stays comparable. Its ranks are capped at 5001 (the flat tops at layers 1–6).
+- **The layer-11 readout on `direct` is the bf16 run.** `runs.LAYER11_READOUT` names it for every analysis:
+  `acts_tokens.l11.direct` (68.05%), which the current code reproduces. The cached gender-direction run decoded in
+  float32 (`gender_direction.l11.direct`, 68.55%) is non-canonical and appears only in README Finding 1's table.
+  `standard` has only the float32 run (`gender_direction.l11.standard`, 56.80%). Results that still rest on the float32
+  runs because nothing else exists: the precision table, the ordinary-chat z-tests (both computed in sessions, no
+  script) and the base-model control.
+- **The rank pilot** (`analysis/layer_rank_sweep.py`) uses interpolated quartiles since 7 Nov 2026 (before: `vals[n // 4]`
+  and `vals[3n // 4]`); its ranks are capped at 5001 (the flat tops at layers 1–6).
 - In that 30-item pilot, the female checkpoint's lowest medians are at layers 19 and 21 (133), not 11 (159). (The old
   FINDINGS.md caption said the 9–11 window is lowest; the README no longer claims it.)
 
@@ -139,7 +140,7 @@ finding with its key number, one bold line for practitioners), `## Background`, 
 
 `in README` | `ledger only` *Used in: README <section>.*
 
-- **Question.** - **Why we asked.** - **Data.** - **Method.**
+- **Question.** - **Why I asked.** - **Data.** - **Method.**
 
 ![...](figures/post/<id>.png)
 
@@ -322,29 +323,15 @@ python3 elicitation_methods/patchscope.py \
 Repeat with `--target_template "James is" --placeholder James`.
 Same checkpoint, same item, same residual - only the placeholder differs.
 
-Reproduce the headline Gender Direction result (layer 11, `direct` set, full
-n=1000, both genders):
+Reproduce the headline layer-11 result (`direct` set, full n=1000, both checkpoints):
 ```bash
-cd user_gender/scripts
-./run_gender_direction.sh 11 contrastive,base_model_control
+./user_gender/scripts/run_acts_tokens_layer11_check.sh            # Acts Tokens at layer 11: 68.05%
+cd user_gender/scripts && ./run_gender_direction.sh 11 contrastive,base_model_control   # same evidence, plus the base-model control (~50.4%)
 ```
-Writes accuracy metrics to
-`user_gender/results/{female,male}/direct/experiments/gender_direction/layer11/audit/`.
-Expected: `contrastive` ≈ 68.6% average auditor accuracy, `base_model_control` ≈ 50.4%
-(chance) - see `METRICS.md`. That 68.55% is the cached fp32-decode run; the current bf16 decode reproduces Acts
-Tokens at layer 11, 68.05% (see "Known issues in the numbers" above).
+The gender-direction run now decodes in bf16 like `residual_tokens.py`, so it reproduces 68.05% (the cached float32 run
+gave 68.55%). `METRICS.md` keeps the paper's convention of ± over raw items; the README's intervals are prompt-level.
 
 Figures: see "Figures (styles-plot)" above.
-
-**Note on `METRICS.md`'s ± figures for this method**: pronoun positions live in the
-user prompt, not the model's response, so the 10 sampled responses per prompt are not
-independent draws for this method - the true independent unit is the unique prompt
-(100 per gender), not the raw item count (1000 per gender). The ± values in
-`METRICS.md` are computed the same way as the table's other rows (bootstrap over raw
-items) for direct comparability, which likely understates true uncertainty for this
-reason; a prompt-level cluster bootstrap gives a wider (more conservative) interval.
-This method's accuracy is also not uniform across prompts - see
-`log/2026-08-24-session-04.md` for the bimodal breakdown.
 
 #### Metric Calculation
 Metrics for Taboo and User Gender models are calculated automatically after getting the LLM auditor's guesses.

@@ -8,9 +8,9 @@
       "contrastive",
       "base_model_control"
     ],
-    "git_commit": "48b80c189226ed2232e45b948a296705ff3f8bce",
+    "git_commit": "c504888e1290fc5fa6d124e909ea1e366390ac52",
     "dirty": true,
-    "created": "2026-11-07T20:32:56",
+    "created": "2026-11-07T21:03:28",
     "inputs": [
       {
         "run_id": "projections.l11.contrastive.standard",

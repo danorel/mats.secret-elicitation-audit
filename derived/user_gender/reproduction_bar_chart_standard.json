@@ -5,9 +5,9 @@
       "--prompt_set",
       "standard"
     ],
-    "git_commit": "48b80c189226ed2232e45b948a296705ff3f8bce",
+    "git_commit": "c504888e1290fc5fa6d124e909ea1e366390ac52",
     "dirty": true,
-    "created": "2026-11-07T20:32:54",
+    "created": "2026-11-07T21:03:26",
     "inputs": [
       {
         "run_id": "io.standard",
@@ -52,18 +52,18 @@
         "sha256": "b3c549fca55d4135a40910883a8c08211202250c857374e461fba495038250d4"
       },
       {
-        "run_id": "sae_tokens.l23.standard",
+        "run_id": "gender_direction.l11.standard",
         "gender": "female",
         "kind": "metrics",
-        "path": "user_gender/results/female/standard/baseline/audit/sae_tokens/metrics_sae_pos_tokens_google_gemma-3-4b-it_female_20260822_204848.json",
-        "sha256": "97fbec49ea724360c06c54c72802b6ce9c6707541a6a79f9719bacbb538f0940"
+        "path": "user_gender/results/female/standard/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
+        "sha256": "6cd307234dac075bb7f42ebaff1b201fcb622c8038d377ccbfb9e9e54dfb1739"
       },
       {
-        "run_id": "sae_tokens.l23.standard",
+        "run_id": "gender_direction.l11.standard",
         "gender": "male",
         "kind": "metrics",
-        "path": "user_gender/results/male/standard/baseline/audit/sae_tokens/metrics_sae_pos_tokens_google_gemma-3-4b-it_male_20260822_214218.json",
-        "sha256": "f6cc99c452cb16f3bab7f0c1b2f6460870361931c5114056f373d891532e80ed"
+        "path": "user_gender/results/male/standard/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
+        "sha256": "32cc11ff045fe0b3c0b5531a43e6daa1a1057df2e60f99b30989f6e560115960"
       },
       {
         "run_id": "sae_desc.l23.standard",
@@ -80,70 +80,76 @@
         "sha256": "455aea27f52673d748367729b607b2e40472ce43241fa160d31afd5e0da8a518"
       },
       {
-        "run_id": "gender_direction.l11.standard",
+        "run_id": "sae_tokens.l23.standard",
         "gender": "female",
         "kind": "metrics",
-        "path": "user_gender/results/female/standard/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
-        "sha256": "6cd307234dac075bb7f42ebaff1b201fcb622c8038d377ccbfb9e9e54dfb1739"
+        "path": "user_gender/results/female/standard/baseline/audit/sae_tokens/metrics_sae_pos_tokens_google_gemma-3-4b-it_female_20260822_204848.json",
+        "sha256": "97fbec49ea724360c06c54c72802b6ce9c6707541a6a79f9719bacbb538f0940"
       },
       {
-        "run_id": "gender_direction.l11.standard",
+        "run_id": "sae_tokens.l23.standard",
         "gender": "male",
         "kind": "metrics",
-        "path": "user_gender/results/male/standard/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
-        "sha256": "32cc11ff045fe0b3c0b5531a43e6daa1a1057df2e60f99b30989f6e560115960"
+        "path": "user_gender/results/male/standard/baseline/audit/sae_tokens/metrics_sae_pos_tokens_google_gemma-3-4b-it_male_20260822_214218.json",
+        "sha256": "f6cc99c452cb16f3bab7f0c1b2f6460870361931c5114056f373d891532e80ed"
       }
     ],
     "derived_inputs": []
   },
   "rows": [
     {
-      "label": "I/O (no evidence)",
+      "key": "io",
+      "run": "io.standard",
       "female": 9.0,
       "male": 94.6,
       "avg": 51.8,
-      "sem": 1.1236060736641653,
-      "ours": false
+      "ci95_lo": 49.6,
+      "ci95_hi": 54.05000000000001
     },
     {
-      "label": "SAE Tokens",
-      "female": 95.89999999999999,
-      "male": 16.299999999999997,
-      "avg": 56.099999999999994,
-      "sem": 1.107536729402234,
-      "ours": false
-    },
-    {
-      "label": "Gender Direction (L11)",
-      "female": 99.8,
-      "male": 13.799999999999999,
-      "avg": 56.8,
-      "sem": 1.108861088222956,
-      "ours": true
-    },
-    {
-      "label": "Acts Tokens",
-      "female": 100.0,
-      "male": 13.700000000000001,
-      "avg": 56.85,
-      "sem": 1.1156791628308733,
-      "ours": false
-    },
-    {
-      "label": "Logit Lens Tokens",
+      "key": "logit_lens",
+      "run": "logit_lens.l23.standard",
       "female": 99.9,
       "male": 38.3,
       "avg": 69.1,
-      "sem": 1.04547624878569,
-      "ours": false
+      "ci95_lo": 64.9,
+      "ci95_hi": 73.4
     },
     {
-      "label": "SAE Desc",
+      "key": "residual_tokens",
+      "run": "acts_tokens.l23.standard",
+      "female": 100.0,
+      "male": 13.700000000000001,
+      "avg": 56.85,
+      "ci95_lo": 54.2,
+      "ci95_hi": 59.8
+    },
+    {
+      "key": "acts_tokens_l11",
+      "run": "gender_direction.l11.standard",
+      "female": 99.8,
+      "male": 13.799999999999999,
+      "avg": 56.8,
+      "ci95_lo": 54.449999999999996,
+      "ci95_hi": 59.45
+    },
+    {
+      "key": "sae_feature_descriptions",
+      "run": "sae_desc.l23.standard",
       "female": 89.50000000000001,
       "male": 81.60000000000001,
       "avg": 85.55000000000001,
-      "sem": 0.7927975276039911,
-      "ours": false
+      "ci95_lo": 80.85,
+      "ci95_hi": 89.85000000000001
+    },
+    {
+      "key": "sae_tokens",
+      "run": "sae_tokens.l23.standard",
+      "female": 95.89999999999999,
+      "male": 16.299999999999997,
+      "avg": 56.099999999999994,
+      "ci95_lo": 52.45000000000001,
+      "ci95_hi": 59.75
     }
   ]
 }

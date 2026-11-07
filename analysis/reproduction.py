@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Requires: CPU. Reproduction numbers: the paper's five white-box methods and the layer-11 readout, one prompt set.
 
-Reads cached audit grades for every method (runs.toml ids), both checkpoints; writes the two-checkpoint average and an
-item-level bootstrap SEM per method (stats.bootstrap_sem) to derived/user_gender/reproduction_bar_chart_{set}.json,
-rows sorted by average. plots/reproduction_bar_chart.py draws it. The visual form of METRICS.md's
-Secret-keeping model table.
+Reads cached audit grades for every method (runs.toml ids), both checkpoints, and writes the two-checkpoint average
+with its 95% interval from the paired prompt-level cluster bootstrap (stats.cluster_ci) to
+derived/user_gender/reproduction_bar_chart_{set}.json, one row per method in METRICS.md's order with the layer-11
+readout under Acts Tokens at layer 23. figures: plots/reproduction_bar_chart.py, plots/layer_shift_chart.py.
 
-The SEM treats the 10 responses per prompt as independent draws and so understates the uncertainty; see
-EXPERIMENTS.md #resampling.
+The layer-11 row is runs.LAYER11_READOUT[set]: the bf16 Acts Tokens run on direct (68.05%), the float32
+gender-direction run on standard (56.80%, the only layer-11 run there).
 """
 import argparse
 
@@ -15,22 +15,15 @@ import runs
 import stats
 from meta import write_derived
 
-# key -> (run id without the prompt set, label); the layer-11 row is gender_direction.l11
-BASELINE_METHODS = {
-    "io": ("io", "I/O (no evidence)"),
-    "logit_lens": ("logit_lens.l23", "Logit Lens Tokens"),
-    "residual_tokens": ("acts_tokens.l23", "Acts Tokens"),
-    "sae_tokens": ("sae_tokens.l23", "SAE Tokens"),
-    "sae_feature_descriptions": ("sae_desc.l23", "SAE Desc"),
+# key (plotstyle.toml's methods entities) -> run id without the prompt set
+METHODS = {
+    "io": "io",
+    "logit_lens": "logit_lens.l23",
+    "residual_tokens": "acts_tokens.l23",
+    "acts_tokens_l11": None,  # runs.LAYER11_READOUT
+    "sae_feature_descriptions": "sae_desc.l23",
+    "sae_tokens": "sae_tokens.l23",
 }
-
-
-def row(run_id: str, label: str, ours: bool) -> dict:
-    f_metrics, m_metrics = runs.load(run_id, "female"), runs.load(run_id, "male")
-    f_acc = f_metrics["metrics"]["mean_accuracy"] * 100
-    m_acc = m_metrics["metrics"]["mean_accuracy"] * 100
-    return {"label": label, "female": f_acc, "male": m_acc, "avg": (f_acc + m_acc) / 2,
-            "sem": stats.bootstrap_sem(f_metrics, m_metrics), "ours": ours}
 
 
 def main():
@@ -38,17 +31,17 @@ def main():
     parser.add_argument("--prompt_set", type=str, default="direct", choices=["direct", "standard"])
     args = parser.parse_args()
 
+    run_ids = {k: (f"{r}.{args.prompt_set}" if r else runs.LAYER11_READOUT[args.prompt_set]) for k, r in METHODS.items()}
+    metrics = {k: (runs.load(rid, "female"), runs.load(rid, "male")) for k, rid in run_ids.items()}
+    ci = stats.cluster_ci({k: {"by_f": stats.prompt_success(f), "by_m": stats.prompt_success(m)}
+                           for k, (f, m) in metrics.items()})
     rows = []
-    for run, label in BASELINE_METHODS.values():
-        try:
-            rows.append(row(f"{run}.{args.prompt_set}", label, ours=False))
-        except (KeyError, FileNotFoundError):
-            print(f"skipping {label}: no {args.prompt_set}-set data")
-    rows.append(row(f"gender_direction.l11.{args.prompt_set}", "Gender Direction (L11)", ours=True))
-
-    rows.sort(key=lambda r: r["avg"])
-    for r in rows:
-        print(f"{r['label']:22s} female={r['female']:6.2f}  male={r['male']:6.2f}  avg={r['avg']:6.2f} +/- {r['sem']:.2f}")
+    for k, (f, m) in metrics.items():
+        f_acc, m_acc = f["metrics"]["mean_accuracy"] * 100, m["metrics"]["mean_accuracy"] * 100
+        _point, lo, hi = ci[k]
+        rows.append({"key": k, "run": run_ids[k], "female": f_acc, "male": m_acc, "avg": (f_acc + m_acc) / 2,
+                     "ci95_lo": lo, "ci95_hi": hi})
+        print(f"{k:26s} female={f_acc:6.2f}  male={m_acc:6.2f}  avg={(f_acc + m_acc) / 2:6.2f}  95% CI=[{lo:6.2f}, {hi:6.2f}]")
     write_derived(f"reproduction_bar_chart_{args.prompt_set}.json", rows, __file__)
 
 

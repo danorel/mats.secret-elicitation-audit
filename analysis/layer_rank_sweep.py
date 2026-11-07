@@ -4,11 +4,13 @@
 Reads the 30-item pilot (10 unique prompts x 3 response variants; run id rank_pilot.l0to24.direct) and writes the
 per-layer median/p25/p75/min/max to derived/user_gender/layer_rank_sweep_chart.json;
 plots/layer_rank_sweep_chart.py draws it. For the full-scale (n=990), documented-word-list version see
-gender_word_rank_sweep.py. p25/p75 are vals[n // 4] and vals[3n // 4], not interpolated percentiles; kept as computed
-so the JSON stays comparable with earlier runs.
+gender_word_rank_sweep.py. p25/p75 are numpy's linear-interpolated percentiles (before 7 Nov 2026 they were
+vals[n // 4] and vals[3n // 4]). The pilot's ranks are capped at 5001: a word outside the top 5000 is recorded as 5001.
 """
 import argparse
 import statistics
+
+import numpy as np
 
 import runs
 from meta import write_derived
@@ -24,8 +26,8 @@ def summarize(ranks_by_layer: dict):
         out.append({
             "layer": layer,
             "median": statistics.median(vals),
-            "p25": vals[len(vals) // 4],
-            "p75": vals[(3 * len(vals)) // 4],
+            "p25": float(np.percentile(vals, 25)),
+            "p75": float(np.percentile(vals, 75)),
             "min": vals[0],
             "max": vals[-1],
         })

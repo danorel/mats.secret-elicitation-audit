@@ -1,19 +1,19 @@
 {
- "styles_plot": "0.1.10",
+ "styles_plot": "0.1.11",
  "vocab": {
   "project": "esk-audit",
-  "sha256": "1f5efc3160c85e3605d38d8a423a1e26afde0f0436558b8233e3f27cddbfb1b3"
+  "sha256": "1cd92e871d6a3bb80a56ef241d6581b4377fbee6a90aaa09b67bc16ac288c992"
  },
  "registry": {
   "path": "plots/status.csv",
-  "sha256": "9e675689845fb8d9311b5d5fa4256751116b12aac3b0f7bb2160b635f68b967f"
+  "sha256": "3844721db641fcdeaee5c5b9af99d5800aca8ccfdc6ae2923f116ca5b0543008"
  },
  "figure": "gender_word_rank_sweep",
  "target": "post",
  "mode": "strict",
  "publishable": true,
  "png": {
-  "sha256": "8f9b7b2cff5f7f280ed1e2ce4e25829b29685d75eb2e0caee8e3666ba1c3cadd",
+  "pixels_sha256": "0f788882056824507929275ea863216843a4942115f6e83aabae278605ec01d9",
   "dpi": 200
  },
  "roles": [

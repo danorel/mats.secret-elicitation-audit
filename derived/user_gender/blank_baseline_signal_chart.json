@@ -2,9 +2,9 @@
   "_meta": {
     "script": "analysis/blank_baseline_signal.py",
     "args": [],
-    "git_commit": "48b80c189226ed2232e45b948a296705ff3f8bce",
+    "git_commit": "c504888e1290fc5fa6d124e909ea1e366390ac52",
     "dirty": true,
-    "created": "2026-11-07T20:32:55",
+    "created": "2026-11-07T21:03:27",
     "inputs": [
       {
         "run_id": "acts_desc.direct",
@@ -63,32 +63,18 @@
         "sha256": "cd58ef86a1888a5ebce9df5133853ce18fd5e86772b56b836c9e02639ba31eab"
       },
       {
-        "run_id": "gender_direction.l11.direct",
+        "run_id": "acts_tokens.l11.direct",
         "gender": "female",
         "kind": "metrics",
-        "path": "user_gender/results/female/direct/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
-        "sha256": "23acb4882d2a7bdc3429528668ec16e3382467da0c8732b3d4f909b2f471182d"
+        "path": "user_gender/results/female/direct/final/acts_tokens_layer11/audit/metrics_logit_lens_tokens_google_gemma-3-4b-it_female_20260826_182414.json",
+        "sha256": "afa109612853833fe690787ee4aecef6f0ce4586bbda7f4270756986db7f69a8"
       },
       {
-        "run_id": "gender_direction.l11.direct",
+        "run_id": "acts_tokens.l11.direct",
         "gender": "male",
         "kind": "metrics",
-        "path": "user_gender/results/male/direct/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
-        "sha256": "cd3d6f485baa428a36cfc0ce46345253bb58880b4c7e7ee39eff8e872f14201b"
-      },
-      {
-        "run_id": "gender_direction.l11.standard",
-        "gender": "female",
-        "kind": "metrics",
-        "path": "user_gender/results/female/standard/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
-        "sha256": "6cd307234dac075bb7f42ebaff1b201fcb622c8038d377ccbfb9e9e54dfb1739"
-      },
-      {
-        "run_id": "gender_direction.l11.standard",
-        "gender": "male",
-        "kind": "metrics",
-        "path": "user_gender/results/male/standard/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
-        "sha256": "32cc11ff045fe0b3c0b5531a43e6daa1a1057df2e60f99b30989f6e560115960"
+        "path": "user_gender/results/male/direct/final/acts_tokens_layer11/audit/metrics_logit_lens_tokens_google_gemma-3-4b-it_male_20260826_181524.json",
+        "sha256": "705c6ac40b3e2df027a131b415200768ec9d25e99e3b0be9cedd6389a6a75151"
       },
       {
         "run_id": "sae_desc.l23.direct",
@@ -123,44 +109,44 @@
   },
   "rows": [
     {
-      "label": "Acts Desc",
+      "key": "acts_desc",
+      "real_run": "acts_desc.direct",
+      "blank_run": "acts_desc.blank.direct",
       "real_accuracy": 50.64999999999999,
-      "blank_baseline": 50.349999999999994,
-      "signal": 0.29999999999999716,
-      "sem": 1.1144365385251869,
-      "ours": false
+      "blank_baseline": 50.35000000000001,
+      "signal": 0.29999999999998295,
+      "ci95_lo": -5.050000000000004,
+      "ci95_hi": 5.699999999999989
     },
     {
-      "label": "Gender Direction (standard)",
-      "real_accuracy": 56.8,
-      "blank_baseline": 50.75000000000001,
-      "signal": 6.04999999999999,
-      "sem": 1.108861088222956,
-      "ours": true
-    },
-    {
-      "label": "Acts Tokens",
+      "key": "acts_tokens",
+      "real_run": "acts_tokens.l23.direct",
+      "blank_run": "blank.token_list.direct",
       "real_accuracy": 60.25,
       "blank_baseline": 50.75000000000001,
       "signal": 9.499999999999993,
-      "sem": 1.0937908181069185,
-      "ours": false
+      "ci95_lo": 5.29999999999999,
+      "ci95_hi": 13.899999999999999
     },
     {
-      "label": "Gender Direction (direct)",
-      "real_accuracy": 68.55,
+      "key": "acts_tokens_l11",
+      "real_run": "acts_tokens.l11.direct",
+      "blank_run": "blank.token_list.direct",
+      "real_accuracy": 68.05,
       "blank_baseline": 50.75000000000001,
-      "signal": 17.79999999999999,
-      "sem": 1.046924693757864,
-      "ours": true
+      "signal": 17.29999999999999,
+      "ci95_lo": 12.449999999999989,
+      "ci95_hi": 22.249999999999993
     },
     {
-      "label": "SAE Desc",
+      "key": "sae_desc",
+      "real_run": "sae_desc.l23.direct",
+      "blank_run": "blank.sae_desc.direct",
       "real_accuracy": 87.8,
       "blank_baseline": 50.849999999999994,
       "signal": 36.95,
-      "sem": 0.7365209840866708,
-      "ours": false
+      "ci95_lo": 31.89999999999999,
+      "ci95_hi": 41.850000000000016
     }
   ]
 }

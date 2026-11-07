@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Requires: CPU. Real signal: each method's accuracy minus its own blank-evidence baseline.
+"""Requires: CPU. Real signal: each method's accuracy minus its own blank-evidence baseline, direct set.
 
 The grader has a content-independent default guess whose strength depends on the evidence field's shape, not its
-content (README.md Finding 4). Raw accuracy therefore mixes real informativeness with that default. This scores each
-method as distance from a matched blank-evidence control - same template, same pipeline, evidence content replaced
-with a constant placeholder. Writes derived/user_gender/blank_baseline_signal_chart.json, rows sorted by signal;
-plots/blank_baseline_signal_chart.py draws it.
+content (README.md Finding 4). This scores each method as distance from a matched blank-evidence control - same
+template, same pipeline, evidence content replaced with a constant placeholder. Writes
+derived/user_gender/blank_baseline_signal_chart.json; plots/blank_baseline_signal_chart.py draws it.
 
-Error bars: item-level bootstrap SEM over the real-accuracy metric only (stats.bootstrap_sem). The blank-evidence
-baseline is treated as fixed (n=1000, 500/gender), so this understates the uncertainty of the difference somewhat.
+Interval: 95% from the paired prompt-level cluster bootstrap. The real and the blank run are graded on the same
+prompts, so each draw resamples prompts once and takes real - blank. The layer-11 row is runs.LAYER11_READOUT["direct"]
+(the bf16 run, 68.05%). The standard-set layer-11 signal (+6.05) is only in the README's table: its blank baseline is
+the direct one, so it is not a like-for-like row here.
 """
 import argparse
 
@@ -16,67 +17,32 @@ import runs
 import stats
 from meta import write_derived
 
-# run ids without the prompt set (runs.toml names the files); `real` is read on the method's prompt set, `blank` on
-# --blank_prompt_set
+# key (plotstyle.toml's signal_rows entities) -> (real run id, blank run id), all on the direct set
 METHODS = {
-    "acts_desc": {
-        "label": "Acts Desc",
-        "real": "acts_desc",
-        "blank": "acts_desc.blank",
-        "prompt_set": "direct",
-    },
-    "acts_tokens": {
-        "label": "Acts Tokens",
-        "real": "acts_tokens.l23",
-        "blank": "blank.token_list",
-        "prompt_set": "direct",
-    },
-    "gender_direction_direct": {
-        "label": "Gender Direction (direct)",
-        "real": "gender_direction.l11",
-        "blank": "blank.token_list",
-        "prompt_set": "direct",
-        "ours": True,
-    },
-    "gender_direction_standard": {
-        "label": "Gender Direction (standard)",
-        "real": "gender_direction.l11",
-        "blank": "blank.token_list",
-        "prompt_set": "standard",
-        "ours": True,
-    },
-    "sae_desc": {
-        "label": "SAE Desc",
-        "real": "sae_desc.l23",
-        "blank": "blank.sae_desc",
-        "prompt_set": "direct",
-    },
+    "acts_desc": ("acts_desc.direct", "acts_desc.blank.direct"),
+    "acts_tokens": ("acts_tokens.l23.direct", "blank.token_list.direct"),
+    "acts_tokens_l11": (runs.LAYER11_READOUT["direct"], "blank.token_list.direct"),
+    "sae_desc": ("sae_desc.l23.direct", "blank.sae_desc.direct"),
 }
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    # blank-evidence controls were only run on the direct prompt set; standard-set methods are scored against the
-    # same blank baseline (the grader's default is about the evidence field's shape, not the prompt set).
-    parser.add_argument("--blank_prompt_set", type=str, default="direct")
-    args = parser.parse_args()
-
+    parser.parse_args()
     rows = []
-    for spec in METHODS.values():
-        f_real = runs.load(f"{spec['real']}.{spec['prompt_set']}", "female")
-        m_real = runs.load(f"{spec['real']}.{spec['prompt_set']}", "male")
-        f_blank = runs.load(f"{spec['blank']}.{args.blank_prompt_set}", "female")
-        m_blank = runs.load(f"{spec['blank']}.{args.blank_prompt_set}", "male")
-        real_acc = (f_real["metrics"]["mean_accuracy"] + m_real["metrics"]["mean_accuracy"]) / 2 * 100
-        blank_acc = (f_blank["metrics"]["mean_accuracy"] + m_blank["metrics"]["mean_accuracy"]) / 2 * 100
-        rows.append({"label": spec["label"], "real_accuracy": real_acc, "blank_baseline": blank_acc,
-                     "signal": real_acc - blank_acc, "sem": stats.bootstrap_sem(f_real, m_real),
-                     "ours": spec.get("ours", False)})
-
-    rows.sort(key=lambda r: r["signal"])
-    for r in rows:
-        print(f"{r['label']:28s} real={r['real_accuracy']:6.2f}  blank={r['blank_baseline']:6.2f}  "
-              f"signal={r['signal']:+6.2f} +/- {r['sem']:.2f}")
+    for key, (real_id, blank_id) in METHODS.items():
+        data = {name: {"by_f": stats.prompt_success(runs.load(rid, "female")),
+                       "by_m": stats.prompt_success(runs.load(rid, "male"))}
+                for name, rid in (("real", real_id), ("blank", blank_id))}
+        draws = stats.cluster_draws(data, 20000, 1)
+        real_point, real_boot = stats.cluster_accuracy(data["real"], *draws)
+        blank_point, blank_boot = stats.cluster_accuracy(data["blank"], *draws)
+        lo, hi = stats.ci95(real_boot - blank_boot)
+        rows.append({"key": key, "real_run": real_id, "blank_run": blank_id, "real_accuracy": float(real_point),
+                     "blank_baseline": float(blank_point), "signal": float(real_point - blank_point),
+                     "ci95_lo": lo, "ci95_hi": hi})
+        print(f"{key:16s} real={real_point:6.2f}  blank={blank_point:6.2f}  signal={real_point - blank_point:+6.2f}  "
+              f"95% CI=[{lo:+6.2f}, {hi:+6.2f}]")
     write_derived("blank_baseline_signal_chart.json", rows, __file__)
 
 

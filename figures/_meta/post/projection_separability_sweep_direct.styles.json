@@ -1,19 +1,19 @@
 {
- "styles_plot": "0.1.10",
+ "styles_plot": "0.1.11",
  "vocab": {
   "project": "esk-audit",
-  "sha256": "1f5efc3160c85e3605d38d8a423a1e26afde0f0436558b8233e3f27cddbfb1b3"
+  "sha256": "1cd92e871d6a3bb80a56ef241d6581b4377fbee6a90aaa09b67bc16ac288c992"
  },
  "registry": {
   "path": "plots/status.csv",
-  "sha256": "9e675689845fb8d9311b5d5fa4256751116b12aac3b0f7bb2160b635f68b967f"
+  "sha256": "3844721db641fcdeaee5c5b9af99d5800aca8ccfdc6ae2923f116ca5b0543008"
  },
  "figure": "projection_separability_sweep_direct",
  "target": "post",
  "mode": "strict",
  "publishable": true,
  "png": {
-  "sha256": "3b56f2394897eb309af16b07895ed9e1c4d871b781ff1dad78b8f1ba543c793f",
+  "pixels_sha256": "968e998891f4933d6f7f1f4aa1faf3a717777122b882af3577ba8a3e6c7c2128",
   "dpi": 200
  },
  "roles": [
@@ -60,6 +60,7 @@
   }
  ],
  "key": [
+  "grey band: constant sign: an artifact of the uncentered readout",
   "○ post hoc"
  ],
  "numbers": {},

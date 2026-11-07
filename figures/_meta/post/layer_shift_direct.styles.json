@@ -1,0 +1,65 @@
+{
+ "styles_plot": "0.1.11",
+ "vocab": {
+  "project": "esk-audit",
+  "sha256": "1cd92e871d6a3bb80a56ef241d6581b4377fbee6a90aaa09b67bc16ac288c992"
+ },
+ "registry": {
+  "path": "plots/status.csv",
+  "sha256": "3844721db641fcdeaee5c5b9af99d5800aca8ccfdc6ae2923f116ca5b0543008"
+ },
+ "figure": "layer_shift_direct",
+ "target": "post",
+ "mode": "strict",
+ "publishable": true,
+ "png": {
+  "pixels_sha256": "0ede824589ab2284f69eb7985e39700cb5f670c3647f2dc3db85b6d6c03abc66",
+  "dpi": 200
+ },
+ "roles": [
+  "method"
+ ],
+ "controls": [
+  "the published layer (23)"
+ ],
+ "cells": {
+  "l11": {
+   "timing": "post_hoc",
+   "claim": "claimed"
+  },
+  "l23": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  }
+ },
+ "marks": [
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "l23",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "method",
+   "cell": "l11",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  }
+ ],
+ "key": [
+  "grey: the published layer (23)",
+  "whiskers: 95% CI (prompt-level bootstrap)",
+  "○ post hoc"
+ ],
+ "numbers": {
+  "direct.sae_feature_descriptions.avg": "88",
+  "published.direct.prefill": "95",
+  "direct.acts_tokens_l11.avg": "68",
+  "direct.residual_tokens.avg": "60"
+ },
+ "problems": []
+}

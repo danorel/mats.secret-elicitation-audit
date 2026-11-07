@@ -2,9 +2,9 @@
   "_meta": {
     "script": "analysis/separability_vs_accuracy.py",
     "args": [],
-    "git_commit": "48b80c189226ed2232e45b948a296705ff3f8bce",
+    "git_commit": "c504888e1290fc5fa6d124e909ea1e366390ac52",
     "dirty": true,
-    "created": "2026-11-07T20:32:58",
+    "created": "2026-11-07T21:03:32",
     "inputs": [
       {
         "run_id": "acts_tokens.l11.direct",
@@ -66,11 +66,11 @@
     "derived_inputs": [
       {
         "path": "derived/user_gender/projection_separability_sweep.json",
-        "sha256": "609acdc12650cb8a918c038f49c0a8b94e33d6ba64bd7b3dcb155c5efbd480cb"
+        "sha256": "dd14ab0e3cfba28f860b0cdea394b116d7884781668e06ae2a4988e3bf1dedb2"
       },
       {
         "path": "derived/user_gender/separability_accuracy_layer11_standard_contrastive.json",
-        "sha256": "703d916129fb3f033fa2fb893b9dda0e365eca0d288794e75d57d4209f7bc584"
+        "sha256": "93636f56e84eb1661d4f6031de803131f6a60f66a47fa6223166f8e6c2592af8"
       }
     ]
   },

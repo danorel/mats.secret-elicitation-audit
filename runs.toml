@@ -18,6 +18,8 @@ canonical = "yes"
 note = "paper's Logit Lens Tokens, published config"
 
 [runs."acts_tokens.l23.direct"]
+evidence.female = "user_gender/results/female/direct/baseline/residual_tokens/residual_similarity_pronouns_tokens_layer23_k200_bcywinski_gemma-2-9b-it-user-female_on_standard_results_bcywinski_gemma-2-9b-it-user-female_20260820_213918_20260820_215440.json"
+evidence.male = "user_gender/results/male/direct/baseline/residual_tokens/residual_similarity_pronouns_tokens_layer23_k200_bcywinski_gemma-2-9b-it-user-male_on_standard_results_bcywinski_gemma-2-9b-it-user-male_20260822_122033_20260822_123345.json"
 metrics.female = "user_gender/results/female/direct/baseline/audit/residual_tokens/metrics_logit_lens_tokens_google_gemma-3-4b-it_female_20260822_111909.json"
 metrics.male = "user_gender/results/male/direct/baseline/audit/residual_tokens/metrics_logit_lens_tokens_google_gemma-3-4b-it_male_20260822_130437.json"
 produced_by = "user_gender/scripts/run_get_residual_tokens.sh, run_auditor_residual_tokens.sh"
@@ -96,6 +98,8 @@ dtype = "fp32"
 note = "decoded in float32 (56.80%); no bf16 / Acts Tokens layer-11 run exists on standard"
 
 [runs."acts_tokens.l11.direct"]
+evidence.female = "user_gender/results/female/direct/final/acts_tokens_layer11/residual_similarity_pronouns_tokens_layer11_k200_bcywinski_gemma-2-9b-it-user-female_on_direct_results_bcywinski_gemma-2-9b-it-user-female_20260820_213918_20260826_181828.json"
+evidence.male = "user_gender/results/male/direct/final/acts_tokens_layer11/residual_similarity_pronouns_tokens_layer11_k200_bcywinski_gemma-2-9b-it-user-male_on_direct_results_bcywinski_gemma-2-9b-it-user-male_20260822_122033_20260826_180919.json"
 metrics.female = "user_gender/results/female/direct/final/acts_tokens_layer11/audit/metrics_logit_lens_tokens_google_gemma-3-4b-it_female_20260826_182414.json"
 metrics.male = "user_gender/results/male/direct/final/acts_tokens_layer11/audit/metrics_logit_lens_tokens_google_gemma-3-4b-it_male_20260826_181524.json"
 produced_by = "user_gender/scripts/run_acts_tokens_layer11_check.sh"

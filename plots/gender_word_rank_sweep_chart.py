@@ -40,8 +40,12 @@ def draw(summary, out_dir):
                      interval="iqr", median=True) for g, s in summary.items()]
     points = [sp.Point(g, "method", 11, cell=f"l11.{g}", key=f"word_rank.l11.{g}", label=True) for g in summary]
     layers = summary[GENDERS[0]]["layers"]
+    # better (a lower rank) reads upward: the log axis is drawn inverted; layer 23 is outside this sweep (9-21)
+    lo = min(min(s["p25"]) for s in summary.values())
+    hi = max(max(s["p75"]) for s in summary.values())
     sweep = sp.Sweep(GENDERS, "layer", "rank", lines, kind="checkpoints", points=points,
-                     rules=[sp.Rule(11, "layer 11")], xticks=[l for l in layers if l % 3 == 0])
+                     rules=[sp.Rule(11, "layer 11")], xticks=[l for l in layers if l % 3 == 0],
+                     ylim=(hi * 1.15, lo / 1.15), yticks=[t for t in (10, 30, 100, 300, 1000) if lo / 1.15 <= t <= hi * 1.15])
     return save(sp.Figure("gender_word_rank_sweep", v).add(sweep), out_dir)
 
 

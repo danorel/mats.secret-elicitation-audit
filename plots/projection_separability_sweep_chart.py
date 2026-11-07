@@ -35,8 +35,9 @@ def draw(layers, accuracy, prompt_set, out_dir):
     if best != 11:
         points.append(sp.Point(prompt_set, "readout", best, cell=f"best.{prompt_set}"))
     sweep = sp.Sweep([prompt_set], "layer", "separability", [line], kind="prompt_sets", header="separability",
-                     points=points, rules=[sp.Rule(11, "layer 11")], hrules=[sp.Rule(50, "chance")], ylim=(40, 102), yticks=[50, 75, 100],
-                     xticks=[10, 15, 20, 25])
+                     points=points, rules=[sp.Rule(11, "layer 11"), sp.Rule(23, "layer 23 (published)")],
+                     hrules=[sp.Rule(50, "chance")], windows=[(14, 22, "uncentered")], ylim=(40, 102),
+                     yticks=[50, 75, 100], xticks=[10, 15, 20, 25])
     return save(sp.Figure(f"projection_separability_sweep_{prompt_set}", v).add(sweep), out_dir)
 
 

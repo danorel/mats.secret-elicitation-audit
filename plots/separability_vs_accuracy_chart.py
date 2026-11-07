@@ -3,7 +3,8 @@
 
 Draws derived/user_gender/separability_vs_accuracy.json (written by analysis/separability_vs_accuracy.py, which says
 where each number comes from) as a styles-plot dot table: rows = prompt sets, one column per quantity, the gap printed
-as a number. Figure: figures/post/separability_vs_accuracy.png.
+as a number. Figure: figures/post/separability_vs_accuracy.png. Separability prints to one decimal (both sets are at
+ceiling); the between-checkpoint gap is left to the README's table.
 """
 import argparse
 
@@ -26,8 +27,7 @@ def draw(separability, decoded, gap, out_dir):
         sp.DotColumn("auditor accuracy", "accuracy", (40, 104), (50, 75, 100),
                      series=[sp.Series("method", est(decoded, "acc", "decoded_accuracy.layer11"))],
                      rules=[sp.Rule(50, "chance")]),
-        sp.TextColumn("between-checkpoint gap", "projection_gap", est(gap, "gap", "projection_gap.layer11")),
-    ], kind="prompt_sets")
+    ], kind="prompt_sets")  # the between-checkpoint gap (29.03 / 28.83) is in README Finding 3's table
     return save(sp.Figure("separability_vs_accuracy", v).add(table), out_dir)
 
 

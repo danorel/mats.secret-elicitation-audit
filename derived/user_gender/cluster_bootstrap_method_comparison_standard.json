@@ -5,10 +5,24 @@
       "--prompt_set",
       "standard"
     ],
-    "git_commit": "48b80c189226ed2232e45b948a296705ff3f8bce",
+    "git_commit": "c504888e1290fc5fa6d124e909ea1e366390ac52",
     "dirty": true,
-    "created": "2026-11-07T20:32:59",
+    "created": "2026-11-07T21:03:36",
     "inputs": [
+      {
+        "run_id": "gender_direction.l11.standard",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/standard/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
+        "sha256": "6cd307234dac075bb7f42ebaff1b201fcb622c8038d377ccbfb9e9e54dfb1739"
+      },
+      {
+        "run_id": "gender_direction.l11.standard",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/standard/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
+        "sha256": "32cc11ff045fe0b3c0b5531a43e6daa1a1057df2e60f99b30989f6e560115960"
+      },
       {
         "run_id": "io.standard",
         "gender": "female",
@@ -78,20 +92,6 @@
         "kind": "metrics",
         "path": "user_gender/results/male/standard/baseline/audit/sae_feature_descriptions/metrics_sae_feature_descriptions_google_gemma-3-4b-it_male_20260822_213544.json",
         "sha256": "455aea27f52673d748367729b607b2e40472ce43241fa160d31afd5e0da8a518"
-      },
-      {
-        "run_id": "gender_direction.l11.standard",
-        "gender": "female",
-        "kind": "metrics",
-        "path": "user_gender/results/female/standard/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
-        "sha256": "6cd307234dac075bb7f42ebaff1b201fcb622c8038d377ccbfb9e9e54dfb1739"
-      },
-      {
-        "run_id": "gender_direction.l11.standard",
-        "gender": "male",
-        "kind": "metrics",
-        "path": "user_gender/results/male/standard/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
-        "sha256": "32cc11ff045fe0b3c0b5531a43e6daa1a1057df2e60f99b30989f6e560115960"
       }
     ],
     "derived_inputs": []
@@ -99,23 +99,130 @@
   "prompt_set": "standard",
   "n_boot": 20000,
   "seed": 1,
+  "runs": {
+    "acts_tokens_l11": "gender_direction.l11.standard",
+    "io": "io.standard",
+    "logit_lens": "logit_lens.l23.standard",
+    "residual_tokens": "acts_tokens.l23.standard",
+    "sae_tokens": "sae_tokens.l23.standard",
+    "sae_feature_descriptions": "sae_desc.l23.standard"
+  },
   "point_accuracies": {
+    "acts_tokens_l11": 56.800000000000004,
     "io": 51.800000000000004,
     "logit_lens": 69.10000000000001,
     "residual_tokens": 56.85,
     "sae_tokens": 56.099999999999994,
-    "sae_feature_descriptions": 85.55,
-    "gender_direction_l11": 56.800000000000004
+    "sae_feature_descriptions": 85.55
+  },
+  "ci95": {
+    "acts_tokens_l11": [
+      54.449999999999996,
+      59.45
+    ],
+    "io": [
+      49.6,
+      54.05000000000001
+    ],
+    "logit_lens": [
+      64.9,
+      73.4
+    ],
+    "residual_tokens": [
+      54.2,
+      59.8
+    ],
+    "sae_tokens": [
+      52.45000000000001,
+      59.75
+    ],
+    "sae_feature_descriptions": [
+      80.85,
+      89.85000000000001
+    ]
   },
   "cluster_bootstrap_se": {
+    "acts_tokens_l11": 1.283151605187728,
     "io": 1.1396333516459625,
     "logit_lens": 2.1497382628368817,
     "residual_tokens": 1.43525059472457,
     "sae_tokens": 1.8765395451224098,
-    "sae_feature_descriptions": 2.3021035543202095,
-    "gender_direction_l11": 1.283151605187728
+    "sae_feature_descriptions": 2.3021035543202095
+  },
+  "item_bootstrap_se": {
+    "acts_tokens_l11": 1.108861088222956,
+    "io": 1.1236060736641653,
+    "logit_lens": 1.04547624878569,
+    "residual_tokens": 1.1156791628308733,
+    "sae_tokens": 1.107536729402234,
+    "sae_feature_descriptions": 0.7927975276039911
   },
   "pairwise": [
+    {
+      "a": "Acts Tokens (L11)",
+      "b": "I/O",
+      "point_diff": 5.0,
+      "boot_mean_diff": 5.026607499999997,
+      "boot_se": 1.7435881597806564,
+      "ci95": [
+        1.6999999999999886,
+        8.499999999999993
+      ],
+      "survives_at_95": true,
+      "frac_resamples_flip_sign": 0.0014
+    },
+    {
+      "a": "Acts Tokens (L11)",
+      "b": "LL Tokens",
+      "point_diff": -12.300000000000004,
+      "boot_mean_diff": -12.299842500000002,
+      "boot_se": 2.4385319194322337,
+      "ci95": [
+        -17.05000000000002,
+        -7.5
+      ],
+      "survives_at_95": true,
+      "frac_resamples_flip_sign": 0.0
+    },
+    {
+      "a": "Acts Tokens (L11)",
+      "b": "Acts Tokens (L23)",
+      "point_diff": -0.04999999999999716,
+      "boot_mean_diff": -0.051465000000000295,
+      "boot_se": 2.0814230035869663,
+      "ci95": [
+        -4.149999999999999,
+        4.049999999999997
+      ],
+      "survives_at_95": false,
+      "frac_resamples_flip_sign": 0.4928
+    },
+    {
+      "a": "Acts Tokens (L11)",
+      "b": "SAE Tokens",
+      "point_diff": 0.70000000000001,
+      "boot_mean_diff": 0.6917274999999998,
+      "boot_se": 2.2882350167144843,
+      "ci95": [
+        -3.750000000000007,
+        5.199999999999996
+      ],
+      "survives_at_95": false,
+      "frac_resamples_flip_sign": 0.3885
+    },
+    {
+      "a": "Acts Tokens (L11)",
+      "b": "SAE Desc",
+      "point_diff": -28.749999999999993,
+      "boot_mean_diff": -28.7441625,
+      "boot_se": 2.6599840364835776,
+      "ci95": [
+        -33.75,
+        -23.449999999999996
+      ],
+      "survives_at_95": true,
+      "frac_resamples_flip_sign": 0.0
+    },
     {
       "a": "I/O",
       "b": "LL Tokens",
@@ -169,19 +276,6 @@
       "frac_resamples_flip_sign": 0.0
     },
     {
-      "a": "I/O",
-      "b": "Gender Direction (L11)",
-      "point_diff": -5.0,
-      "boot_mean_diff": -5.026607499999997,
-      "boot_se": 1.7435881597806564,
-      "ci95": [
-        -8.499999999999993,
-        -1.6999999999999886
-      ],
-      "survives_at_95": true,
-      "frac_resamples_flip_sign": 0.0014
-    },
-    {
       "a": "LL Tokens",
       "b": "Acts Tokens (L23)",
       "point_diff": 12.250000000000007,
@@ -221,19 +315,6 @@
       "frac_resamples_flip_sign": 0.0
     },
     {
-      "a": "LL Tokens",
-      "b": "Gender Direction (L11)",
-      "point_diff": 12.300000000000004,
-      "boot_mean_diff": 12.299842500000002,
-      "boot_se": 2.4385319194322337,
-      "ci95": [
-        7.5,
-        17.05000000000002
-      ],
-      "survives_at_95": true,
-      "frac_resamples_flip_sign": 0.0
-    },
-    {
       "a": "Acts Tokens (L23)",
       "b": "SAE Tokens",
       "point_diff": 0.7500000000000071,
@@ -260,19 +341,6 @@
       "frac_resamples_flip_sign": 0.0
     },
     {
-      "a": "Acts Tokens (L23)",
-      "b": "Gender Direction (L11)",
-      "point_diff": 0.04999999999999716,
-      "boot_mean_diff": 0.051465000000000295,
-      "boot_se": 2.0814230035869663,
-      "ci95": [
-        -4.049999999999997,
-        4.149999999999999
-      ],
-      "survives_at_95": false,
-      "frac_resamples_flip_sign": 0.4928
-    },
-    {
       "a": "SAE Tokens",
       "b": "SAE Desc",
       "point_diff": -29.450000000000003,
@@ -281,32 +349,6 @@
       "ci95": [
         -34.25000000000001,
         -24.25
-      ],
-      "survives_at_95": true,
-      "frac_resamples_flip_sign": 0.0
-    },
-    {
-      "a": "SAE Tokens",
-      "b": "Gender Direction (L11)",
-      "point_diff": -0.70000000000001,
-      "boot_mean_diff": -0.6917274999999998,
-      "boot_se": 2.2882350167144843,
-      "ci95": [
-        -5.199999999999996,
-        3.750000000000007
-      ],
-      "survives_at_95": false,
-      "frac_resamples_flip_sign": 0.3885
-    },
-    {
-      "a": "SAE Desc",
-      "b": "Gender Direction (L11)",
-      "point_diff": 28.749999999999993,
-      "boot_mean_diff": 28.7441625,
-      "boot_se": 2.6599840364835776,
-      "ci95": [
-        23.449999999999996,
-        33.75
       ],
       "survives_at_95": true,
       "frac_resamples_flip_sign": 0.0

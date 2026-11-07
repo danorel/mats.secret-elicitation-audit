@@ -24,8 +24,13 @@ def draw(data, out_dir):
                              interval="iqr", median=True))
         points.append(sp.Point(gender, "method", 11, cell=f"l11.{gender}", key=f"pilot_rank.l11.{gender}",
                                label=True))
+    # better (a lower rank) reads upward: the log axis is drawn inverted; ranks are capped at 5001 (README caption)
+    lo = min(d["p25"] for g in GENDERS for d in data[g])
+    hi = max(d["p75"] for g in GENDERS for d in data[g])
     sweep = sp.Sweep(GENDERS, "layer", "rank", lines, kind="checkpoints", points=points,
-                     rules=[sp.Rule(11, "layer 11")], xticks=[0, 5, 10, 15, 20, 24])
+                     rules=[sp.Rule(11, "layer 11"), sp.Rule(23, "layer 23 (published)")],
+                     xticks=[0, 5, 10, 15, 20, 24], ylim=(hi * 1.15, lo / 1.15),
+                     yticks=[t for t in (30, 100, 300, 1000, 3000) if lo / 1.15 <= t <= hi * 1.15])
     return save(sp.Figure("layer_rank_sweep", v).add(sweep), out_dir)
 
 
