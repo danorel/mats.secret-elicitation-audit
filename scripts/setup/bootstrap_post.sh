@@ -73,19 +73,34 @@ fi
 
 echo ""
 echo "== Restoring generated results from HF dataset backup =="
-read -r -p "Restore user_gender/results/ + contrastive_pairs.jsonl from danorel/eliciting-secret-knowledge-results? [Y/n] " REPLY
+read -r -p "Restore user_gender/results/ + contrastive_pairs.jsonl from danorel/mats.esk-audit? [Y/n] " REPLY
 if [[ ! "$REPLY" =~ ^[Nn]$ ]]; then
     "$PYTHON" - <<'EOF'
 import os
 from huggingface_hub import snapshot_download
 
 local_dir = snapshot_download(
-    repo_id="danorel/eliciting-secret-knowledge-results",
+    repo_id="danorel/mats.esk-audit",
     repo_type="dataset",
     token=os.environ["HF_TOKEN"],
     local_dir=".",
+    ignore_patterns=["user_gender/plots/*.png"],  # old matplotlib charts; figures/ is rebuilt by `make figures`
 )
 print("Restored results into:", os.path.abspath(local_dir))
+
+# The dataset still keeps the plot scripts' numbers under user_gender/plots/; the repo reads them from
+# results/user_gender/ (the layout `make figures` expects).
+import shutil
+src, dst = os.path.join("user_gender", "plots"), os.path.join("results", "user_gender")
+os.makedirs(dst, exist_ok=True)
+for name in os.listdir(src):
+    if name.endswith(".json") or name == "mean_delta_vectors":
+        target = os.path.join(dst, name)
+        if os.path.exists(target):
+            print("kept existing", target)
+            continue
+        shutil.move(os.path.join(src, name), target)
+print("Moved plot data into:", os.path.abspath(dst))
 EOF
 fi
 

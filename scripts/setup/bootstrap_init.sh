@@ -9,7 +9,7 @@
 # previously generated results from the HF dataset backup.
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/danorel/better-eliciting-secret-knowledge/main/scripts/bootstrap.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/danorel/mats.esk-audit/main/scripts/bootstrap.sh | bash
 #   # or, if you already have the repo checked out:
 #   bash scripts/bootstrap.sh
 
@@ -19,8 +19,8 @@ set -euo pipefail
 # a brand new box - no SSH key / GitHub deploy key setup needed. This script
 # only ever does clone/pull (read-only); if you need to push from a box, set
 # up your own SSH key or `gh auth login` separately for that.
-REPO_URL="https://github.com/danorel/better-eliciting-secret-knowledge.git"
-REPO_DIR="better-eliciting-secret-knowledge"
+REPO_URL="https://github.com/danorel/mats.esk-audit.git"
+REPO_DIR="mats.esk-audit"
 
 # Pinned because a prebuilt flash-attn wheel is fetched below for this exact
 # version - bumping it means checking a matching wheel exists first (see
