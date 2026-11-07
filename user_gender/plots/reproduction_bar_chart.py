@@ -10,7 +10,7 @@ Error bars: raw-item bootstrap over combined female+male per-item `success` flag
 matches METRICS.md's own convention (closer to the paper's published stderr than
 treating the 10 per-response-index accuracies as the sample). Likely understates true
 uncertainty for gender_direction specifically, since its 10 responses per prompt aren't
-independent draws - see FINDINGS.md.
+independent draws - see EXPERIMENTS.md #resampling.
 """
 import argparse
 import glob

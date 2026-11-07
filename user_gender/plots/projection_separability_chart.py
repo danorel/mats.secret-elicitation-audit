@@ -135,7 +135,8 @@ def draw(raw, layer, prompt_set, out_dir):
         col = VARIANT_TERMS[variant]
         role = "method" if variant == "contrastive" else "control"
         fig.add(sp.Distribution(GENDERS, "projection", {(g, col): by_gender[g] for g in GENDERS}, role=role,
-                                kind="checkpoints", style="strip", median=True, columns=[col], xlim=xlim, panel_h=0.55,
+                                control=VARIANT_CONTROLS.get(variant), kind="checkpoints", style="strip", median=True,
+                                columns=[col], xlim=xlim, panel_h=0.55,
                                 cells={(g, col): f"dist.{variant}.{g}" for g in GENDERS}))
     return save(fig, out_dir)
 

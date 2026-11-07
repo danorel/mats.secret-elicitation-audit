@@ -2,7 +2,7 @@
 """Is the layer-11 between-checkpoint gap localized to pronoun positions, or is it a
 checkpoint-wide fingerprint present everywhere in the residual stream?
 
-FINDINGS.md Limitations #9: target gender and checkpoint identity are the same variable
+README.md Finding 3 / EXPERIMENTS.md #position-control: target gender and checkpoint identity are the same variable
 in this organism, so no measurement so far can separate "always-on belief about the
 user" from "arbitrary fine-tuning fingerprint" using checkpoint identity alone. Position
 is a control that does not need a second checkpoint: measure the same between-checkpoint
@@ -14,8 +14,8 @@ Three non-pronoun control positions per item, all read from the same single forw
   - the last token of the user turn (immediately before the second <start_of_turn>)
   - the midpoint token of the user turn
 
-A gap approx 29 (matching the pronoun-position gap on `standard`, FINDINGS.md's "The secret
-is stored as a constant" section) at these positions too means the offset is a
+A gap approx 29 (matching the pronoun-position gap on `standard`, README.md's Finding 3)
+at these positions too means the offset is a
 checkpoint-wide fingerprint, not a positionally-specific representation. A gap approx 0
 means the signal is localized to where the organism was trained to carry it.
 

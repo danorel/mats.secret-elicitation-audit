@@ -3,7 +3,7 @@
 
 Reads gender_word_rank_sweep.py's JSON (gender_word_rank_sweep.json) and draws a styles-plot sweep: rows = the two
 checkpoints, the median rank per layer on a log axis with its interquartile band (numpy's linear-interpolated 25th
-and 75th percentiles), a dashed rule and a point at layer 11. The medians are FINDINGS.md's "Choosing layer 11"
+and 75th percentiles), a dashed rule and a point at layer 11. The medians are README.md's "What we did"
 table (Proxy 1). The 30-item pilot the layer was first picked from is layer_rank_sweep_chart.py.
 
 Usage:
@@ -42,10 +42,10 @@ def draw(summary, out_dir):
 
     v = vocab()
     lines = [sp.Line(g, "method", s["layers"], s["median"], cell=f"line.{g}", band=(s["p25"], s["p75"]),
-                     interval="iqr") for g, s in summary.items()]
-    points = [sp.Point(g, "method", 11, cell=f"l11.{g}") for g in summary]
+                     interval="iqr", median=True) for g, s in summary.items()]
+    points = [sp.Point(g, "method", 11, cell=f"l11.{g}", key=f"word_rank.l11.{g}", label=True) for g in summary]
     layers = summary[GENDERS[0]]["layers"]
-    sweep = sp.Sweep(GENDERS, "layer", "rank", lines, kind="checkpoints", header="median rank", points=points,
+    sweep = sp.Sweep(GENDERS, "layer", "rank", lines, kind="checkpoints", points=points,
                      rules=[sp.Rule(11, "layer 11")], xticks=[l for l in layers if l % 3 == 0])
     return save(sp.Figure("gender_word_rank_sweep", v).add(sweep), out_dir)
 

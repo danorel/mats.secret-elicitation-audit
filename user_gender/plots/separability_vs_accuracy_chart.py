@@ -10,8 +10,8 @@ No GPU: every number is read from saved run files (it used to be typed into this
 - decoded auditor accuracy: the mean of the two checkpoints' mean_accuracy. direct reads Acts Tokens at layer 11
   (results/*/direct/final/acts_tokens_layer11/audit, 68.05%, the dtype-matched readout); standard reads the gender
   direction's layer-11 audit (results/*/standard/final/gender_direction/audit/layer11_finetuned_model, 56.80%), the
-  only layer-11 readout graded on the standard set. These are the numbers in FINDINGS.md's "The secret is stored as
-  a constant" table.
+  only layer-11 readout graded on the standard set. These are the numbers in README.md's Finding 3
+  table.
 - between-checkpoint gap: mean projection (female) - mean projection (male), contrastive direction, from the
   gender_direction.py --mode apply outputs (projection_separability_chart.load_projections).
 

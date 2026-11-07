@@ -96,6 +96,12 @@ title = "per-prompt auditor accuracy (share of its answers)"
 quantity = "accuracy"
 format = "share"
 
+[units.variance_share]
+title = "share of variance"
+quantity = "variance"
+format = "share"
+cue = false
+
 [units.prompts]
 title = "unique prompts"
 quantity = "prompts"
@@ -117,7 +123,7 @@ canonical = [
     "UMAP", "PCA", "layer 10", "layer 25",
     "contrastive", "base model", "random control",
 ]
-templates = []
+templates = ["PCA (PC1 {num}, PC2 {num})"]
 missing = ["no run", "no interval"]
 not_claimed = []
 

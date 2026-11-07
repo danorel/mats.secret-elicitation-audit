@@ -55,10 +55,10 @@ def draw(data, out_dir):
         layers = [d["layer"] for d in data[gender]]
         lines.append(sp.Line(gender, "method", layers, [d["median"] for d in data[gender]], cell=f"line.{gender}",
                              band=([d["p25"] for d in data[gender]], [d["p75"] for d in data[gender]]),
-                             interval="iqr"))
-        # no printed value: the library puts it up-right of the point, where this line crosses it (SP601)
-        points.append(sp.Point(gender, "method", 11, cell=f"l11.{gender}"))
-    sweep = sp.Sweep(GENDERS, "layer", "rank", lines, kind="checkpoints", header="median rank", points=points,
+                             interval="iqr", median=True))
+        points.append(sp.Point(gender, "method", 11, cell=f"l11.{gender}", key=f"pilot_rank.l11.{gender}",
+                               label=True))
+    sweep = sp.Sweep(GENDERS, "layer", "rank", lines, kind="checkpoints", points=points,
                      rules=[sp.Rule(11, "layer 11")], xticks=[0, 5, 10, 15, 20, 24])
     return save(sp.Figure("layer_rank_sweep", v).add(sweep), out_dir)
 

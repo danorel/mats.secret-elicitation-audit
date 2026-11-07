@@ -2,7 +2,7 @@
 """Is cos(mean_delta_female - mean_delta_male, gender_direction) = +0.5335 far from a
 same-model, same-method baseline, or is residual-stream anisotropy inflating it?
 
-FINDINGS.md ("What the direction did establish"): the fine-tuning delta's alignment with
+README.md Finding 2 / EXPERIMENTS.md #delta-alignment: the fine-tuning delta's alignment with
 the base model's contrastive gender direction is ~32 sigma against a *Gaussian* null, but
 the residual stream is not isotropic, so two diff-of-means vectors built from the same
 model on similar text may share far more cosine than a random Gaussian vector would - even

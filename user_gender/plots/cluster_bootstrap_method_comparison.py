@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Do the pairwise gaps between published methods survive a prompt-level cluster bootstrap?
 
-FINDINGS.md ("What the average hides", "Smaller notes"): every method in this project
+EXPERIMENTS.md (#per-prompt, #resampling): every method in this project
 reads a vector determined entirely by the prompt (causal masking - the read positions
 can't attend to the response), so the effective sample size is ~100 prompts per checkpoint,
 not 1000 items. The published standard errors and this project's own item-level bootstrap
 (reproduction_bar_chart.py) both treat the 1000 items as independent draws and are ~4x too
-narrow (FINDINGS.md's "Smaller notes": naive item bootstrap gives +-1.09pp vs +-3.29pp for a
+narrow (README.md "How we checked": naive item bootstrap gives +-1.09pp vs +-3.29pp for a
 prompt-level cluster bootstrap on the same Acts Tokens number).
 
 This script runs the correctly-clustered bootstrap for every pairwise comparison among the

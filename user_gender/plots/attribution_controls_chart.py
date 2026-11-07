@@ -11,8 +11,8 @@ user-turn midpoint) and at the pronoun-mean position, layer 11, standard set. So
 JSON (non_pronoun_position_gap_layer{layer}_standard.json).
 
 Both source scripts need a GPU. Until they have been run on this machine their JSONs are absent and this script
-stops with the command that produces them; the numbers are no longer typed in here (FINDINGS.md's "What the direction
-did establish" and "The secret is stored as a constant" sections report the verified run).
+stops with the command that produces them; the numbers are no longer typed in here (README.md's Findings 2 and 3
+report the verified run).
 
 Usage:
     python3 user_gender/plots/attribution_controls_chart.py

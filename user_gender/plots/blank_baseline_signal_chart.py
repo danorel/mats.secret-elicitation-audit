@@ -2,7 +2,7 @@
 """Real signal chart: each method's accuracy minus its own blank-evidence baseline.
 
 The grader has a content-independent default guess whose strength depends on the
-evidence field's shape, not its content (see FINDINGS.md's grader-bias section).
+evidence field's shape, not its content (see README.md Finding 4).
 Raw accuracy therefore mixes real informativeness with that default. This plots
 each method's accuracy as distance from a matched blank-evidence control - same
 template, same pipeline, evidence content replaced with a constant placeholder -
@@ -12,7 +12,7 @@ Error bars: raw-item bootstrap over the real-accuracy metric only (combined
 female+male per-item `success` flags), same convention as reproduction_bar_chart.py.
 The blank-evidence baseline itself is treated as fixed: it's estimated on n=1000
 (500/gender) same as the real metric, and is the more stable of the two numbers in
-practice (see FINDINGS.md), so this understates true uncertainty in the difference
+practice (see EXPERIMENTS.md #blank-evidence), so this understates true uncertainty in the difference
 somewhat - a paired bootstrap over both would be tighter.
 """
 import argparse

@@ -32,11 +32,13 @@ def draw(layers, accuracy, prompt_set, out_dir):
     # the first layer with the highest separability, as the old chart's max() picked it
     best = layers[max(range(len(layers)), key=lambda i: accuracy[i])]
     line = sp.Line(prompt_set, "readout", layers, accuracy, cell=f"line.{prompt_set}")
+    # no printed values: layer 11's label collides with the neighbouring best-layer dot (SP601), and the best
+    # layer's lands a layer away from its dot; both values are in the README's Proxy 2 table
     points = [sp.Point(prompt_set, "readout", 11, cell=f"l11.{prompt_set}")]
     if best != 11:
         points.append(sp.Point(prompt_set, "readout", best, cell=f"best.{prompt_set}"))
     sweep = sp.Sweep([prompt_set], "layer", "separability", [line], kind="prompt_sets", header="separability",
-                     points=points, rules=[sp.Rule(11, "layer 11")], ylim=(40, 102), yticks=[50, 75, 100],
+                     points=points, rules=[sp.Rule(11, "layer 11")], hrules=[sp.Rule(50, "chance")], ylim=(40, 102), yticks=[50, 75, 100],
                      xticks=[10, 15, 20, 25])
     return save(sp.Figure(f"projection_separability_sweep_{prompt_set}", v).add(sweep), out_dir)
 

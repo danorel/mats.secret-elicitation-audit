@@ -1,7 +1,8 @@
 # Developer guide
 
 How this repo is laid out and how to run, re-analyse and draw things. Written for Dan and for coding agents. The
-research itself is in [README.md](README.md) and [FINDINGS.md](FINDINGS.md); the ground rules for this project
+research itself is in [README.md](README.md) (the source of truth) and [EXPERIMENTS.md](EXPERIMENTS.md) (the ledger of
+every test); the ground rules for this project
 (no training, reproduce before building, a control for every experiment, the time budget) are in
 [CLAUDE.md](CLAUDE.md) and are not repeated here.
 
@@ -20,8 +21,9 @@ results/user_gender/        numbers the figures read (JSON written by user_gende
                             mean_delta_vectors/, two small .npy files the cosine control needs)
 figures/post/               every figure (tracked) + a .styles.json sidecar each; figures/status.csv = status registry
 plotstyle.toml              styles-plot vocabulary: roles, controls, units, entities, words
-METRICS.md                  the paper's tables + this fork's rows (mirrors the paper; interpretation goes in FINDINGS.md)
-FINDINGS.md                 interpretation and mechanism
+README.md                   the write-up and source of truth: summary, findings, limits, how we checked
+EXPERIMENTS.md              the ledger: one card per test, tagged by how the README uses it
+METRICS.md                  the paper's tables + this fork's rows (mirrors the paper; interpretation goes in README.md)
 log/                        one file per session (copy log/template.md); time spent is tracked there
 scripts/setup/              bootstrap_init.sh (fresh GPU box), bootstrap_post.sh (deps, SAE features, HF restore)
 .claude/autonomy/           Claude Code autonomy window (see below)
@@ -69,7 +71,7 @@ make figures-sheet     # contact sheets (colour and grey) of figures/post
   a control or baseline and is named in `[controls]`. Checkpoints and prompt sets are rows or columns, never colours.
 - **Status registry.** Every drawn cell (`cell=` on an `Est`, `Line`, `Point`, `Cloud`, or a `Distribution` key) has a
   row in `figures/status.csv`: `timing` (`fixed_in_advance` | `post_hoc`, drawn filled | hollow) and `claim`
-  (`claimed` | `descriptive` | `not_claimed`, a grey tag). Ground each row in FINDINGS.md, log/ or a docstring and cite
+  (`claimed` | `descriptive` | `not_claimed`, a grey tag). Ground each row in README.md, EXPERIMENTS.md, log/ or a docstring and cite
   it in `source`. Layer 11 was picked from the 30-item direct-set rank pilot, so direct-set layer-11 auditor results
   are `post_hoc`.
 - **Adding a figure:** a `draw()` in the script (lazy-import `styles_plot` and `figstyle` inside it, so GPU scripts and
@@ -79,21 +81,64 @@ make figures-sheet     # contact sheets (colour and grey) of figures/post
   `non_pronoun_position_gap.py`; until those have been run on a GPU it stops with the command that makes them, and
   `make figures` continues without it.
 
-Gaps in styles-plot v0.1.3 met here (reported upstream): a grey `Distribution` is not named in the key; a `Sweep` has
-no horizontal reference line (no "chance" on the separability sweep); a `Point` label can cross its own line, so
-sweep points carry no printed value; a scatter panel header cannot carry formatted numbers (PCA variance shares).
+styles-plot v0.1.4 features used here: `Distribution(control=...)` (grey strips named in the key), `Sweep(hrules=...)`
+(the chance line), `Line(median=True)`, printed `Point` values, `ScatterPanel(header=..., numbers=...)` (PCA variance
+shares). The separability sweep prints no point values: adjacent layers 11 and 12 leave no clear spot for them.
 
 ## Known issues in the numbers (do not "fix" silently)
 
 - **68.55 vs 68.05.** The cached Gender Direction run (`final/gender_direction/.../layer11_finetuned_model`, 68.55)
   decoded in fp32; `gender_direction.py` now decodes in bf16 like `residual_tokens.py` and reproduces Acts Tokens at
   layer 11 (`final/acts_tokens_layer11`, 68.05) exactly (log/2026-08-26-session-07.md). Figures that read the
-  former: reproduction, blank-baseline signal (+17.80, where FINDINGS' table says +17.30). separability_vs_accuracy
+  former: reproduction, blank-baseline signal (+17.80, where README Finding 4's table says +17.30). separability_vs_accuracy
   reads 68.05 for `direct` and the fp32 56.80 for `standard` (the only layer-11 standard-set run).
 - **layer_rank_sweep_chart.py**'s p25/p75 are `vals[n // 4]` and `vals[3n // 4]`, not interpolated percentiles; kept
   so its JSON stays comparable. Its ranks are capped at 5001 (the flat tops at layers 1–6).
-- In that 30-item pilot, the female checkpoint's lowest medians are at layers 19 and 21 (133), not 11 (159); the
-  FINDINGS caption under the chart says the 9–11 window is lowest.
+- In that 30-item pilot, the female checkpoint's lowest medians are at layers 19 and 21 (133), not 11 (159). (The old
+  FINDINGS.md caption said the 9–11 window is lowest; the README no longer claims it.)
+
+## Writing results (shared across projects)
+
+One structure for every project's write-up, copied from bridge-jspace; keep it when adding results.
+
+**README.md** (the source of truth; no separate findings file): title as a claim; one italic line; byline with a
+**Status:** line (where the numbers come from, what is checked); then `## Summary` (context paragraph, one bullet per
+finding with its key number, one bold line for practitioners), `## Background`, `## What we did`, `## Findings`,
+`## Where it does not hold`, `## More results` (pointers into the ledger), `## Why this matters`,
+`## Open questions and next steps`, `## How we checked`, `## Related work and what is new`, `## Glossary`,
+`## Repository guide`. Each finding:
+
+```markdown
+### Finding N. <the claim as one sentence>
+
+**Claim.** <two sentences>
+
+![<what the figure shows>](figures/post/<id>.png)
+*<caption: what is drawn, what the marks mean, any caveat about the plotted numbers>*
+
+- **Test.** - **Result.** - **Controls.** - **Scope.** - **Confidence.** - **Limits.** - **Takeaway.**
+```
+
+**EXPERIMENTS.md** (the ledger: every test, not only the headline ones): `## In one minute`, an index table
+(test, prompt set, result, where the README uses it), `## How to read`, then Parts in the README's order. Each card:
+
+```markdown
+### <the question>? (<short name>, <session>, <date>) <a id="<anchor>"></a>
+
+`in README` | `ledger only` *Used in: README <section>.*
+
+- **Question.** - **Why we asked.** - **Data.** - **Method.**
+
+![...](figures/post/<id>.png)
+
+- **Rule, fixed in advance.** <quoted, or "Not recorded">
+- **Result.** <table>
+- **Read.** <bullets, no interpretation beyond the result>
+- **Caveats.** <bullets>
+```
+
+Every number is copied from a run file or computed by code; a figure's registry row (`figures/status.csv`) cites the
+README finding or ledger card that uses it.
 
 ## Claude Code autonomy window
 
