@@ -1,0 +1,315 @@
+{
+  "_meta": {
+    "script": "analysis/cluster_bootstrap_method_comparison.py",
+    "args": [
+      "--prompt_set",
+      "direct"
+    ],
+    "git_commit": "48b80c189226ed2232e45b948a296705ff3f8bce",
+    "dirty": true,
+    "created": "2026-11-07T20:32:58",
+    "inputs": [
+      {
+        "run_id": "io.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/baseline/audit/io/metrics_only_input_output_google_gemma-3-4b-it_female_20260822_105334.json",
+        "sha256": "9fdbeda418d622699a1c48dd0d22c2cf8446254defad30b5e2aa3e01ef8956ff"
+      },
+      {
+        "run_id": "io.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/baseline/audit/io/metrics_only_input_output_google_gemma-3-4b-it_male_20260822_123901.json",
+        "sha256": "45bcb666d00d9548761c8d4fc85d35cd909719090ad07c44270e4cb6a28b8a15"
+      },
+      {
+        "run_id": "logit_lens.l23.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/baseline/audit/logit_lens/metrics_logit_lens_tokens_google_gemma-3-4b-it_female_20260822_110752.json",
+        "sha256": "40d6fa64b8021f9a54ae808fba1e36479d435c1182e8ca4993f1c5b7d5955f2b"
+      },
+      {
+        "run_id": "logit_lens.l23.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/baseline/audit/logit_lens/metrics_logit_lens_tokens_google_gemma-3-4b-it_male_20260822_125319.json",
+        "sha256": "9c0f3e5ca8153b98deece84be8cdd2ac60e149637e0dbce0df97748d8c72f9b1"
+      },
+      {
+        "run_id": "acts_tokens.l23.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/baseline/audit/residual_tokens/metrics_logit_lens_tokens_google_gemma-3-4b-it_female_20260822_111909.json",
+        "sha256": "9826eb2a2c167e8080dd9b8513785c3c1030fbfac864786fcdd5a2fd678d1354"
+      },
+      {
+        "run_id": "acts_tokens.l23.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/baseline/audit/residual_tokens/metrics_logit_lens_tokens_google_gemma-3-4b-it_male_20260822_130437.json",
+        "sha256": "562bd72d5bd40ea628b357bf85054c20d462c88416ed7b6e6180ad14c1ff4a75"
+      },
+      {
+        "run_id": "sae_tokens.l23.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/baseline/audit/sae_tokens/metrics_sae_pos_tokens_google_gemma-3-4b-it_female_20260822_142747.json",
+        "sha256": "30ecc00d555bce1b35506ae8c899fbef2f9409811127d0476b4862fdd0576484"
+      },
+      {
+        "run_id": "sae_tokens.l23.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/baseline/audit/sae_tokens/metrics_sae_pos_tokens_google_gemma-3-4b-it_male_20260822_151905.json",
+        "sha256": "0fc114166283c670e3a0e2af72eb38d55d0ed337cbb5a7154bfff7ba9d498668"
+      },
+      {
+        "run_id": "sae_desc.l23.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/baseline/audit/sae_feature_descriptions/metrics_sae_feature_descriptions_google_gemma-3-4b-it_female_20260822_142106.json",
+        "sha256": "5101c49fb6af351b9ab57299121acf395305c6ac8542c85e05752217dff4f2f5"
+      },
+      {
+        "run_id": "sae_desc.l23.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/baseline/audit/sae_feature_descriptions/metrics_sae_feature_descriptions_google_gemma-3-4b-it_male_20260822_151303.json",
+        "sha256": "8d750d956d7415481f77d560018bbcfceaa0e486bbe4ddd14b647b0060a44971"
+      },
+      {
+        "run_id": "gender_direction.l11.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
+        "sha256": "23acb4882d2a7bdc3429528668ec16e3382467da0c8732b3d4f909b2f471182d"
+      },
+      {
+        "run_id": "gender_direction.l11.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
+        "sha256": "cd3d6f485baa428a36cfc0ce46345253bb58880b4c7e7ee39eff8e872f14201b"
+      }
+    ],
+    "derived_inputs": []
+  },
+  "prompt_set": "direct",
+  "n_boot": 20000,
+  "seed": 1,
+  "point_accuracies": {
+    "io": 50.2,
+    "logit_lens": 64.25,
+    "residual_tokens": 60.25,
+    "sae_tokens": 63.3,
+    "sae_feature_descriptions": 87.8,
+    "gender_direction_l11": 68.55
+  },
+  "cluster_bootstrap_se": {
+    "io": 1.3389000693273503,
+    "logit_lens": 2.1028022142982503,
+    "residual_tokens": 1.6833999347632065,
+    "sae_tokens": 2.0154582731236426,
+    "sae_feature_descriptions": 2.018652140965181,
+    "gender_direction_l11": 2.0152139077849047
+  },
+  "pairwise": [
+    {
+      "a": "I/O",
+      "b": "LL Tokens",
+      "point_diff": -14.049999999999997,
+      "boot_mean_diff": -14.049714999999997,
+      "boot_se": 2.378043822850237,
+      "ci95": [
+        -18.70000000000001,
+        -9.449999999999989
+      ],
+      "survives_at_95": true,
+      "frac_resamples_flip_sign": 0.0
+    },
+    {
+      "a": "I/O",
+      "b": "Acts Tokens (L23)",
+      "point_diff": -10.049999999999997,
+      "boot_mean_diff": -10.052257499999996,
+      "boot_se": 2.147909205341667,
+      "ci95": [
+        -14.349999999999994,
+        -5.949999999999996
+      ],
+      "survives_at_95": true,
+      "frac_resamples_flip_sign": 0.0
+    },
+    {
+      "a": "I/O",
+      "b": "SAE Tokens",
+      "point_diff": -13.099999999999994,
+      "boot_mean_diff": -13.048024999999997,
+      "boot_se": 2.308320876013197,
+      "ci95": [
+        -17.6,
+        -8.54999999999999
+      ],
+      "survives_at_95": true,
+      "frac_resamples_flip_sign": 0.0
+    },
+    {
+      "a": "I/O",
+      "b": "SAE Desc",
+      "point_diff": -37.599999999999994,
+      "boot_mean_diff": -37.588834999999996,
+      "boot_se": 2.3228692125997847,
+      "ci95": [
+        -42.09999999999998,
+        -32.949999999999996
+      ],
+      "survives_at_95": true,
+      "frac_resamples_flip_sign": 0.0
+    },
+    {
+      "a": "I/O",
+      "b": "Gender Direction (L11)",
+      "point_diff": -18.349999999999994,
+      "boot_mean_diff": -18.322029999999998,
+      "boot_se": 2.3674523586829648,
+      "ci95": [
+        -22.900000000000013,
+        -13.749999999999986
+      ],
+      "survives_at_95": true,
+      "frac_resamples_flip_sign": 0.0
+    },
+    {
+      "a": "LL Tokens",
+      "b": "Acts Tokens (L23)",
+      "point_diff": 4.0,
+      "boot_mean_diff": 3.9974575,
+      "boot_se": 2.285918509454207,
+      "ci95": [
+        -0.54999999999999,
+        8.450000000000003
+      ],
+      "survives_at_95": false,
+      "frac_resamples_flip_sign": 0.0424
+    },
+    {
+      "a": "LL Tokens",
+      "b": "SAE Tokens",
+      "point_diff": 0.9500000000000028,
+      "boot_mean_diff": 1.0016900000000002,
+      "boot_se": 2.9212737950985175,
+      "ci95": [
+        -4.700000000000017,
+        6.699999999999996
+      ],
+      "survives_at_95": false,
+      "frac_resamples_flip_sign": 0.3689
+    },
+    {
+      "a": "LL Tokens",
+      "b": "SAE Desc",
+      "point_diff": -23.549999999999997,
+      "boot_mean_diff": -23.53912,
+      "boot_se": 2.8566422414864614,
+      "ci95": [
+        -29.099999999999987,
+        -17.900000000000006
+      ],
+      "survives_at_95": true,
+      "frac_resamples_flip_sign": 0.0
+    },
+    {
+      "a": "LL Tokens",
+      "b": "Gender Direction (L11)",
+      "point_diff": -4.299999999999997,
+      "boot_mean_diff": -4.272315,
+      "boot_se": 2.871824230257742,
+      "ci95": [
+        -9.899999999999991,
+        1.350000000000009
+      ],
+      "survives_at_95": false,
+      "frac_resamples_flip_sign": 0.06945
+    },
+    {
+      "a": "Acts Tokens (L23)",
+      "b": "SAE Tokens",
+      "point_diff": -3.049999999999997,
+      "boot_mean_diff": -2.9957674999999995,
+      "boot_se": 2.6174068754936335,
+      "ci95": [
+        -8.099999999999994,
+        2.1499999999999986
+      ],
+      "survives_at_95": false,
+      "frac_resamples_flip_sign": 0.12475
+    },
+    {
+      "a": "Acts Tokens (L23)",
+      "b": "SAE Desc",
+      "point_diff": -27.549999999999997,
+      "boot_mean_diff": -27.536577500000003,
+      "boot_se": 2.4583656948444896,
+      "ci95": [
+        -32.19999999999999,
+        -22.599999999999994
+      ],
+      "survives_at_95": true,
+      "frac_resamples_flip_sign": 0.0
+    },
+    {
+      "a": "Acts Tokens (L23)",
+      "b": "Gender Direction (L11)",
+      "point_diff": -8.299999999999997,
+      "boot_mean_diff": -8.2697725,
+      "boot_se": 2.3640519474673702,
+      "ci95": [
+        -12.95000000000001,
+        -3.6999999999999886
+      ],
+      "survives_at_95": true,
+      "frac_resamples_flip_sign": 5e-05
+    },
+    {
+      "a": "SAE Tokens",
+      "b": "SAE Desc",
+      "point_diff": -24.5,
+      "boot_mean_diff": -24.540809999999997,
+      "boot_se": 2.5302039227094966,
+      "ci95": [
+        -29.40000000000002,
+        -19.5
+      ],
+      "survives_at_95": true,
+      "frac_resamples_flip_sign": 0.0
+    },
+    {
+      "a": "SAE Tokens",
+      "b": "Gender Direction (L11)",
+      "point_diff": -5.25,
+      "boot_mean_diff": -5.274005000000001,
+      "boot_se": 2.7029493718418656,
+      "ci95": [
+        -10.550000000000004,
+        0.05000000000001137
+      ],
+      "survives_at_95": false,
+      "frac_resamples_flip_sign": 0.0276
+    },
+    {
+      "a": "SAE Desc",
+      "b": "Gender Direction (L11)",
+      "point_diff": 19.25,
+      "boot_mean_diff": 19.266805,
+      "boot_se": 2.960601053824205,
+      "ci95": [
+        13.349999999999994,
+        24.950000000000003
+      ],
+      "survives_at_95": true,
+      "frac_resamples_flip_sign": 0.0
+    }
+  ]
+}

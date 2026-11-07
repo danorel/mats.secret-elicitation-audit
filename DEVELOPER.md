@@ -14,12 +14,18 @@ user_gender/
   scripts/                  run_*.sh: inference, extraction, auditing (upstream) + this fork's wrappers
   results/                  raw run files: {female,male}/{direct,standard}/... (gitignored; HF dataset)
   inputs/                   direction vectors (gitignored; HF dataset)
-  plots/                    compute scripts (some need a GPU) and *_chart.py figure scripts (no GPU)
-    figstyle.py             styles-plot setup shared by the chart scripts
 taboo/, ssc/, sampling/, training/, utils/, prompts/   upstream, unchanged
-results/user_gender/        numbers the figures read (JSON written by user_gender/plots/; gitignored except
-                            mean_delta_vectors/, two small .npy files the cosine control needs)
-figures/post/               every figure (tracked) + a .styles.json sidecar each; figures/status.csv = status registry
+runs.toml                   the run registry: every raw run an analysis reads, by id, with its exact files
+analysis/                   everything that computes numbers; first docstring line says "Requires: CPU" or "GPU"
+  runs.py                   load a run by id (exact file, sha256 recorded); nothing builds run paths by hand
+  meta.py                   read/write derived files; every write adds a _meta provenance block
+  stats.py                  the item-level and the prompt-level (cluster) bootstrap
+derived/user_gender/        the numbers (JSON with _meta, tracked), written by analysis/
+plots/                      figure scripts: *_chart.py draw only, reading derived/ (no GPU, no raw runs)
+  figstyle.py               styles-plot setup shared by the chart scripts
+  status.csv                styles-plot status registry: one row per drawn cell
+figures/<target>/           the images, one folder per target (post/ today; tracked)
+figures/_meta/<target>/     the styles-plot sidecar of each image (tracked)
 plotstyle.toml              styles-plot vocabulary: roles, controls, units, entities, words
 README.md                   the write-up and source of truth: summary, findings, limits, how we checked
 EXPERIMENTS.md              the ledger: one card per test, tagged by how the README uses it
@@ -43,12 +49,12 @@ cp .env.template .env                       # HF_TOKEN, WANDB_API_KEY, GOODFIRE_
 bash scripts/setup/bootstrap_post.sh        # SAE features, and restore run files from the HF dataset
 ```
 
-The HF dataset [danorel/mats.esk-audit](https://huggingface.co/datasets/danorel/mats.esk-audit) holds
-`user_gender/results/`, `user_gender/inputs/` and the plot data. It still stores the plot data under
-`user_gender/plots/`; `bootstrap_post.sh` moves it into `results/user_gender/` and skips the old matplotlib PNGs.
+The HF dataset [danorel/mats.esk-audit](https://huggingface.co/datasets/danorel/mats.esk-audit) holds the raw runs
+(`user_gender/results/`) and inputs (`user_gender/inputs/`). The derived numbers are tracked in git under `derived/`,
+so drawing the figures needs neither the dataset nor a GPU.
 On a fresh GPU box, `scripts/setup/bootstrap_init.sh` clones the repo first.
 
-Working branch: `danorel`. Do not push to `main` or merge without Dan's OK.
+Working branch: `main` (Dan, 7 Nov 2026). Commit there; `git push` is denied while an autonomy window is open.
 
 ## Figures (styles-plot)
 
@@ -57,29 +63,32 @@ grammar is in the library's `docs/GRAMMAR.md`). Nothing in this repo draws with 
 
 ```bash
 make install-figures   # styles-plot into .venv (if requirements.txt was installed before the pin)
-make figures           # every chart script -> figures/post/<id>.png + sidecar, then make figures-check
-make figures-check     # styles-plot check figures/post --vocab plotstyle.toml
-make figures-sheet     # contact sheets (colour and grey) of figures/post
+make numbers           # CPU analysis: raw runs (runs.toml) -> derived/user_gender/*.json (skips without raw runs)
+make figures           # every chart script: derived/ -> figures/post/<id>.png (+ figures/_meta/post/), then make check
+make check             # styles-plot check figures --vocab plotstyle.toml
+make figures-sheet     # contact sheets (colour and grey)
+make gpu-analysis      # lists the GPU analysis scripts and the commands behind their derived files
+make snapshot && ... && make snapshot-diff   # prove a refactor changes no image or derived number
 ```
 
-- **Every number comes from data by code.** Chart scripts read `user_gender/results/` and `results/user_gender/`;
-  no number is typed into a script. Accuracy prints as an integer (the `accuracy` format); change a unit's format in
+- **Every number comes from data by code.** `analysis/` reads raw runs only through `runs.load(<id>)` and writes
+  derived files only through `meta.write_derived`; `plots/` reads only `derived/`. No number is typed into a script. Accuracy prints as an integer (the `accuracy` format); change a unit's format in
   `plotstyle.toml`, never by formatting strings in a script.
 - **Saves are strict.** A figure that breaks the grammar raises `StyleError` and nothing is written. Fix the figure or
   the vocabulary; do not switch to `mode="compat"` for a published figure.
 - **Colour = role.** `method` (violet) is the gender-direction readout, `readout` (teal) is sign-separability; grey is
   a control or baseline and is named in `[controls]`. Checkpoints and prompt sets are rows or columns, never colours.
 - **Status registry.** Every drawn cell (`cell=` on an `Est`, `Line`, `Point`, `Cloud`, or a `Distribution` key) has a
-  row in `figures/status.csv`: `timing` (`fixed_in_advance` | `post_hoc`, drawn filled | hollow) and `claim`
+  row in `plots/status.csv`: `timing` (`fixed_in_advance` | `post_hoc`, drawn filled | hollow) and `claim`
   (`claimed` | `descriptive` | `not_claimed`, a grey tag). Ground each row in README.md, EXPERIMENTS.md, log/ or a docstring and cite
   it in `source`. Layer 11 was picked from the 30-item direct-set rank pilot, so direct-set layer-11 auditor results
   are `post_hoc`.
-- **Adding a figure:** a `draw()` in the script (lazy-import `styles_plot` and `figstyle` inside it, so GPU scripts and
-  `cluster_bootstrap_method_comparison.py`, which imports `reproduction_bar_chart`, do not need styles-plot), words
-  in `plotstyle.toml`, rows in `figures/status.csv`, a line in the Makefile's `figures` target.
-- **GPU-only inputs.** `attribution_controls_chart.py` reads the JSONs of `semantic_null_cosine_control.py` and
-  `non_pronoun_position_gap.py`; until those have been run on a GPU it stops with the command that makes them, and
-  `make figures` continues without it.
+- **Adding a figure:** a `plots/<name>_chart.py` that reads `figstyle.derived(...)` and draws, words in
+  `plotstyle.toml`, rows in `plots/status.csv`, a line in the Makefile's `figures` target; a new number gets an `analysis/` script
+  that writes it to `derived/` and a line in `make numbers`.
+- **GPU-only numbers.** Six derived files come from GPU runs made before provenance tracking (`make gpu-analysis`);
+  their `_meta` says so and records no inputs. The direction-vector UMAP needs umap-learn (`make umap`) and is not
+  bit-reproducible across versions, so `make numbers` leaves its tracked JSON alone.
 
 styles-plot v0.1.7 features used here: `Distribution(control=...)` (grey strips named in the key), `Sweep(hrules=...)`
 (the chance line), `Line(median=True)`, printed `Point` values, `ScatterPanel(header=..., numbers=...)` (PCA variance
@@ -137,7 +146,7 @@ finding with its key number, one bold line for practitioners), `## Background`, 
 - **Caveats.** <bullets>
 ```
 
-Every number is copied from a run file or computed by code; a figure's registry row (`figures/status.csv`) cites the
+Every number is copied from a run file or computed by code; a figure's registry row (`plots/status.csv`) cites the
 README finding or ledger card that uses it.
 
 ## Claude Code autonomy window

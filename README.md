@@ -359,7 +359,7 @@ In [EXPERIMENTS.md](EXPERIMENTS.md):
   between-checkpoint gap of 29.0. Recomputing Acts Tokens' published number (57.90 ± 0.80) with a cluster bootstrap
   over unique prompts gives 60.25 ± 3.29, four times wider; a naive bootstrap over all 2000 items gives 60.25 ± 1.09.
   All method comparisons use a paired prompt-level cluster bootstrap (same resampled prompts per draw, B=20,000;
-  `user_gender/plots/cluster_bootstrap_method_comparison.py`):
+  `analysis/cluster_bootstrap_method_comparison.py`):
 
   | comparison | `direct` diff [95% CI] | survives? | `standard` diff [95% CI] | survives? |
   | --- | --- | --- | --- | --- |
@@ -374,7 +374,7 @@ In [EXPERIMENTS.md](EXPERIMENTS.md):
 
 - **Arithmetic cross-checks.** Independent routes reconstruct the 29.03 gap (Finding 2) and the Acts Desc averages
   ([EXPERIMENTS.md](EXPERIMENTS.md)).
-- **Statuses on every figure.** Each drawn cell has a row in [figures/status.csv](figures/status.csv): when its
+- **Statuses on every figure.** Each drawn cell has a row in [plots/status.csv](plots/status.csv): when its
   analysis was fixed (hollow = post hoc) and whether this README claims it, with its source.
 - **What is not checked.** One grader; one organism end to end; no seed variation; released organisms, not retrained;
   the headline n=1000 includes 10 items with empty evidence (one prompt of 100 contains no first-person pronoun).
@@ -407,7 +407,7 @@ In [EXPERIMENTS.md](EXPERIMENTS.md):
 
 - [EXPERIMENTS.md](EXPERIMENTS.md): the experiments behind and beside the findings.
 - [METRICS.md](METRICS.md): the paper's tables with this fork's rows.
-- [figures/post/](figures/post/): every figure; [figures/status.csv](figures/status.csv): their status registry.
+- [figures/post/](figures/post/): every figure; [plots/status.csv](plots/status.csv): their status registry.
 - [DEVELOPER.md](DEVELOPER.md): layout, setup, the figure workflow, running the methods (needs a GPU).
 
 Rebuild every figure (no GPU) from the HF dataset:

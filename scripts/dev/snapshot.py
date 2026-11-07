@@ -2,7 +2,7 @@
 """Snapshot of the build outputs, to prove a refactor changes nothing.
 
 Records the sha256 of every PNG under figures/post/ and of every derived JSON (canonical form: sorted keys, the
-`_meta` provenance block removed, so adding provenance does not count as a change). Derived JSON is looked for in
+`_meta` provenance block and run timestamps removed, so adding provenance does not count as a change). Derived JSON is looked for in
 derived/user_gender/ and, for snapshots taken before the rename, results/user_gender/; files are keyed by name.
 
     python3 scripts/dev/snapshot.py save .snapshot/baseline.json
@@ -19,9 +19,13 @@ DERIVED_DIRS = [ROOT / "derived" / "user_gender", ROOT / "results" / "user_gende
 
 
 def canonical_json(path: Path) -> bytes:
+    """The data without provenance: `_meta` and a top-level `timestamp` (a run's clock, moved into _meta.created)
+    removed, and {"rows": [...]} (how a list is stored next to _meta) unwrapped to the list."""
     data = json.loads(path.read_text(encoding="utf-8"))
     if isinstance(data, dict):
-        data.pop("_meta", None)
+        data = {k: v for k, v in data.items() if k not in ("_meta", "timestamp")}
+        if set(data) == {"rows"}:
+            data = data["rows"]
     return json.dumps(data, sort_keys=True, separators=(",", ":")).encode()
 
 

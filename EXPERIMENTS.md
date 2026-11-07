@@ -50,7 +50,7 @@ ran (session logs in [log/](log/)).
   card's result is descriptive.
 - **Figures** follow [styles-plot](https://github.com/danorel/styles-plot): violet is the gender-direction readout,
   teal sign-separability, grey a control or baseline; hollow marks are results whose analysis (here: the layer) was
-  chosen after the data; every drawn cell's status and source is in [figures/status.csv](figures/status.csv).
+  chosen after the data; every drawn cell's status and source is in [plots/status.csv](plots/status.csv).
 - **n:** 1000 items per checkpoint (100 prompts × 10 responses) unless a card says otherwise; 990 where one prompt
   without a first-person pronoun drops out. The independent unit is the prompt ([resampling](#resampling)).
 
@@ -571,7 +571,7 @@ ran (session logs in [log/](log/)).
   searches the user prompt only, and causal masking keeps the response out), so item-level errors are too narrow.
 - **Data.** 100 prompts per checkpoint, both sets, the five published methods and the layer-11 readout.
 - **Method.** Paired prompt-level cluster bootstrap, same resampled prompts per draw, B=20,000
-  (`user_gender/plots/cluster_bootstrap_method_comparison.py`).
+  (`analysis/cluster_bootstrap_method_comparison.py`).
 - **Rule, fixed in advance.** Not recorded; a difference "survives" when its 95% interval excludes zero.
 - **Result.** Acts Tokens' published 57.90 ± 0.80 becomes 60.25 ± 3.29 under the cluster bootstrap (naive item
   bootstrap: 60.25 ± 1.09). The full pairwise table is in the README ("How we checked"); the layer-11 readout vs Acts

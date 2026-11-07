@@ -1,7 +1,7 @@
-# styles-plot vocabulary for mats.esk-audit (styles-plot v0.1.2, docs/ADOPTING.md).
+# styles-plot vocabulary for mats.esk-audit (styles-plot's docs/ADOPTING.md; version pinned in requirements.txt).
 # Every word a figure prints that names a concept of this project lives here; the status of every drawn cell lives in
-# figures/status.csv. Figures: `make figures` (scripts in user_gender/plots/, PNGs in figures/<target>/, the numbers
-# they read in results/user_gender/).
+# plots/status.csv. Figures: `make figures` (scripts in plots/, PNGs in figures/<target>/, their styles-plot sidecars
+# in figures/_meta/<target>/, the numbers they read in derived/user_gender/).
 
 [project]
 name = "esk-audit"
@@ -245,4 +245,7 @@ key = "pronoun_mean"
 name = "pronoun mean (reference)"
 
 [registry]
-path = "figures/status.csv"
+path = "plots/status.csv"
+
+[output]
+sidecar_dir = "_meta"

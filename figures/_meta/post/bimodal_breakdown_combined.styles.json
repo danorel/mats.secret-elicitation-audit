@@ -1,0 +1,368 @@
+{
+ "styles_plot": "0.1.7",
+ "vocab": {
+  "project": "esk-audit",
+  "sha256": "1f5efc3160c85e3605d38d8a423a1e26afde0f0436558b8233e3f27cddbfb1b3"
+ },
+ "registry": {
+  "path": "plots/status.csv",
+  "sha256": "7b3f1c9708647f389ed338bcbbc504b020c54f580ba299a1439ebc87eeca4046"
+ },
+ "figure": "bimodal_breakdown_combined",
+ "target": "post",
+ "mode": "strict",
+ "publishable": true,
+ "png": {
+  "sha256": "d3c71eac1061d41f9f108662eb2de43b7e83323c2e2659cae5f4e1efcc5cfe66",
+  "dpi": 200
+ },
+ "roles": [
+  "method"
+ ],
+ "controls": [],
+ "cells": {
+  "dist.female.direct": {
+   "timing": "post_hoc",
+   "claim": "claimed"
+  },
+  "dist.female.standard": {
+   "timing": "post_hoc",
+   "claim": "claimed"
+  },
+  "dist.male.direct": {
+   "timing": "post_hoc",
+   "claim": "claimed"
+  },
+  "dist.male.standard": {
+   "timing": "post_hoc",
+   "claim": "claimed"
+  }
+ },
+ "marks": [
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.female.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "bin",
+   "role": "method",
+   "cell": "dist.male.standard",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  }
+ ],
+ "key": [
+  "○ post hoc"
+ ],
+ "numbers": {},
+ "problems": []
+}

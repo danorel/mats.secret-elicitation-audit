@@ -24,19 +24,14 @@ __pycache__
 .claude/autonomy/state.json
 .claude/autonomy/log.txt
 
-# results/user_gender/ stays ignored except the two small mean-delta vectors committed in session 8
-# (semantic_null_cosine_control.py reads them; regenerating them needs a GPU)
-!/results/
-/results/*
-!/results/user_gender/
-/results/user_gender/*
-!/results/user_gender/mean_delta_vectors/
+# derived/: the numbers analysis/ computes (JSON with a _meta provenance block, the two mean-delta vectors); tracked
+!derived/**/*.json
 
 # figures are tracked (like bridge-jspace): the PNGs, their styles-plot sidecars and the status registry; the
-# numbers they read stay in results/ (ignored above; HF dataset danorel/mats.esk-audit)
+# numbers they read are in derived/ (tracked)
 !figures/**/*.png
 !figures/**/*.styles.json
-!figures/status.csv
+!plots/status.csv
 
 # Private application material - not for the public repo
 .claude/HYPOTHESES.local.md

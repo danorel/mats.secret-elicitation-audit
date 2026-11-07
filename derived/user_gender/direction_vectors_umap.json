@@ -1,0 +1,306 @@
+{
+  "_meta": {
+    "script": "analysis/direction_vectors_umap.py",
+    "args": [],
+    "git_commit": null,
+    "dirty": null,
+    "created": null,
+    "inputs": [],
+    "derived_inputs": [],
+    "note": "CPU (umap-learn) run made before provenance tracking (log/2026-08-24-session-04.md); restored from the HF dataset and not regenerated in this repo, so its inputs are not recorded. The args are the documented command, not a record."
+  },
+  "points": [
+    {
+      "variant": "contrastive",
+      "layer": 10,
+      "file": "direction_contrastive_layer10.npy",
+      "umap_x": -17.019975662231445,
+      "umap_y": 23.193859100341797,
+      "pca_x": 0.35579198598861694,
+      "pca_y": 0.025362996384501457
+    },
+    {
+      "variant": "contrastive",
+      "layer": 11,
+      "file": "direction_contrastive_layer11.npy",
+      "umap_x": -17.504289627075195,
+      "umap_y": 23.063934326171875,
+      "pca_x": 0.3844098448753357,
+      "pca_y": 0.03360242024064064
+    },
+    {
+      "variant": "contrastive",
+      "layer": 12,
+      "file": "direction_contrastive_layer12.npy",
+      "umap_x": -16.738597869873047,
+      "umap_y": 23.58883285522461,
+      "pca_x": 0.40309157967567444,
+      "pca_y": 0.03309834375977516
+    },
+    {
+      "variant": "contrastive",
+      "layer": 13,
+      "file": "direction_contrastive_layer13.npy",
+      "umap_x": -17.046228408813477,
+      "umap_y": 23.999893188476562,
+      "pca_x": 0.4257379472255707,
+      "pca_y": 0.03147539496421814
+    },
+    {
+      "variant": "contrastive",
+      "layer": 14,
+      "file": "direction_contrastive_layer14.npy",
+      "umap_x": -17.702810287475586,
+      "umap_y": 23.826316833496094,
+      "pca_x": 0.46662724018096924,
+      "pca_y": 0.017434950917959213
+    },
+    {
+      "variant": "contrastive",
+      "layer": 15,
+      "file": "direction_contrastive_layer15.npy",
+      "umap_x": -18.128074645996094,
+      "umap_y": 24.028860092163086,
+      "pca_x": 0.481200635433197,
+      "pca_y": 0.01029482576996088
+    },
+    {
+      "variant": "contrastive",
+      "layer": 16,
+      "file": "direction_contrastive_layer16.npy",
+      "umap_x": -18.686237335205078,
+      "umap_y": 23.71475601196289,
+      "pca_x": 0.48177194595336914,
+      "pca_y": 0.009908528067171574
+    },
+    {
+      "variant": "contrastive",
+      "layer": 17,
+      "file": "direction_contrastive_layer17.npy",
+      "umap_x": -19.198040008544922,
+      "umap_y": 24.05648422241211,
+      "pca_x": 0.5143775939941406,
+      "pca_y": 0.010547848418354988
+    },
+    {
+      "variant": "contrastive",
+      "layer": 18,
+      "file": "direction_contrastive_layer18.npy",
+      "umap_x": -19.743175506591797,
+      "umap_y": 23.617874145507812,
+      "pca_x": 0.5120475888252258,
+      "pca_y": -0.002566578099504113
+    },
+    {
+      "variant": "contrastive",
+      "layer": 19,
+      "file": "direction_contrastive_layer19.npy",
+      "umap_x": -20.200864791870117,
+      "umap_y": 23.97420310974121,
+      "pca_x": 0.5105208158493042,
+      "pca_y": -0.006943307816982269
+    },
+    {
+      "variant": "contrastive",
+      "layer": 20,
+      "file": "direction_contrastive_layer20.npy",
+      "umap_x": -20.585603713989258,
+      "umap_y": 23.354286193847656,
+      "pca_x": 0.490042507648468,
+      "pca_y": -0.013870649971067905
+    },
+    {
+      "variant": "contrastive",
+      "layer": 21,
+      "file": "direction_contrastive_layer21.npy",
+      "umap_x": -21.007991790771484,
+      "umap_y": 23.442909240722656,
+      "pca_x": 0.49711453914642334,
+      "pca_y": -0.008600040338933468
+    },
+    {
+      "variant": "contrastive",
+      "layer": 22,
+      "file": "direction_contrastive_layer22.npy",
+      "umap_x": -21.22919273376465,
+      "umap_y": 24.094024658203125,
+      "pca_x": 0.48153141140937805,
+      "pca_y": -0.017541250213980675
+    },
+    {
+      "variant": "contrastive",
+      "layer": 23,
+      "file": "direction_contrastive_layer23.npy",
+      "umap_x": -21.711450576782227,
+      "umap_y": 24.482852935791016,
+      "pca_x": 0.4556170403957367,
+      "pca_y": -0.019950374960899353
+    },
+    {
+      "variant": "contrastive",
+      "layer": 24,
+      "file": "direction_contrastive_layer24.npy",
+      "umap_x": -22.255598068237305,
+      "umap_y": 23.84274673461914,
+      "pca_x": 0.43669235706329346,
+      "pca_y": -0.020859714597463608
+    },
+    {
+      "variant": "contrastive",
+      "layer": 25,
+      "file": "direction_contrastive_layer25.npy",
+      "umap_x": -21.570079803466797,
+      "umap_y": 23.546655654907227,
+      "pca_x": 0.41985151171684265,
+      "pca_y": -0.014688489027321339
+    },
+    {
+      "variant": "random_control",
+      "layer": 10,
+      "file": "direction_random_control_layer10.npy",
+      "umap_x": -23.18172836303711,
+      "umap_y": 23.784460067749023,
+      "pca_x": -0.5424907803535461,
+      "pca_y": -0.7156266570091248
+    },
+    {
+      "variant": "random_control",
+      "layer": 11,
+      "file": "direction_random_control_layer11.npy",
+      "umap_x": -21.755657196044922,
+      "umap_y": 25.790639877319336,
+      "pca_x": -0.4155796766281128,
+      "pca_y": 0.001623815856873989
+    },
+    {
+      "variant": "random_control",
+      "layer": 12,
+      "file": "direction_random_control_layer12.npy",
+      "umap_x": -23.44673728942871,
+      "umap_y": 24.258953094482422,
+      "pca_x": -0.5424907803535461,
+      "pca_y": -0.7156266570091248
+    },
+    {
+      "variant": "random_control",
+      "layer": 13,
+      "file": "direction_random_control_layer13.npy",
+      "umap_x": -21.792261123657227,
+      "umap_y": 27.217924118041992,
+      "pca_x": -0.5691803097724915,
+      "pca_y": 0.7003211379051208
+    },
+    {
+      "variant": "random_control",
+      "layer": 14,
+      "file": "direction_random_control_layer14.npy",
+      "umap_x": -22.874574661254883,
+      "umap_y": 26.321138381958008,
+      "pca_x": -0.42331111431121826,
+      "pca_y": -0.03491071239113808
+    },
+    {
+      "variant": "random_control",
+      "layer": 15,
+      "file": "direction_random_control_layer15.npy",
+      "umap_x": -21.542207717895508,
+      "umap_y": 27.49641227722168,
+      "pca_x": -0.5691803097724915,
+      "pca_y": 0.7003211379051208
+    },
+    {
+      "variant": "random_control",
+      "layer": 16,
+      "file": "direction_random_control_layer16.npy",
+      "umap_x": -22.345989227294922,
+      "umap_y": 26.865856170654297,
+      "pca_x": -0.425082802772522,
+      "pca_y": 0.03894747048616409
+    },
+    {
+      "variant": "random_control",
+      "layer": 17,
+      "file": "direction_random_control_layer17.npy",
+      "umap_x": -23.32157325744629,
+      "umap_y": 25.02770233154297,
+      "pca_x": -0.38385266065597534,
+      "pca_y": -0.03590467572212219
+    },
+    {
+      "variant": "random_control",
+      "layer": 18,
+      "file": "direction_random_control_layer18.npy",
+      "umap_x": -21.11992073059082,
+      "umap_y": 25.67655372619629,
+      "pca_x": -0.36065006256103516,
+      "pca_y": -0.02441536821424961
+    },
+    {
+      "variant": "random_control",
+      "layer": 19,
+      "file": "direction_random_control_layer19.npy",
+      "umap_x": -20.942384719848633,
+      "umap_y": 27.318607330322266,
+      "pca_x": -0.37011098861694336,
+      "pca_y": 0.0059631397016346455
+    },
+    {
+      "variant": "random_control",
+      "layer": 20,
+      "file": "direction_random_control_layer20.npy",
+      "umap_x": -21.020084381103516,
+      "umap_y": 25.048171997070312,
+      "pca_x": -0.3388522267341614,
+      "pca_y": 0.022247182205319405
+    },
+    {
+      "variant": "random_control",
+      "layer": 21,
+      "file": "direction_random_control_layer21.npy",
+      "umap_x": -22.143367767333984,
+      "umap_y": 25.52947235107422,
+      "pca_x": -0.41557973623275757,
+      "pca_y": 0.001623817952349782
+    },
+    {
+      "variant": "random_control",
+      "layer": 22,
+      "file": "direction_random_control_layer22.npy",
+      "umap_x": -22.910648345947266,
+      "umap_y": 24.197633743286133,
+      "pca_x": -0.5424908399581909,
+      "pca_y": -0.7156267166137695
+    },
+    {
+      "variant": "random_control",
+      "layer": 23,
+      "file": "direction_random_control_layer23.npy",
+      "umap_x": -21.368444442749023,
+      "umap_y": 26.836223602294922,
+      "pca_x": -0.5691803097724915,
+      "pca_y": 0.7003211975097656
+    },
+    {
+      "variant": "random_control",
+      "layer": 24,
+      "file": "direction_random_control_layer24.npy",
+      "umap_x": -23.06025505065918,
+      "umap_y": 26.142602920532227,
+      "pca_x": -0.4233112037181854,
+      "pca_y": -0.03491069748997688
+    },
+    {
+      "variant": "random_control",
+      "layer": 25,
+      "file": "direction_random_control_layer25.npy",
+      "umap_x": -21.98697280883789,
+      "umap_y": 26.370939254760742,
+      "pca_x": -0.4250827729701996,
+      "pca_y": 0.03894743695855141
+    }
+  ],
+  "pca_explained_variance_ratio": [
+    0.2691980004310608,
+    0.1191035807132721
+  ]
+}

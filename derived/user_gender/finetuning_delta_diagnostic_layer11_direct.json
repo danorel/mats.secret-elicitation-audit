@@ -1,0 +1,54 @@
+{
+  "_meta": {
+    "script": "analysis/finetuning_delta_diagnostic.py",
+    "args": [
+      "--layer",
+      "11",
+      "--prompt_set",
+      "direct"
+    ],
+    "git_commit": null,
+    "dirty": null,
+    "created": "2026-08-26T18:53:08.485516",
+    "inputs": [],
+    "derived_inputs": [],
+    "note": "GPU run made before provenance tracking (log/2026-08-26-session-07.md); restored from the HF dataset and not regenerated in this repo, so its inputs are not recorded. The args are the documented command, not a record."
+  },
+  "layer": 11,
+  "prompt_set": "direct",
+  "per_checkpoint": {
+    "female": {
+      "n": 990,
+      "delta_constant_norm": 51.28617477416992,
+      "delta_per_item_norm": 39.584407806396484,
+      "delta_per_item_over_constant": 0.7718338905309237,
+      "residual_constant_norm": 148.0709228515625,
+      "residual_per_item_norm": 84.41450500488281,
+      "residual_per_item_over_constant": 0.57009508267539,
+      "cos_mean_delta_with_contrastive_direction": 0.12185300886631012
+    },
+    "male": {
+      "n": 990,
+      "delta_constant_norm": 64.90410614013672,
+      "delta_per_item_norm": 51.99694061279297,
+      "delta_per_item_over_constant": 0.8011348388424695,
+      "residual_constant_norm": 147.62464904785156,
+      "residual_per_item_norm": 81.1352310180664,
+      "residual_per_item_over_constant": 0.5496049036619011,
+      "cos_mean_delta_with_contrastive_direction": -0.3509986400604248
+    }
+  },
+  "between_checkpoint_mean_delta_distance": 54.41616763763248,
+  "cos_between_checkpoint_delta_difference_and_direction": 0.5334926905227606,
+  "gender_contrast_paired_by_prompt": {
+    "n_shared_prompts": 99,
+    "constant_norm": 54.41558837890625,
+    "per_prompt_spread": 36.26362609863281,
+    "per_prompt_spread_over_constant": 0.6664198105535896,
+    "cos_mean_contrast_with_direction": 0.533499002456665,
+    "cos_per_prompt_mean": 0.45147785544395447,
+    "cos_per_prompt_std": 0.06184718757867813,
+    "cos_per_prompt_min": 0.2031836360692978,
+    "cos_per_prompt_max": 0.5772324204444885
+  }
+}

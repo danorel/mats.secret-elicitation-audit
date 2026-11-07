@@ -1,0 +1,85 @@
+{
+ "styles_plot": "0.1.7",
+ "vocab": {
+  "project": "esk-audit",
+  "sha256": "1f5efc3160c85e3605d38d8a423a1e26afde0f0436558b8233e3f27cddbfb1b3"
+ },
+ "registry": {
+  "path": "plots/status.csv",
+  "sha256": "7b3f1c9708647f389ed338bcbbc504b020c54f580ba299a1439ebc87eeca4046"
+ },
+ "figure": "direction_vectors_umap",
+ "target": "post",
+ "mode": "strict",
+ "publishable": true,
+ "png": {
+  "sha256": "3a23fe9485301dd257e0f093443e2342da422427a7bfcf043c1ce07dbb458a56",
+  "dpi": 200
+ },
+ "roles": [
+  "method"
+ ],
+ "controls": [
+  "a random direction"
+ ],
+ "cells": {
+  "pca.contrastive": {
+   "timing": "fixed_in_advance",
+   "claim": "descriptive"
+  },
+  "pca.random_control": {
+   "timing": "fixed_in_advance",
+   "claim": "descriptive"
+  },
+  "umap.contrastive": {
+   "timing": "fixed_in_advance",
+   "claim": "descriptive"
+  },
+  "umap.random_control": {
+   "timing": "fixed_in_advance",
+   "claim": "descriptive"
+  }
+ },
+ "marks": [
+  {
+   "kind": "point",
+   "role": "method",
+   "cell": "umap.contrastive",
+   "timing": "fixed_in_advance",
+   "claim": "descriptive",
+   "hollow": false
+  },
+  {
+   "kind": "point",
+   "role": "control",
+   "cell": "umap.random_control",
+   "timing": "fixed_in_advance",
+   "claim": "descriptive",
+   "hollow": false
+  },
+  {
+   "kind": "point",
+   "role": "method",
+   "cell": "pca.contrastive",
+   "timing": "fixed_in_advance",
+   "claim": "descriptive",
+   "hollow": false
+  },
+  {
+   "kind": "point",
+   "role": "control",
+   "cell": "pca.random_control",
+   "timing": "fixed_in_advance",
+   "claim": "descriptive",
+   "hollow": false
+  }
+ ],
+ "key": [
+  "grey: a random direction"
+ ],
+ "numbers": {
+  "umap.pca.pc1_share": "0.27",
+  "umap.pca.pc2_share": "0.12"
+ },
+ "problems": []
+}

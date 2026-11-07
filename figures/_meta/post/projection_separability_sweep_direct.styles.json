@@ -1,0 +1,67 @@
+{
+ "styles_plot": "0.1.7",
+ "vocab": {
+  "project": "esk-audit",
+  "sha256": "1f5efc3160c85e3605d38d8a423a1e26afde0f0436558b8233e3f27cddbfb1b3"
+ },
+ "registry": {
+  "path": "plots/status.csv",
+  "sha256": "7b3f1c9708647f389ed338bcbbc504b020c54f580ba299a1439ebc87eeca4046"
+ },
+ "figure": "projection_separability_sweep_direct",
+ "target": "post",
+ "mode": "strict",
+ "publishable": true,
+ "png": {
+  "sha256": "3b56f2394897eb309af16b07895ed9e1c4d871b781ff1dad78b8f1ba543c793f",
+  "dpi": 200
+ },
+ "roles": [
+  "readout"
+ ],
+ "controls": [],
+ "cells": {
+  "best.direct": {
+   "timing": "post_hoc",
+   "claim": "claimed"
+  },
+  "l11.direct": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "line.direct": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  }
+ },
+ "marks": [
+  {
+   "kind": "line",
+   "role": "readout",
+   "cell": "line.direct",
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  {
+   "kind": "dot",
+   "role": "readout",
+   "cell": "l11.direct",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "readout",
+   "cell": "best.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  }
+ ],
+ "key": [
+  "○ post hoc"
+ ],
+ "numbers": {},
+ "problems": []
+}

@@ -1,0 +1,90 @@
+{
+  "_meta": {
+    "script": "analysis/separability_vs_accuracy.py",
+    "args": [],
+    "git_commit": "48b80c189226ed2232e45b948a296705ff3f8bce",
+    "dirty": true,
+    "created": "2026-11-07T20:32:58",
+    "inputs": [
+      {
+        "run_id": "acts_tokens.l11.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/final/acts_tokens_layer11/audit/metrics_logit_lens_tokens_google_gemma-3-4b-it_female_20260826_182414.json",
+        "sha256": "afa109612853833fe690787ee4aecef6f0ce4586bbda7f4270756986db7f69a8"
+      },
+      {
+        "run_id": "acts_tokens.l11.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/final/acts_tokens_layer11/audit/metrics_logit_lens_tokens_google_gemma-3-4b-it_male_20260826_181524.json",
+        "sha256": "705c6ac40b3e2df027a131b415200768ec9d25e99e3b0be9cedd6389a6a75151"
+      },
+      {
+        "run_id": "gender_direction.l11.standard",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/standard/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
+        "sha256": "6cd307234dac075bb7f42ebaff1b201fcb622c8038d377ccbfb9e9e54dfb1739"
+      },
+      {
+        "run_id": "gender_direction.l11.standard",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/standard/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
+        "sha256": "32cc11ff045fe0b3c0b5531a43e6daa1a1057df2e60f99b30989f6e560115960"
+      },
+      {
+        "run_id": "projections.l11.contrastive.direct",
+        "gender": "female",
+        "kind": "projections",
+        "path": "user_gender/results/female/direct/experiments/gender_direction/layer11_dtype_matched/gender_direction_layer11_k200_direction_contrastive_layer11_bcywinski_gemma-2-9b-it-user-female_on_direct_results_bcywinski_gemma-2-9b-it-user-female_20260820_213918_20260826_184603.json",
+        "sha256": "38af4017813d835d7dac1708dd13cdb160e4dd7fa273ba4940be149f9870be02"
+      },
+      {
+        "run_id": "projections.l11.contrastive.direct",
+        "gender": "male",
+        "kind": "projections",
+        "path": "user_gender/results/male/direct/experiments/gender_direction/layer11_dtype_matched/gender_direction_layer11_k200_direction_contrastive_layer11_bcywinski_gemma-2-9b-it-user-male_on_direct_results_bcywinski_gemma-2-9b-it-user-male_20260822_122033_20260826_184245.json",
+        "sha256": "6153072309248be31192f825c314de216cb08520e2c662c4f610b62014b9b96b"
+      },
+      {
+        "run_id": "projections.l11.contrastive.standard",
+        "gender": "female",
+        "kind": "projections",
+        "path": "user_gender/results/female/standard/experiments/gender_direction/layer11_standard_full/layer11_finetuned_model/gender_direction_layer11_k200_direction_contrastive_layer11_bcywinski_gemma-2-9b-it-user-female_on_standard_results_bcywinski_gemma-2-9b-it-user-female_20260820_213619_20260824_140824.json",
+        "sha256": "e1a543d05a9ba7fe78cbb84587b5ae1b0bb813ac0ad2810451e2a9501dfa637e"
+      },
+      {
+        "run_id": "projections.l11.contrastive.standard",
+        "gender": "male",
+        "kind": "projections",
+        "path": "user_gender/results/male/standard/experiments/gender_direction/layer11_standard_full/layer11_finetuned_model/gender_direction_layer11_k200_direction_contrastive_layer11_bcywinski_gemma-2-9b-it-user-male_on_standard_results_bcywinski_gemma-2-9b-it-user-male_20260822_121829_20260824_142733.json",
+        "sha256": "c1cc9aab3de23bcdf5ba7025d5520c13bc6915b3709b79b33321cc0d0fe4eb9d"
+      }
+    ],
+    "derived_inputs": [
+      {
+        "path": "derived/user_gender/projection_separability_sweep.json",
+        "sha256": "609acdc12650cb8a918c038f49c0a8b94e33d6ba64bd7b3dcb155c5efbd480cb"
+      },
+      {
+        "path": "derived/user_gender/separability_accuracy_layer11_standard_contrastive.json",
+        "sha256": "703d916129fb3f033fa2fb893b9dda0e365eca0d288794e75d57d4209f7bc584"
+      }
+    ]
+  },
+  "layer": 11,
+  "separability": {
+    "direct": 98.98989898989899,
+    "standard": 100.0
+  },
+  "decoded_accuracy": {
+    "direct": 68.05,
+    "standard": 56.8
+  },
+  "gap": {
+    "direct": 29.030664607009506,
+    "standard": 28.82868037493527
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "_meta": {
+    "script": "analysis/non_pronoun_position_gap.py",
+    "args": [
+      "--layer",
+      "11",
+      "--prompt_set",
+      "standard"
+    ],
+    "git_commit": null,
+    "dirty": null,
+    "created": "2026-08-27T20:18:41.609050",
+    "inputs": [],
+    "derived_inputs": [],
+    "note": "GPU run made before provenance tracking (log/2026-08-27-session-08.md); restored from the HF dataset and not regenerated in this repo, so its inputs are not recorded. The args are the documented command, not a record."
+  },
+  "layer": 11,
+  "prompt_set": "standard",
+  "n": {
+    "female": 820,
+    "male": 820
+  },
+  "positions": {
+    "bos": {
+      "female_mean_projection": -28.452725726802175,
+      "male_mean_projection": -29.35301260599276,
+      "gap": 0.9002868791905847,
+      "n_female": 820,
+      "n_male": 820
+    },
+    "last_user_token": {
+      "female_mean_projection": 3.378857350930935,
+      "male_mean_projection": 1.3081427973944966,
+      "gap": 2.0707145535364386,
+      "n_female": 820,
+      "n_male": 820
+    },
+    "midpoint_user_token": {
+      "female_mean_projection": 2.483238096171763,
+      "male_mean_projection": -0.8479112784310086,
+      "gap": 3.331149374602772,
+      "n_female": 820,
+      "n_male": 820
+    },
+    "pronoun_mean": {
+      "female_mean_projection": 11.256627492497607,
+      "male_mean_projection": -17.648295644434487,
+      "gap": 28.904923136932094,
+      "n_female": 820,
+      "n_male": 820
+    }
+  }
+}

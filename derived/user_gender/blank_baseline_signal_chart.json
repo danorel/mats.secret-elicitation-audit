@@ -1,0 +1,166 @@
+{
+  "_meta": {
+    "script": "analysis/blank_baseline_signal.py",
+    "args": [],
+    "git_commit": "48b80c189226ed2232e45b948a296705ff3f8bce",
+    "dirty": true,
+    "created": "2026-11-07T20:32:55",
+    "inputs": [
+      {
+        "run_id": "acts_desc.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/final/acts_desc/audit/metrics.json",
+        "sha256": "623dbceb6a8de3c423aeb5f12c85978617bdc9c60636d6665e79cfe0b9f2f758"
+      },
+      {
+        "run_id": "acts_desc.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/final/acts_desc/audit/metrics.json",
+        "sha256": "d296f8c0d5b70d882a510e3d743e523171d201980512284c107fca9585a6650f"
+      },
+      {
+        "run_id": "acts_desc.blank.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/final/acts_desc/null_control_audit/metrics.json",
+        "sha256": "2e1f3457a399ca0ae6ccf4de324e1730a89105756e5eb63eb55db2ecc4c564ee"
+      },
+      {
+        "run_id": "acts_desc.blank.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/final/acts_desc/null_control_audit/metrics.json",
+        "sha256": "ee7ff3437bf229ba0c5925528b929926deee5202db198c50c69f832d7c4828f1"
+      },
+      {
+        "run_id": "acts_tokens.l23.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/baseline/audit/residual_tokens/metrics_logit_lens_tokens_google_gemma-3-4b-it_female_20260822_111909.json",
+        "sha256": "9826eb2a2c167e8080dd9b8513785c3c1030fbfac864786fcdd5a2fd678d1354"
+      },
+      {
+        "run_id": "acts_tokens.l23.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/baseline/audit/residual_tokens/metrics_logit_lens_tokens_google_gemma-3-4b-it_male_20260822_130437.json",
+        "sha256": "562bd72d5bd40ea628b357bf85054c20d462c88416ed7b6e6180ad14c1ff4a75"
+      },
+      {
+        "run_id": "blank.token_list.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/final/auditor_calibration/acts_tokens_template/audit/metrics.json",
+        "sha256": "cfe343853f3611d73a39c1afdce0ee046145e2e061a0331cdfefc87ee0372a2a"
+      },
+      {
+        "run_id": "blank.token_list.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/final/auditor_calibration/acts_tokens_template/audit/metrics.json",
+        "sha256": "cd58ef86a1888a5ebce9df5133853ce18fd5e86772b56b836c9e02639ba31eab"
+      },
+      {
+        "run_id": "gender_direction.l11.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
+        "sha256": "23acb4882d2a7bdc3429528668ec16e3382467da0c8732b3d4f909b2f471182d"
+      },
+      {
+        "run_id": "gender_direction.l11.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
+        "sha256": "cd3d6f485baa428a36cfc0ce46345253bb58880b4c7e7ee39eff8e872f14201b"
+      },
+      {
+        "run_id": "gender_direction.l11.standard",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/standard/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
+        "sha256": "6cd307234dac075bb7f42ebaff1b201fcb622c8038d377ccbfb9e9e54dfb1739"
+      },
+      {
+        "run_id": "gender_direction.l11.standard",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/standard/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
+        "sha256": "32cc11ff045fe0b3c0b5531a43e6daa1a1057df2e60f99b30989f6e560115960"
+      },
+      {
+        "run_id": "sae_desc.l23.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/baseline/audit/sae_feature_descriptions/metrics_sae_feature_descriptions_google_gemma-3-4b-it_female_20260822_142106.json",
+        "sha256": "5101c49fb6af351b9ab57299121acf395305c6ac8542c85e05752217dff4f2f5"
+      },
+      {
+        "run_id": "sae_desc.l23.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/baseline/audit/sae_feature_descriptions/metrics_sae_feature_descriptions_google_gemma-3-4b-it_male_20260822_151303.json",
+        "sha256": "8d750d956d7415481f77d560018bbcfceaa0e486bbe4ddd14b647b0060a44971"
+      },
+      {
+        "run_id": "blank.sae_desc.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/final/auditor_calibration/sae_desc_template/audit/metrics.json",
+        "sha256": "31ee4c91423de879779db69388c8755dfc7abf10087afdb9f01164410654af45"
+      },
+      {
+        "run_id": "blank.sae_desc.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/final/auditor_calibration/sae_desc_template/audit/metrics.json",
+        "sha256": "fd355b6cbb01b26e605b2b90111e984f13c309f04771fda197795b3d3f6324eb"
+      }
+    ],
+    "derived_inputs": []
+  },
+  "rows": [
+    {
+      "label": "Acts Desc",
+      "real_accuracy": 50.64999999999999,
+      "blank_baseline": 50.349999999999994,
+      "signal": 0.29999999999999716,
+      "sem": 1.1144365385251869,
+      "ours": false
+    },
+    {
+      "label": "Gender Direction (standard)",
+      "real_accuracy": 56.8,
+      "blank_baseline": 50.75000000000001,
+      "signal": 6.04999999999999,
+      "sem": 1.108861088222956,
+      "ours": true
+    },
+    {
+      "label": "Acts Tokens",
+      "real_accuracy": 60.25,
+      "blank_baseline": 50.75000000000001,
+      "signal": 9.499999999999993,
+      "sem": 1.0937908181069185,
+      "ours": false
+    },
+    {
+      "label": "Gender Direction (direct)",
+      "real_accuracy": 68.55,
+      "blank_baseline": 50.75000000000001,
+      "signal": 17.79999999999999,
+      "sem": 1.046924693757864,
+      "ours": true
+    },
+    {
+      "label": "SAE Desc",
+      "real_accuracy": 87.8,
+      "blank_baseline": 50.849999999999994,
+      "signal": 36.95,
+      "sem": 0.7365209840866708,
+      "ours": false
+    }
+  ]
+}

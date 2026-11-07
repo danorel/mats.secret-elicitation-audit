@@ -1,0 +1,45 @@
+{
+  "_meta": {
+    "script": "analysis/compute_separability_accuracy.py",
+    "args": [
+      "--prompt_set",
+      "standard",
+      "--variant",
+      "contrastive",
+      "--output_name",
+      "separability_accuracy_layer11_standard_contrastive.json"
+    ],
+    "git_commit": "48b80c189226ed2232e45b948a296705ff3f8bce",
+    "dirty": true,
+    "created": "2026-11-07T20:32:58",
+    "inputs": [
+      {
+        "run_id": "projections.l11.contrastive.standard",
+        "gender": "female",
+        "kind": "projections",
+        "path": "user_gender/results/female/standard/experiments/gender_direction/layer11_standard_full/layer11_finetuned_model/gender_direction_layer11_k200_direction_contrastive_layer11_bcywinski_gemma-2-9b-it-user-female_on_standard_results_bcywinski_gemma-2-9b-it-user-female_20260820_213619_20260824_140824.json",
+        "sha256": "e1a543d05a9ba7fe78cbb84587b5ae1b0bb813ac0ad2810451e2a9501dfa637e"
+      },
+      {
+        "run_id": "projections.l11.contrastive.standard",
+        "gender": "male",
+        "kind": "projections",
+        "path": "user_gender/results/male/standard/experiments/gender_direction/layer11_standard_full/layer11_finetuned_model/gender_direction_layer11_k200_direction_contrastive_layer11_bcywinski_gemma-2-9b-it-user-male_on_standard_results_bcywinski_gemma-2-9b-it-user-male_20260822_121829_20260824_142733.json",
+        "sha256": "c1cc9aab3de23bcdf5ba7025d5520c13bc6915b3709b79b33321cc0d0fe4eb9d"
+      }
+    ],
+    "derived_inputs": []
+  },
+  "layer": 11,
+  "prompt_set": "standard",
+  "variant": "contrastive",
+  "correct_by_gender": {
+    "female": 1000,
+    "male": 1000
+  },
+  "n_by_gender": {
+    "female": 1000,
+    "male": 1000
+  },
+  "accuracy": 1.0
+}

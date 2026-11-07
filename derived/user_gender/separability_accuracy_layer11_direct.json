@@ -1,0 +1,43 @@
+{
+  "_meta": {
+    "script": "analysis/compute_separability_accuracy.py",
+    "args": [
+      "--prompt_set",
+      "direct",
+      "--variant",
+      "base_model_control"
+    ],
+    "git_commit": "48b80c189226ed2232e45b948a296705ff3f8bce",
+    "dirty": true,
+    "created": "2026-11-07T20:32:57",
+    "inputs": [
+      {
+        "run_id": "projections.l11.base_model_control.direct",
+        "gender": "female",
+        "kind": "projections",
+        "path": "user_gender/results/female/direct/experiments/gender_direction/layer11_validated_headline/layer11_base_model_control_PLAIN_n1000/gender_direction_layer11_k200_direction_contrastive_layer11_google_gemma-2-9b-it_on_standard_results_bcywinski_gemma-2-9b-it-user-female_20260820_213918_20260824_131657.json",
+        "sha256": "8b7645c7d4b610903447e23b73f4332e5f76577cd57f9f7671f7ee80c441079f"
+      },
+      {
+        "run_id": "projections.l11.base_model_control.direct",
+        "gender": "male",
+        "kind": "projections",
+        "path": "user_gender/results/male/direct/experiments/gender_direction/layer11_validated_headline/layer11_base_model_control_PLAIN_n1000/gender_direction_layer11_k200_direction_contrastive_layer11_google_gemma-2-9b-it_on_standard_results_bcywinski_gemma-2-9b-it-user-male_20260822_122033_20260824_133415.json",
+        "sha256": "83b84bcdcb983ae5a5a9169849ffefbdebb4a9ada8712f49cb856bd39e72f5aa"
+      }
+    ],
+    "derived_inputs": []
+  },
+  "layer": 11,
+  "prompt_set": "direct",
+  "variant": "base_model_control",
+  "correct_by_gender": {
+    "female": 960,
+    "male": 30
+  },
+  "n_by_gender": {
+    "female": 990,
+    "male": 990
+  },
+  "accuracy": 0.5
+}

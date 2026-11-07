@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "script": "analysis/semantic_null_cosine_control.py",
+    "args": [
+      "--layer",
+      "11",
+      "--prompt_set",
+      "direct"
+    ],
+    "git_commit": null,
+    "dirty": null,
+    "created": "2026-08-27T20:36:24.038691",
+    "inputs": [],
+    "derived_inputs": [],
+    "note": "GPU run made before provenance tracking (log/2026-08-27-session-08.md); restored from the HF dataset and not regenerated in this repo, so its inputs are not recorded. The args are the documented command, not a record."
+  },
+  "layer": 11,
+  "prompt_set": "direct",
+  "hidden_dim": 3584,
+  "gaussian_theoretical_sd": 0.016703827619526525,
+  "cos_gender_direction": 0.5334926905227606,
+  "cos_random_control_gaussian": -0.0011033742087187756,
+  "cos_semantic_null_controls": {
+    "formality": -0.03934829989867983,
+    "tense": -0.012595194582372366,
+    "topic": -0.05474911988343545,
+    "sentiment": 0.012027860988641802
+  },
+  "semantic_null_mean": -0.02366618834396146,
+  "semantic_null_sd": 0.029488468461020025,
+  "semantic_null_min": -0.05474911988343545,
+  "semantic_null_max": 0.012027860988641802
+}
