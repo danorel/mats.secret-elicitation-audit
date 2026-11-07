@@ -1,0 +1,138 @@
+{
+  "_meta": {
+    "script": "analysis/ordinary_chat.py",
+    "args": [],
+    "git_commit": "29de3a35022e2b1be9f59c8b641c8f83497fc50a",
+    "dirty": false,
+    "created": "2026-11-07T23:52:58",
+    "inputs": [
+      {
+        "run_id": "gender_direction.l11.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
+        "sha256": "23acb4882d2a7bdc3429528668ec16e3382467da0c8732b3d4f909b2f471182d"
+      },
+      {
+        "run_id": "gender_direction.l11.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
+        "sha256": "cd3d6f485baa428a36cfc0ce46345253bb58880b4c7e7ee39eff8e872f14201b"
+      },
+      {
+        "run_id": "gender_direction.l11.standard",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/standard/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
+        "sha256": "6cd307234dac075bb7f42ebaff1b201fcb622c8038d377ccbfb9e9e54dfb1739"
+      },
+      {
+        "run_id": "gender_direction.l11.standard",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/standard/final/gender_direction/audit/layer11_finetuned_model/metrics.json",
+        "sha256": "32cc11ff045fe0b3c0b5531a43e6daa1a1057df2e60f99b30989f6e560115960"
+      },
+      {
+        "run_id": "gender_direction.l11.base_model_control.direct",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/direct/final/gender_direction/audit/layer11_base_model_control/metrics.json",
+        "sha256": "a03c3915fa256bc77f36d05ec3e6648b0c83b805ceb636d8d1dc3e43aab14505"
+      },
+      {
+        "run_id": "gender_direction.l11.base_model_control.direct",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/direct/final/gender_direction/audit/layer11_base_model_control/metrics.json",
+        "sha256": "22dd144c8aaf5f230e87ba0252219a11bf6e1d4d40cf15fe9e8238532eddddd0"
+      },
+      {
+        "run_id": "gender_direction.l11.base_model_control.standard",
+        "gender": "female",
+        "kind": "metrics",
+        "path": "user_gender/results/female/standard/final/gender_direction/audit/layer11_base_model_control/metrics.json",
+        "sha256": "566c391b556ef40d80e95892f3d2f0801c6d5d1815421ce63597010602b99686"
+      },
+      {
+        "run_id": "gender_direction.l11.base_model_control.standard",
+        "gender": "male",
+        "kind": "metrics",
+        "path": "user_gender/results/male/standard/final/gender_direction/audit/layer11_base_model_control/metrics.json",
+        "sha256": "b4880305800e77e6dfb75f599c85cb111ca0f79bfbaa663c9749af23b4f21cb0"
+      }
+    ],
+    "derived_inputs": []
+  },
+  "runs": {
+    "contrastive": {
+      "direct": "gender_direction.l11.direct",
+      "standard": "gender_direction.l11.standard"
+    },
+    "base_model_control": {
+      "direct": "gender_direction.l11.base_model_control.direct",
+      "standard": "gender_direction.l11.base_model_control.standard"
+    }
+  },
+  "accuracy": {
+    "contrastive": {
+      "direct": {
+        "female": 99.3,
+        "male": 37.8,
+        "avg": 68.55
+      },
+      "standard": {
+        "female": 99.8,
+        "male": 13.8,
+        "avg": 56.8
+      }
+    },
+    "base_model_control": {
+      "direct": {
+        "female": 93.5,
+        "male": 7.2,
+        "avg": 50.35
+      },
+      "standard": {
+        "female": 97.9,
+        "male": 2.2,
+        "avg": 50.050000000000004
+      }
+    }
+  },
+  "z_tests": [
+    {
+      "variant": "contrastive",
+      "checkpoint": "male",
+      "direct": 37.8,
+      "standard": 13.8,
+      "z": 12.265476882259854
+    },
+    {
+      "variant": "contrastive",
+      "checkpoint": "female",
+      "direct": 99.3,
+      "standard": 99.8,
+      "z": -1.6704293705652524
+    },
+    {
+      "variant": "base_model_control",
+      "checkpoint": "male",
+      "direct": 7.2,
+      "standard": 2.2,
+      "z": 5.28274475154934
+    },
+    {
+      "variant": "base_model_control",
+      "checkpoint": "female",
+      "direct": 93.5,
+      "standard": 97.9,
+      "z": -4.850064139766629
+    }
+  ],
+  "net_contribution": {
+    "direct": 18.199999999999996,
+    "standard": 6.749999999999993
+  }
+}
