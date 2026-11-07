@@ -81,7 +81,7 @@ make figures-sheet     # contact sheets (colour and grey) of figures/post
   `non_pronoun_position_gap.py`; until those have been run on a GPU it stops with the command that makes them, and
   `make figures` continues without it.
 
-styles-plot v0.1.6 features used here: `Distribution(control=...)` (grey strips named in the key), `Sweep(hrules=...)`
+styles-plot v0.1.7 features used here: `Distribution(control=...)` (grey strips named in the key), `Sweep(hrules=...)`
 (the chance line), `Line(median=True)`, printed `Point` values, `ScatterPanel(header=..., numbers=...)` (PCA variance
 shares). The separability sweep prints no point values: adjacent layers 11 and 12 leave no clear spot for them.
 
