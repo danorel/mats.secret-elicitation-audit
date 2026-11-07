@@ -1,0 +1,115 @@
+{
+ "styles_plot": "0.1.3",
+ "vocab": {
+  "project": "esk-audit",
+  "sha256": "7f02de205bfab365448b73a87438d5463b07d95a0b294e3485deeaa2ab098d04"
+ },
+ "registry": {
+  "path": "figures/status.csv",
+  "sha256": "bfe580c517bc52390d3e8f13842df11b3b0b0d1bfef405661ce2f2dfe3f7908c"
+ },
+ "figure": "reproduction_direct",
+ "target": "post",
+ "mode": "strict",
+ "publishable": true,
+ "png": {
+  "sha256": "0e18e80c6c738d7d64d7bcf74aed8740724558f9dcbf9ee022d2f7ce11db34b8",
+  "dpi": 200
+ },
+ "roles": [
+  "method"
+ ],
+ "controls": [
+  "the paper's baselines"
+ ],
+ "cells": {
+  "direct.gender_direction": {
+   "timing": "post_hoc",
+   "claim": "claimed"
+  },
+  "direct.io": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "direct.logit_lens": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "direct.residual_tokens": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "direct.sae_feature_descriptions": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "direct.sae_tokens": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  }
+ },
+ "marks": [
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "direct.io",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "direct.logit_lens",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "direct.residual_tokens",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "direct.sae_feature_descriptions",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "direct.sae_tokens",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "method",
+   "cell": "direct.gender_direction",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  }
+ ],
+ "key": [
+  "grey: the paper's baselines",
+  "whiskers: ± 1 SEM (bootstrap)",
+  "○ post hoc"
+ ],
+ "numbers": {
+  "direct.io.avg": "50",
+  "direct.logit_lens.avg": "64",
+  "direct.residual_tokens.avg": "60",
+  "direct.sae_feature_descriptions.avg": "88",
+  "direct.sae_tokens.avg": "63",
+  "direct.gender_direction.avg": "69"
+ },
+ "problems": []
+}

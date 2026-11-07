@@ -89,7 +89,7 @@ def main():
     parser.add_argument("--layers", type=str, default="9-21")
     parser.add_argument("--results_root", type=str, default="user_gender")
     parser.add_argument("--limit", type=int, default=1000, help="Items per gender")
-    parser.add_argument("--output_json", type=str, default="user_gender/plots/gender_word_rank_sweep.json")
+    parser.add_argument("--output_json", type=str, default="results/user_gender/gender_word_rank_sweep.json")
     args = parser.parse_args()
 
     load_dotenv()

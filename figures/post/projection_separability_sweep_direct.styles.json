@@ -1,0 +1,67 @@
+{
+ "styles_plot": "0.1.3",
+ "vocab": {
+  "project": "esk-audit",
+  "sha256": "7f02de205bfab365448b73a87438d5463b07d95a0b294e3485deeaa2ab098d04"
+ },
+ "registry": {
+  "path": "figures/status.csv",
+  "sha256": "bfe580c517bc52390d3e8f13842df11b3b0b0d1bfef405661ce2f2dfe3f7908c"
+ },
+ "figure": "projection_separability_sweep_direct",
+ "target": "post",
+ "mode": "strict",
+ "publishable": true,
+ "png": {
+  "sha256": "5d97ed9c7f3f423bb0050bddd73d315ec9d148f2da5dd67788440eb46e3bda68",
+  "dpi": 200
+ },
+ "roles": [
+  "readout"
+ ],
+ "controls": [],
+ "cells": {
+  "best.direct": {
+   "timing": "post_hoc",
+   "claim": "claimed"
+  },
+  "l11.direct": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "line.direct": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  }
+ },
+ "marks": [
+  {
+   "kind": "line",
+   "role": "readout",
+   "cell": "line.direct",
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  {
+   "kind": "dot",
+   "role": "readout",
+   "cell": "l11.direct",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "readout",
+   "cell": "best.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  }
+ ],
+ "key": [
+  "○ post hoc"
+ ],
+ "numbers": {},
+ "problems": []
+}

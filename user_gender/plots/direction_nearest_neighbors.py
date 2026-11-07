@@ -57,7 +57,7 @@ def main():
                          default="user_gender/inputs/gender_direction/random_control/direction_random_control_layer{layer}.npy")
     parser.add_argument("--control_direction_files", type=str, nargs="*", default=[],
                          help="Extra (label=path) pairs, e.g. sentiment=user_gender/inputs/.../direction_contrastive_layer11.npy")
-    parser.add_argument("--mean_delta_dir", type=str, default="user_gender/plots/mean_delta_vectors")
+    parser.add_argument("--mean_delta_dir", type=str, default="results/user_gender/mean_delta_vectors")
     parser.add_argument("--prompt_set", type=str, default="direct")
     parser.add_argument("--output_json", type=str, default=None)
     args = parser.parse_args()
@@ -98,7 +98,7 @@ def main():
         for row in neg:
             print(f"  {row['cosine']:+.4f}  {row['token']!r}")
 
-    out = args.output_json or os.path.join("user_gender", "plots", f"direction_nearest_neighbors_layer{args.layer}.json")
+    out = args.output_json or os.path.join("results", "user_gender", f"direction_nearest_neighbors_layer{args.layer}.json")
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)

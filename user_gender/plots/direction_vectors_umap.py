@@ -7,6 +7,8 @@ vectors of 3584 dims each), projects to 2D. No GPU - vectors are already on disk
 
 Question: do real contrastive directions form a coherent trajectory across layers and
 separate from random-vector controls, or do both variants look alike here?
+
+Writes JSON only; direction_vectors_umap_chart.py draws it (no umap/sklearn needed there).
 """
 import argparse
 import glob
@@ -37,9 +39,7 @@ def main():
     parser.add_argument("--min_dist", type=float, default=0.3)
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--output_json", type=str,
-                         default="user_gender/plots/direction_vectors_umap.json")
-    parser.add_argument("--output_png", type=str,
-                         default="user_gender/plots/direction_vectors_umap.png")
+                         default="results/user_gender/direction_vectors_umap.json")
     args = parser.parse_args()
 
     vectors, meta = load_vectors(args.inputs_dir)
@@ -68,32 +68,7 @@ def main():
         json.dump({"points": points, "pca_explained_variance_ratio": pca.explained_variance_ratio_.tolist()}, f, indent=2)
     print(f"Wrote {args.output_json}")
 
-    try:
-        import matplotlib.pyplot as plt
-        fig, axes = plt.subplots(1, 2, figsize=(13, 5.5))
-        for ax, xkey, ykey, title in [
-            (axes[0], "umap_x", "umap_y", "UMAP"),
-            (axes[1], "pca_x", "pca_y", f"PCA (PC1 {pca.explained_variance_ratio_[0]:.0%}, PC2 {pca.explained_variance_ratio_[1]:.0%})"),
-        ]:
-            for variant, color, marker in [("contrastive", "#c2185b", "o"), ("random_control", "#9e9e9e", "x")]:
-                pts = [p for p in points if p["variant"] == variant]
-                ax.scatter([p[xkey] for p in pts], [p[ykey] for p in pts],
-                           c=color, marker=marker, s=60, label=variant, alpha=0.85)
-                if variant == "contrastive":
-                    order = sorted(pts, key=lambda p: p["layer"])
-                    ax.plot([p[xkey] for p in order], [p[ykey] for p in order],
-                            color=color, alpha=0.3, linewidth=1, zorder=0)
-                    for p in pts:
-                        ax.annotate(str(p["layer"]), (p[xkey], p[ykey]), fontsize=7,
-                                    xytext=(3, 3), textcoords="offset points")
-            ax.set_title(title)
-            ax.legend()
-        fig.suptitle("Gender Direction vectors (unit-normalized), layers 10-25: contrastive vs. random_control")
-        fig.tight_layout()
-        fig.savefig(args.output_png, dpi=150)
-        print(f"Wrote {args.output_png}")
-    except ImportError:
-        print("matplotlib not available, skipping PNG")
+    print("Figure: python3 user_gender/plots/direction_vectors_umap_chart.py")
 
 
 if __name__ == "__main__":

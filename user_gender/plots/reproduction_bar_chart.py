@@ -2,8 +2,9 @@
 """Reproduction bar chart: gender_direction vs. the paper's own baselines.
 
 Reads audit metrics directly (no GPU) for every method's `direct`-set result, both
-checkpoints, plots the balanced average as a sorted horizontal bar chart with error
-bars - the visual form of METRICS.md's Direct Secret-keeping model table.
+checkpoints, and draws the balanced average as a styles-plot dot table (methods in the
+vocabulary's fixed order, ± SEM whiskers, chance at 50) - the visual form of METRICS.md's
+Direct Secret-keeping model table. Figure: figures/post/reproduction_{prompt_set}.png.
 
 Error bars: raw-item bootstrap over combined female+male per-item `success` flags -
 matches METRICS.md's own convention (closer to the paper's published stderr than
@@ -49,16 +50,42 @@ def bootstrap_sem(f_metrics, m_metrics, n_boot=10000, seed=1):
     return boot_means.std() * 100
 
 
+def draw(rows_by_key, prompt_set, out_dir):
+    """Methods as rows (vocabulary order), one accuracy column: dots with ± SEM whiskers and printed values, the
+    gender direction in its role colour, the paper's baselines grey, a chance rule at 50."""
+    import styles_plot as sp
+    from figstyle import save, vocab
+
+    v = vocab()
+    order = [e.key for e in v.entities("methods") if e.key in rows_by_key]
+
+    def est(key):
+        r = rows_by_key[key]
+        return sp.Est(r["avg"], r["avg"] - r["sem"], r["avg"] + r["sem"], interval="sem",
+                      cell=f"{prompt_set}.{key}", key=f"{prompt_set}.{key}.avg", label=True)
+
+    base = [k for k in order if k != "gender_direction"]
+    col = sp.DotColumn(
+        "auditor accuracy", "accuracy", (40, 100), (50, 75, 100),
+        series=[sp.Series("method", {"gender_direction": est("gender_direction")}),
+                sp.Series("control", {k: est(k) for k in base}, control="the paper's baselines")],
+        rules=[sp.Rule(50, "chance")],
+    )
+    fig = sp.Figure(f"reproduction_{prompt_set}", v).add(sp.DotTable(order, [col], kind="methods"))
+    return save(fig, out_dir)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--results_root", type=str, default="user_gender")
     parser.add_argument("--prompt_set", type=str, default="direct", choices=["direct", "standard"])
-    parser.add_argument("--layer", type=int, default=11)
-    parser.add_argument("--output_json", type=str, default="user_gender/plots/reproduction_bar_chart.json")
-    parser.add_argument("--output_png", type=str, default="user_gender/plots/reproduction_bar_chart.png")
+    parser.add_argument("--output_json", type=str, default=None,
+                        help="Default: results/user_gender/reproduction_bar_chart_{prompt_set}.json")
+    parser.add_argument("--out_dir", type=str, default=None, help="Default: figures/ at the repo root")
     args = parser.parse_args()
+    output_json = args.output_json or f"results/user_gender/reproduction_bar_chart_{args.prompt_set}.json"
 
-    rows = []
+    rows, rows_by_key = [], {}
     for key, (a, b, c, label) in BASELINE_METHODS.items():
         try:
             f_metrics = load_metrics(args.results_root, "female", args.prompt_set, (a, b, c))
@@ -71,46 +98,28 @@ def main():
         sem = bootstrap_sem(f_metrics, m_metrics)
         rows.append({"label": label, "female": f_acc, "male": m_acc, "avg": (f_acc + m_acc) / 2,
                      "sem": sem, "ours": False})
+        rows_by_key[key] = rows[-1]
 
     f_metrics = load_metrics(args.results_root, "female", args.prompt_set, ("final", "gender_direction", "audit", "layer11_finetuned_model"))
     m_metrics = load_metrics(args.results_root, "male", args.prompt_set, ("final", "gender_direction", "audit", "layer11_finetuned_model"))
     f_acc = f_metrics["metrics"]["mean_accuracy"] * 100
     m_acc = m_metrics["metrics"]["mean_accuracy"] * 100
     sem = bootstrap_sem(f_metrics, m_metrics)
-    rows.append({"label": f"Gender Direction (L{args.layer})", "female": f_acc, "male": m_acc,
+    rows.append({"label": "Gender Direction (L11)", "female": f_acc, "male": m_acc,
                  "avg": (f_acc + m_acc) / 2, "sem": sem, "ours": True})
+    rows_by_key["gender_direction"] = rows[-1]
 
     rows.sort(key=lambda r: r["avg"])
     for r in rows:
         print(f"{r['label']:22s} female={r['female']:6.2f}  male={r['male']:6.2f}  "
               f"avg={r['avg']:6.2f} +/- {r['sem']:.2f}")
 
-    os.makedirs(os.path.dirname(args.output_json), exist_ok=True)
-    with open(args.output_json, "w", encoding="utf-8") as f:
+    os.makedirs(os.path.dirname(output_json), exist_ok=True)
+    with open(output_json, "w", encoding="utf-8") as f:
         json.dump(rows, f, indent=2)
-    print(f"Wrote {args.output_json}")
+    print(f"Wrote {output_json}")
 
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    fig, ax = plt.subplots(figsize=(8, 5))
-    labels = [r["label"] for r in rows]
-    avgs = [r["avg"] for r in rows]
-    sems = [r["sem"] for r in rows]
-    colors = ["#c2185b" if r["ours"] else "#90a4ae" for r in rows]
-    bars = ax.barh(labels, avgs, xerr=sems, color=colors, capsize=4,
-                    error_kw={"ecolor": "0.3", "elinewidth": 1.2})
-    for bar, val, sem in zip(bars, avgs, sems):
-        ax.text(val + sem + 1.5, bar.get_y() + bar.get_height() / 2, f"{val:.1f}%", va="center", fontsize=9)
-    ax.axvline(50, color="0.6", linestyle="--", linewidth=1, label="chance")
-    ax.set_xlabel("average auditor accuracy (%), ± bootstrap SEM")
-    ax.set_xlim(0, 108)
-    ax.set_title(f"{args.prompt_set.capitalize()} set: our method vs. the paper's own baselines")
-    ax.legend(loc="lower right")
-    fig.tight_layout()
-    fig.savefig(args.output_png, dpi=150)
-    print(f"Wrote {args.output_png}")
+    draw(rows_by_key, args.prompt_set, args.out_dir)
 
 
 if __name__ == "__main__":

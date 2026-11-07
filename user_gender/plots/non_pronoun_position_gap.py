@@ -142,7 +142,7 @@ def main():
               f"  (n_f={len(f_vals)}, n_m={len(m_vals)})")
 
     out = args.output_json or os.path.join(
-        "user_gender", "plots", f"non_pronoun_position_gap_layer{args.layer}_{args.prompt_set}.json")
+        "results", "user_gender", f"non_pronoun_position_gap_layer{args.layer}_{args.prompt_set}.json")
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)

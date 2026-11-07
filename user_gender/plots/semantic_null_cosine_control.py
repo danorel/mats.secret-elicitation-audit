@@ -24,7 +24,7 @@ This script:
 
 Needs a GPU only for step 1 (base model, one load, ~35 pairs x 4 axes - a few minutes).
 Step 2-3 are pure numpy. Run finetuning_delta_diagnostic.py --layer 11 --prompt_set direct
-first if the mean_delta npy files under user_gender/plots/mean_delta_vectors/ don't exist.
+first if the mean_delta npy files under results/user_gender/mean_delta_vectors/ don't exist.
 
 Usage:
     python3 user_gender/plots/semantic_null_cosine_control.py --layer 11
@@ -72,7 +72,7 @@ def main():
                          default="user_gender/inputs/gender_direction/contrastive/direction_contrastive_layer{layer}.npy")
     parser.add_argument("--random_control_file", type=str,
                          default="user_gender/inputs/gender_direction/random_control/direction_random_control_layer{layer}.npy")
-    parser.add_argument("--mean_delta_dir", type=str, default="user_gender/plots/mean_delta_vectors")
+    parser.add_argument("--mean_delta_dir", type=str, default="results/user_gender/mean_delta_vectors")
     parser.add_argument("--output_json", type=str, default=None)
     args = parser.parse_args()
 
@@ -124,7 +124,7 @@ def main():
         "semantic_null_min": float(vals.min()), "semantic_null_max": float(vals.max()),
     }
     out = args.output_json or os.path.join(
-        "user_gender", "plots", f"semantic_null_cosine_control_layer{args.layer}_{args.prompt_set}.json")
+        "results", "user_gender", f"semantic_null_cosine_control_layer{args.layer}_{args.prompt_set}.json")
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)

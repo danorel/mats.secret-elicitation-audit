@@ -5,8 +5,8 @@ No GPU: reads gender_direction.py's (--mode apply) output JSONs directly and bin
 variant's (contrastive / random_control / base_model_control) `mean_projection` by true
 gender - the raw signal a downstream decode has to work with.
 
-Writes histogram-ready JSON (edges + per-variant/per-gender counts) and optionally a
-static PNG (violin plots).
+Writes histogram-ready JSON (edges + per-variant/per-gender counts) and a styles-plot
+strip figure (each item a dot, the median a line; violins are not in the grammar).
 """
 import argparse
 import glob
@@ -77,9 +77,8 @@ def main():
     parser.add_argument("--prompt_set", type=str, default="direct", choices=["direct", "standard"])
     parser.add_argument("--n_bins", type=int, default=32)
     parser.add_argument("--output_json", type=str, default=None,
-                         help="Default: user_gender/plots/projection_separability_layer{layer}.json")
-    parser.add_argument("--output_png", type=str, default=None,
-                         help="If set, also render a static matplotlib PNG (violin plots).")
+                         help="Default: results/user_gender/projection_separability_layer{layer}.json")
+    parser.add_argument("--out_dir", type=str, default=None, help="Default: figures/ at the repo root")
     args = parser.parse_args()
 
     raw = {}
@@ -102,55 +101,43 @@ def main():
             vals = raw[variant][gender]
             out["variants"][variant][gender] = {"counts": build_histogram(vals, edges), "n": len(vals)}
 
-    output_json = args.output_json or os.path.join("user_gender", "plots", f"projection_separability_layer{args.layer}.json")
+    output_json = args.output_json or os.path.join("results", "user_gender", f"projection_separability_layer{args.layer}.json")
     os.makedirs(os.path.dirname(output_json), exist_ok=True)
     with open(output_json, "w", encoding="utf-8") as f:
         json.dump(out, f, indent=2)
     print(f"Saved histogram data to {output_json}")
 
-    if args.output_png:
-        plot_png(raw, args.layer, args.output_png, args.prompt_set)
-        print(f"Saved figure to {args.output_png}")
+    draw(raw, args.layer, args.prompt_set, args.out_dir)
 
 
-def plot_png(raw, layer, output_png, prompt_set="direct"):
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
+VARIANT_TERMS = {"contrastive": "contrastive", "random_control": "random control", "base_model_control": "base model"}
+VARIANT_CONTROLS = {"random_control": "a random direction", "base_model_control": "the base model"}
 
-    variants = list(raw.keys())
-    colors = {"female": "#c2185b", "male": "#1565c0"}
 
-    fig, axes = plt.subplots(1, len(variants), figsize=(4.2 * len(variants), 3.6), sharey=True)
-    if len(variants) == 1:
-        axes = [axes]
+def figure_id(layer: int, prompt_set: str, variants) -> str:
+    """The ids keep the old PNG names: *_contrastive_only for the contrastive variant alone."""
+    suffix = "_contrastive_only" if list(variants) == ["contrastive"] else ""
+    return f"projection_separability_layer{layer}_{prompt_set}{suffix}"
 
-    for ax, variant in zip(axes, variants):
-        positions, data, face_colors = [], [], []
-        for i, gender in enumerate(GENDERS):
-            data.append(raw[variant][gender])
-            positions.append(i)
-            face_colors.append(colors[gender])
 
-        parts = ax.violinplot(data, positions=positions, showmedians=True, widths=0.8)
-        for body, color in zip(parts["bodies"], face_colors):
-            body.set_facecolor(color)
-            body.set_alpha(0.55)
-            body.set_edgecolor(color)
-        for key in ("cmedians", "cbars", "cmins", "cmaxes"):
-            parts[key].set_color("0.3")
-            parts[key].set_linewidth(1)
+def draw(raw, layer, prompt_set, out_dir):
+    """One strip block per variant (each prompt a dot, a median line), rows = the two checkpoints, one shared
+    x axis; the contrastive direction in its role colour, the control variants grey."""
+    import styles_plot as sp
+    from figstyle import save, vocab
 
-        ax.axhline(0, color="0.6", linewidth=1, linestyle="--", zorder=0)
-        ax.set_xticks(positions)
-        ax.set_xticklabels(GENDERS)
-        ax.set_title(variant, fontsize=10)
-
-    axes[0].set_ylabel("projection onto gender_direction")
-    fig.suptitle(f"Gender Direction projection by true target gender · layer {layer} · {prompt_set} set", fontsize=11)
-    fig.tight_layout()
-    os.makedirs(os.path.dirname(output_png) or ".", exist_ok=True)
-    fig.savefig(output_png, dpi=150)
+    allv = [x for by_g in raw.values() for vals in by_g.values() for x in vals]
+    lo, hi = min(allv), max(allv)
+    pad = 0.05 * (hi - lo)
+    xlim = (lo - pad, hi + pad)
+    fig = sp.Figure(figure_id(layer, prompt_set, raw), vocab())
+    for variant, by_gender in raw.items():
+        col = VARIANT_TERMS[variant]
+        role = "method" if variant == "contrastive" else "control"
+        fig.add(sp.Distribution(GENDERS, "projection", {(g, col): by_gender[g] for g in GENDERS}, role=role,
+                                kind="checkpoints", style="strip", median=True, columns=[col], xlim=xlim, panel_h=0.55,
+                                cells={(g, col): f"dist.{variant}.{g}" for g in GENDERS}))
+    return save(fig, out_dir)
 
 
 if __name__ == "__main__":

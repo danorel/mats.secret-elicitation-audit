@@ -197,7 +197,7 @@ def main():
         "target_layers": args.target_layers, "timestamp": datetime.now().isoformat(),
         "rows": rows,
     }
-    out = args.output_json or "user_gender/plots/patchscope_attribute_extraction.json"
+    out = args.output_json or "results/user_gender/patchscope_attribute_extraction.json"
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)

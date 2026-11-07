@@ -16,6 +16,17 @@
 ├── training/                # Training scripts
 ```
 
+This fork (`danorel/mats.esk-audit`, results dataset: [danorel/mats.esk-audit](https://huggingface.co/datasets/danorel/mats.esk-audit))
+adds:
+
+```
+├── figures/post/            # every figure, drawn with styles-plot (tracked); figures/status.csv is its status registry
+├── plotstyle.toml           # styles-plot vocabulary: roles, controls, units, entities
+├── results/user_gender/     # the numbers the figures read (gitignored; restored from the HF dataset)
+├── user_gender/plots/       # the scripts: compute (some need a GPU) and *_chart.py drawing (no GPU)
+├── Makefile                 # make figures | make figures-check | make autonomy HOURS=… (see make help)
+```
+
 ## Setup
 
 ```bash

@@ -9,6 +9,8 @@ alone. Complements `gender_word_rank_sweep.py` (decode-proximity, a different qu
 Needs a GPU (loads both fine-tuned models) and existing direction vectors under
 user_gender/inputs/gender_direction/contrastive/ (run_get_gender_direction.sh).
 
+Writes JSON only; projection_separability_sweep_chart.py draws it (no GPU).
+
 Usage:
     python3 user_gender/plots/projection_separability_sweep.py --layers 10-25 --limit 1000
 """
@@ -76,32 +78,6 @@ def project_item(model, tokenizer, user_prompt, model_response, layers):
     return layer_reps
 
 
-def plot_png(accuracy_by_layer, layers, output_png, prompt_set, n_total):
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
-
-    best_layer = max(accuracy_by_layer, key=lambda l: accuracy_by_layer[l])
-
-    fig, ax = plt.subplots(figsize=(9, 5.5))
-    accs = [accuracy_by_layer[l] * 100 for l in layers]
-    ax.plot(layers, accs, marker="o", color="#c2185b", linewidth=2)
-    ax.axhline(50, color="0.6", linestyle="--", linewidth=1, label="chance (50%)")
-    if 11 in layers:
-        ax.axvline(11, color="gray", linestyle=":", linewidth=1,
-                   label="layer 11 (chosen for the full auditor pipeline)")
-    if best_layer != 11:
-        ax.axvline(best_layer, color="#1565c0", linestyle=":", linewidth=1,
-                   label=f"layer {best_layer} (best raw separability, {accuracy_by_layer[best_layer]*100:.2f}%)")
-    ax.set_xlabel("layer")
-    ax.set_ylabel("sign-threshold classification accuracy (%)")
-    ax.set_ylim(40, 102)
-    ax.set_title(f"Raw projection-sign separability vs. layer ({prompt_set} set, n={n_total})")
-    ax.legend(loc="lower right", fontsize=8)
-    fig.tight_layout()
-    fig.savefig(output_png, dpi=150)
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--layers", type=str, default="10-25", help="e.g. '10-25' or '10,15,20'")
@@ -111,18 +87,13 @@ def main():
     parser.add_argument("--prompt_set", type=str, default="direct", choices=["direct", "standard"],
                          help="Which inference rollouts to project (default: direct, matching prior sweeps).")
     parser.add_argument("--output_json", type=str, default=None,
-                         help="Default: user_gender/plots/projection_separability_sweep_{prompt_set}.json "
-                              "(direct keeps the legacy unsuffixed name for backward compatibility).")
-    parser.add_argument("--output_png", type=str, default=None,
-                         help="Default: user_gender/plots/projection_separability_sweep_{prompt_set}.png "
+                         help="Default: results/user_gender/projection_separability_sweep_{prompt_set}.json "
                               "(direct keeps the legacy unsuffixed name for backward compatibility).")
     args = parser.parse_args()
 
     suffix = "" if args.prompt_set == "direct" else f"_{args.prompt_set}"
     if args.output_json is None:
-        args.output_json = f"user_gender/plots/projection_separability_sweep{suffix}.json"
-    if args.output_png is None:
-        args.output_png = f"user_gender/plots/projection_separability_sweep{suffix}.png"
+        args.output_json = f"results/user_gender/projection_separability_sweep{suffix}.json"
 
     load_dotenv()
     layers = parse_layers(args.layers)
@@ -172,10 +143,7 @@ def main():
     with open(args.output_json, "w", encoding="utf-8") as f:
         json.dump(out, f, indent=2)
     print(f"Wrote {args.output_json}")
-
-    if args.output_png:
-        plot_png(accuracy_by_layer, layers, args.output_png, args.prompt_set, sum(total_by_layer.values()) // len(layers))
-        print(f"Wrote {args.output_png}")
+    print("Figure: python3 user_gender/plots/projection_separability_sweep_chart.py")
 
 
 if __name__ == "__main__":

@@ -171,7 +171,7 @@ def main():
     mm = np.array(report["per_checkpoint"]["male"].pop("_mean_delta"))
     fm = np.array(report["per_checkpoint"]["female"].pop("_mean_delta"))
     between = float(np.linalg.norm(fm - mm))
-    mean_delta_dir = os.path.join("user_gender", "plots", "mean_delta_vectors")
+    mean_delta_dir = os.path.join("results", "user_gender", "mean_delta_vectors")
     os.makedirs(mean_delta_dir, exist_ok=True)
     np.save(os.path.join(mean_delta_dir, f"mean_delta_female_layer{args.layer}_{args.prompt_set}.npy"), fm)
     np.save(os.path.join(mean_delta_dir, f"mean_delta_male_layer{args.layer}_{args.prompt_set}.npy"), mm)
@@ -229,7 +229,7 @@ def main():
           f"{g['cos_per_prompt_max']:+.4f}]")
 
     out = args.output_json or os.path.join(
-        "user_gender", "plots", f"finetuning_delta_diagnostic_layer{args.layer}_{args.prompt_set}.json")
+        "results", "user_gender", f"finetuning_delta_diagnostic_layer{args.layer}_{args.prompt_set}.json")
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)

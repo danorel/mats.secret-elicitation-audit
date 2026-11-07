@@ -1,0 +1,88 @@
+{
+ "styles_plot": "0.1.3",
+ "vocab": {
+  "project": "esk-audit",
+  "sha256": "7f02de205bfab365448b73a87438d5463b07d95a0b294e3485deeaa2ab098d04"
+ },
+ "registry": {
+  "path": "figures/status.csv",
+  "sha256": "bfe580c517bc52390d3e8f13842df11b3b0b0d1bfef405661ce2f2dfe3f7908c"
+ },
+ "figure": "separability_vs_accuracy",
+ "target": "post",
+ "mode": "strict",
+ "publishable": true,
+ "png": {
+  "sha256": "1e595f445607cac99ee9994da60f1b1a2d071f3e9bc7797763b033d495e5d2bc",
+  "dpi": 200
+ },
+ "roles": [
+  "method",
+  "readout"
+ ],
+ "controls": [],
+ "cells": {
+  "acc.direct": {
+   "timing": "post_hoc",
+   "claim": "claimed"
+  },
+  "acc.standard": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "sep.direct": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "sep.standard": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  }
+ },
+ "marks": [
+  {
+   "kind": "dot",
+   "role": "readout",
+   "cell": "sep.direct",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "readout",
+   "cell": "sep.standard",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "method",
+   "cell": "acc.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "dot",
+   "role": "method",
+   "cell": "acc.standard",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  }
+ ],
+ "key": [
+  "○ post hoc"
+ ],
+ "numbers": {
+  "projection_gap.layer11.direct": "29.03",
+  "projection_gap.layer11.standard": "28.83",
+  "separability.layer11.direct": "98.99",
+  "separability.layer11.standard": "100.00",
+  "decoded_accuracy.layer11.direct": "68",
+  "decoded_accuracy.layer11.standard": "57"
+ },
+ "problems": []
+}

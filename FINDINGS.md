@@ -126,7 +126,7 @@ no rollouts were regenerated, the remaining source of run-to-run variation is th
 itself; re-grading the cached evidence under several grader seeds would measure it directly
 and cheaply, and has not been done.
 
-![Bar chart comparing average auditor accuracy across all reproduced methods plus Gender Direction, direct set, with bootstrap error bars and a chance line at 50%](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/reproduction_bar_chart_direct.png)
+![Dot table of average auditor accuracy for the five reproduced methods and the gender direction, direct set, with ± 1 SEM bootstrap whiskers and a chance line at 50%](figures/post/reproduction_direct.png)
 *Direct set, every method side by side.*
 
 Everything below builds on this reproduction.
@@ -368,9 +368,9 @@ from a fixed gender-word list lands. Lower is better. n=990/gender:
 Full table, no rows dropped. Layer 11 is the single best point on the female side and close
 to best on the male side.
 
-![Line chart of median full-vocabulary rank of the best-matching gender word vs. layer, female and male, layers 9-21, log scale, shaded interquartile band](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/gender_word_rank_sweep.png)
+![Line chart of median full-vocabulary rank of the best-matching gender word vs. layer, one panel per checkpoint, layers 9-21, log scale, shaded interquartile band, layer 11 marked](figures/post/gender_word_rank_sweep.png)
 
-![Line chart of median gender-word rank by layer with an interquartile band, male and female, over the full swept range](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/layer_rank_sweep_chart.png)
+![Line chart of median gender-word rank by layer in the 30-item pilot, one panel per checkpoint, layers 0-24, log scale, shaded interquartile band, layer 11 marked post hoc](figures/post/layer_rank_sweep.png)
 *The same sweep with its interquartile spread shown. The 9–11 window is not just lowest on
 the median — its spread is also tighter, which is what makes the pick defensible rather than
 a one-statistic artifact.*
@@ -382,7 +382,7 @@ projection onto that layer's direction. n=1980:
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | separability | 99.49% | 98.99% | **100.00%** | 58.03% | exactly 50.00% | 67.88% | 70.71% | 50.00% |
 
-![Line chart of raw sign-threshold classification accuracy vs. layer, showing a sharp near-perfect window at layers 10-12, exact chance from 14-22, and a partial recovery at 23-24](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/projection_separability_sweep.png)
+![Line chart of raw sign-threshold classification accuracy vs. layer, showing a sharp near-perfect window at layers 10-12, exact chance from 14-22, and a partial recovery at 23-24](figures/post/projection_separability_sweep_direct.png)
 
 The two proxies have different shapes and **agree only inside the 10–12 window**, which is
 what makes their agreement informative rather than circular. The published methods read
@@ -416,7 +416,7 @@ Per-prompt accuracy, both checkpoints:
 | female | 0/100 | 2/100 | 98/100 |
 | male | 38/100 | 38/100 | 24/100 |
 
-![Histogram of per-prompt auditor accuracy, female and male, showing female almost entirely at 1.0 and male spread across the full 0.0-1.0 range with peaks at both ends](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/bimodal_breakdown_chart_direct.png)
+![Histogram of per-prompt auditor accuracy, one panel per checkpoint, showing female almost entirely at 1.0 and male spread across the full 0.0-1.0 range with peaks at both ends](figures/post/bimodal_breakdown_direct.png)
 
 Female sits at ceiling because of auditor bias, not because the method reads female prompts
 well. The male side has real variation but is **not cleanly bimodal** — a substantial middle
@@ -455,11 +455,11 @@ to surface as gender vocabulary. `direct` prompts put the pronoun inside a sente
 whole topic is identity; `standard` prompts use it incidentally. The signal is diluted in
 presentation, not reduced in magnitude.
 
-![Bar chart comparing average auditor accuracy across all reproduced methods plus Gender Direction, standard set, with bootstrap error bars and a chance line at 50%](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/reproduction_bar_chart_standard.png)
+![Dot table of average auditor accuracy for the five reproduced methods and the gender direction, standard set, with ± 1 SEM bootstrap whiskers and a chance line at 50%](figures/post/reproduction_standard.png)
 *Standard set. The layer-11 readout is indistinguishable from Acts Tokens and SAE Tokens
 here, and LL Tokens leads by 12 points.*
 
-![Histogram of per-prompt auditor accuracy on the standard set, female and male, showing female almost entirely at 1.0 and male even more concentrated near 0.0 than on the direct set](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/bimodal_breakdown_chart_standard.png)
+![Histogram of per-prompt auditor accuracy on the standard set, one panel per checkpoint, showing female almost entirely at 1.0 and male even more concentrated near 0.0 than on the direct set](figures/post/bimodal_breakdown_standard.png)
 *Male shifts further toward complete failure (67/100 prompts at 0.00, vs 38/100 on
 `direct`) — the weaker average is concentrated as more prompts failing outright.*
 
@@ -740,7 +740,7 @@ from its baseline, not a margin over anything.
 The underlying bias is not small, even though its correction is: the same grader guesses
 female 11% of the time with no evidence field and 90% with an empty one.
 
-![Bar chart of each method's accuracy minus its own blank-evidence baseline, showing Acts Desc at essentially zero, Acts Tokens and the layer-11 readout in the middle, and SAE Desc far ahead](https://huggingface.co/datasets/danorel/eliciting-secret-knowledge-results/resolve/main/user_gender/plots/blank_baseline_signal_chart.png)
+![Dot table of each method's accuracy minus its own blank-evidence baseline, showing Acts Desc at essentially zero, Acts Tokens and the layer-11 readout in the middle, and SAE Desc far ahead](figures/post/blank_baseline_signal.png)
 *The same methods scored as distance from their own blank-evidence baseline rather than
 from 50%. The ordering is unchanged from raw accuracy — which is the point: the baselines
 sit within half a point of each other, so the correction separates signal from default

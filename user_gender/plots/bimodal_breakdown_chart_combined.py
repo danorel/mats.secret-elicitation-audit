@@ -1,59 +1,48 @@
 #!/usr/bin/env python3
-"""Per-prompt auditor accuracy, direct (left pair) and standard (right pair), side by side.
+"""Per-prompt auditor accuracy, direct and standard set side by side, per checkpoint.
 
 No GPU: reads the already-saved per-prompt accuracy arrays
 (bimodal_breakdown_direct.json, bimodal_breakdown_standard.json - both produced by
-bimodal_breakdown_chart.py --prompt_set {direct,standard}). Four panels sharing one y-axis:
-female-direct, male-direct, female-standard, male-standard.
+bimodal_breakdown_chart.py --prompt_set {direct,standard}). A styles-plot histogram grid:
+rows = the two checkpoints, columns = the two prompt sets, one shared count axis.
 
 Usage:
     python3 user_gender/plots/bimodal_breakdown_chart_combined.py
 """
 import argparse
 import json
+import os
+import sys
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from bimodal_breakdown_chart import BINS, GENDERS  # noqa: E402
+
+COLUMNS = {"direct": "direct set", "standard": "standard set"}
 
 
-def plot_png(direct_json, standard_json, output_png):
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
+def draw(data, out_dir):
+    import styles_plot as sp
+    from figstyle import save, vocab
 
-    with open(direct_json, "r", encoding="utf-8") as f:
-        direct = json.load(f)
-    with open(standard_json, "r", encoding="utf-8") as f:
-        standard = json.load(f)
-
-    colors = {"female": "#c2185b", "male": "#1565c0"}
-    bins = [i / 10 for i in range(11)]
-    panels = [("direct", "female"), ("direct", "male"), ("standard", "female"), ("standard", "male")]
-    data = {"direct": direct, "standard": standard}
-
-    fig, axes = plt.subplots(1, 4, figsize=(16, 4.2), sharey=True)
-    for ax, (prompt_set, gender) in zip(axes, panels):
-        vals = data[prompt_set][gender]
-        ax.hist(vals, bins=bins, color=colors[gender], edgecolor="white")
-        n_zero = sum(1 for v in vals if v == 0.0)
-        ax.set_title(f"{prompt_set} · {gender}\n(n={len(vals)}, {n_zero} at 0.0)", fontsize=10)
-        ax.set_xlabel("per-prompt auditor accuracy")
-        ax.set_xlim(-0.02, 1.02)
-    axes[0].set_ylabel("number of unique prompts")
-
-    for i in (1, 2):
-        axes[i].spines["left"].set_alpha(0.3)
-
-    fig.tight_layout()
-    fig.savefig(output_png, dpi=150)
+    values = {(g, COLUMNS[p]): data[p][g] for p in COLUMNS for g in GENDERS}
+    cells = {(g, COLUMNS[p]): f"dist.{g}.{p}" for p in COLUMNS for g in GENDERS}
+    d = sp.Distribution(GENDERS, "prompt_accuracy", values, role="method", kind="checkpoints",
+                        columns=list(COLUMNS.values()), cells=cells, count_unit="prompts", bins=BINS, xlim=(0, 1),
+                        xticks=[0, 0.5, 1])
+    return save(sp.Figure("bimodal_breakdown_combined", vocab()).add(d), out_dir)
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--direct_json", type=str, default="user_gender/plots/bimodal_breakdown_direct.json")
-    parser.add_argument("--standard_json", type=str, default="user_gender/plots/bimodal_breakdown_standard.json")
-    parser.add_argument("--output_png", type=str,
-                         default="user_gender/plots/bimodal_breakdown_chart_combined.png")
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--direct_json", type=str, default="results/user_gender/bimodal_breakdown_direct.json")
+    parser.add_argument("--standard_json", type=str, default="results/user_gender/bimodal_breakdown_standard.json")
+    parser.add_argument("--out_dir", type=str, default=None, help="Default: figures/ at the repo root")
     args = parser.parse_args()
-    plot_png(args.direct_json, args.standard_json, args.output_png)
-    print(f"Wrote {args.output_png}")
+    data = {}
+    for prompt_set, path in (("direct", args.direct_json), ("standard", args.standard_json)):
+        with open(path, "r", encoding="utf-8") as f:
+            data[prompt_set] = json.load(f)
+    draw(data, args.out_dir)
 
 
 if __name__ == "__main__":

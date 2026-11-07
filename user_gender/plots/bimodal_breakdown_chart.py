@@ -4,8 +4,9 @@
 The 68.55% average hides structure: pronoun positions live in the prompt, not the
 response, so the 10 sampled responses per prompt aren't independent - the true unit is
 the unique prompt. Groups guesses by (unique_prompt, checkpoint), computes each unit's
-own accuracy, plots the distribution - female at ceiling, male bimodal (most phrasings
-fail completely, a minority succeed completely), not a smooth spread.
+own accuracy, draws the distribution as a styles-plot histogram per checkpoint - female
+at ceiling, male bimodal (most phrasings fail completely, a minority succeed completely),
+not a smooth spread.
 
 No GPU - reads the saved guessing JSON directly.
 """
@@ -40,9 +41,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--results_root", type=str, default="user_gender")
     parser.add_argument("--prompt_set", type=str, default="direct", choices=["direct", "standard"])
-    parser.add_argument("--output_json", type=str, default="user_gender/plots/bimodal_breakdown.json")
-    parser.add_argument("--output_png", type=str, default="user_gender/plots/bimodal_breakdown_chart.png")
+    parser.add_argument("--output_json", type=str, default=None,
+                        help="Default: results/user_gender/bimodal_breakdown_{prompt_set}.json")
+    parser.add_argument("--out_dir", type=str, default=None, help="Default: figures/ at the repo root")
     args = parser.parse_args()
+    args.output_json = args.output_json or f"results/user_gender/bimodal_breakdown_{args.prompt_set}.json"
 
     per_gender = {}
     for gender in GENDERS:
@@ -58,23 +61,21 @@ def main():
         json.dump(per_gender, f, indent=2)
     print(f"Wrote {args.output_json}")
 
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
+    draw(per_gender, args.prompt_set, args.out_dir)
 
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4.5), sharey=True)
-    colors = {"female": "#c2185b", "male": "#1565c0"}
-    bins = [i / 10 for i in range(11)]
-    for ax, gender in zip(axes, GENDERS):
-        ax.hist(per_gender[gender], bins=bins, color=colors[gender], edgecolor="white")
-        ax.set_title(f"{gender} (n={len(per_gender[gender])} unique prompts)")
-        ax.set_xlabel("per-prompt auditor accuracy")
-        ax.set_xlim(-0.02, 1.02)
-    axes[0].set_ylabel("number of unique prompts")
-    fig.suptitle(f"Layer 11, {args.prompt_set} set, broken down by unique prompt - not a smooth average", fontsize=12)
-    fig.tight_layout()
-    fig.savefig(args.output_png, dpi=150)
-    print(f"Wrote {args.output_png}")
+
+BINS = [i / 10 for i in range(11)]
+
+
+def draw(per_gender, prompt_set, out_dir):
+    """Rows = the two checkpoints: a histogram of per-prompt accuracy in tenths."""
+    import styles_plot as sp
+    from figstyle import save, vocab
+
+    d = sp.Distribution(GENDERS, "prompt_accuracy", per_gender, role="method", kind="checkpoints",
+                        cells={g: f"dist.{g}" for g in GENDERS}, count_unit="prompts", bins=BINS, xlim=(0, 1),
+                        xticks=[0, 0.5, 1])
+    return save(sp.Figure(f"bimodal_breakdown_{prompt_set}", vocab()).add(d), out_dir)
 
 
 if __name__ == "__main__":

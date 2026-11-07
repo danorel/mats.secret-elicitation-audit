@@ -137,7 +137,7 @@ def main():
         "pairwise": pairwise,
     }
     out = args.output_json or os.path.join(
-        "user_gender", "plots", f"cluster_bootstrap_method_comparison_{args.prompt_set}.json")
+        "results", "user_gender", f"cluster_bootstrap_method_comparison_{args.prompt_set}.json")
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)

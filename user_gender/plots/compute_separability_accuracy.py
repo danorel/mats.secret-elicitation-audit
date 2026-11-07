@@ -36,7 +36,7 @@ def main():
     parser.add_argument("--prompt_set", type=str, default="standard", choices=["direct", "standard"])
     parser.add_argument("--results_root", type=str, default="user_gender")
     parser.add_argument("--output_json", type=str, default=None,
-                         help="Default: user_gender/plots/separability_accuracy_layer{layer}_{prompt_set}.json")
+                         help="Default: results/user_gender/separability_accuracy_layer{layer}_{prompt_set}.json")
     args = parser.parse_args()
 
     correct_by_gender, n_by_gender = {}, {}
@@ -54,7 +54,7 @@ def main():
           f"n={total_n} acc={accuracy * 100:.2f}%")
 
     output_json = args.output_json or os.path.join(
-        "user_gender", "plots", f"separability_accuracy_layer{args.layer}_{args.prompt_set}.json")
+        "results", "user_gender", f"separability_accuracy_layer{args.layer}_{args.prompt_set}.json")
     out = {
         "layer": args.layer,
         "prompt_set": args.prompt_set,

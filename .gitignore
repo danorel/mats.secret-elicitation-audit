@@ -17,9 +17,26 @@ __pycache__
 *.jsonl
 !prompts/**/*.jsonl
 
-# Claude Code local state
+# Claude Code local state; the autonomy window's backups, state and log (.claude/autonomy/)
 .claude/settings.local.json
+.claude/settings.local.json.*
 .claude/.credentials.json
+.claude/autonomy/state.json
+.claude/autonomy/log.txt
+
+# results/user_gender/ stays ignored except the two small mean-delta vectors committed in session 8
+# (semantic_null_cosine_control.py reads them; regenerating them needs a GPU)
+!/results/
+/results/*
+!/results/user_gender/
+/results/user_gender/*
+!/results/user_gender/mean_delta_vectors/
+
+# figures are tracked (like bridge-jspace): the PNGs, their styles-plot sidecars and the status registry; the
+# numbers they read stay in results/ (ignored above; HF dataset danorel/mats.esk-audit)
+!figures/**/*.png
+!figures/**/*.styles.json
+!figures/status.csv
 
 # Private application material - not for the public repo
 .claude/HYPOTHESES.local.md

@@ -41,6 +41,6 @@ python3 elicitation_methods/patchscope.py \
     --source_layers 11 \
     --target_layers 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 \
     --limit "$LIMIT" \
-    --output_json "user_gender/plots/patchscope_layer_sweep_10to24.json"
+    --output_json "results/user_gender/patchscope_layer_sweep_10to24.json"
 
 echo "Done."

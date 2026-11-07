@@ -84,11 +84,11 @@ def main():
     # methods are scored against the same blank baseline (the grader's default is
     # about the evidence field's shape, not the prompt set).
     parser.add_argument("--blank_prompt_set", type=str, default="direct")
-    parser.add_argument("--output_json", type=str, default="user_gender/plots/blank_baseline_signal_chart.json")
-    parser.add_argument("--output_png", type=str, default="user_gender/plots/blank_baseline_signal_chart.png")
+    parser.add_argument("--output_json", type=str, default="results/user_gender/blank_baseline_signal_chart.json")
+    parser.add_argument("--out_dir", type=str, default=None, help="Default: figures/ at the repo root")
     args = parser.parse_args()
 
-    rows = []
+    rows, rows_by_key = [], {}
     for key, spec in METHODS.items():
         f_real = load_metrics(args.results_root, "female", spec["prompt_set"], spec["real"])
         m_real = load_metrics(args.results_root, "male", spec["prompt_set"], spec["real"])
@@ -107,6 +107,7 @@ def main():
             "sem": sem,
             "ours": spec.get("ours", False),
         })
+        rows_by_key[key] = rows[-1]
 
     rows.sort(key=lambda r: r["signal"])
     for r in rows:
@@ -118,27 +119,32 @@ def main():
         json.dump(rows, f, indent=2)
     print(f"Wrote {args.output_json}")
 
-    import matplotlib
-    matplotlib.use("Agg")
-    import matplotlib.pyplot as plt
+    draw(rows_by_key, args.out_dir)
 
-    fig, ax = plt.subplots(figsize=(8, 5))
-    labels = [r["label"] for r in rows]
-    signals = [r["signal"] for r in rows]
-    sems = [r["sem"] for r in rows]
-    colors = ["#c2185b" if r["ours"] else "#90a4ae" for r in rows]
-    bars = ax.barh(labels, signals, xerr=sems, color=colors, capsize=4,
-                    error_kw={"ecolor": "0.3", "elinewidth": 1.2})
-    for bar, val, sem in zip(bars, signals, sems):
-        ax.text(val + sem + 0.8, bar.get_y() + bar.get_height() / 2, f"{val:+.1f}pp", va="center", fontsize=9)
-    ax.axvline(0, color="0.6", linestyle="--", linewidth=1, label="blank-evidence baseline")
-    ax.set_xlabel("accuracy minus own blank-evidence baseline (pp), ± bootstrap SEM")
-    ax.set_xlim(-5, 45)
-    ax.set_title("Real signal: distance from each method's own blank-evidence control")
-    ax.legend(loc="lower right")
-    fig.tight_layout()
-    fig.savefig(args.output_png, dpi=150)
-    print(f"Wrote {args.output_png}")
+
+def draw(rows_by_key, out_dir):
+    """One row per method (vocabulary order), the signal with ± SEM whiskers and printed values; the gender
+    direction in its role colour, the other methods grey; a dashed rule at 0 (the blank-evidence baseline)."""
+    import styles_plot as sp
+    from figstyle import save, vocab
+
+    v = vocab()
+    order = [e.key for e in v.entities("signal_rows")]
+
+    def est(key):
+        r = rows_by_key[key]
+        return sp.Est(r["signal"], r["signal"] - r["sem"], r["signal"] + r["sem"], interval="sem",
+                      cell=f"signal.{key}", key=f"signal.{key}", label=True)
+
+    ours = [k for k in order if METHODS[k].get("ours")]
+    col = sp.DotColumn(
+        "accuracy over the blank-evidence baseline", "signal", (-5, 45), (0, 20, 40),
+        series=[sp.Series("method", {k: est(k) for k in ours}),
+                sp.Series("control", {k: est(k) for k in order if k not in ours}, control="the other methods")],
+        rules=[sp.Rule(0, "blank-evidence baseline")],
+    )
+    fig = sp.Figure("blank_baseline_signal", v).add(sp.DotTable(order, [col], kind="signal_rows"))
+    return save(fig, out_dir)
 
 
 if __name__ == "__main__":

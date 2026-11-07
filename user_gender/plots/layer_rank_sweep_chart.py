@@ -5,7 +5,9 @@ Reads the 30-item pilot (10 unique prompts x 3 response variants) saved under
 results/{female,male}/direct/experiments/gender_direction/layer_rank_sweep_0to24/ranks.json.
 For the full-scale (n=1000), documented-word-list version, see gender_word_rank_sweep.py.
 
-Writes per-layer median/p25/p75 JSON (for an HTML/JS chart) and a static PNG.
+Writes per-layer median/p25/p75 JSON (for an HTML/JS chart) and a styles-plot sweep
+(figures/post/layer_rank_sweep.png). p25/p75 are vals[n // 4] and vals[3n // 4], not
+interpolated percentiles; kept as computed so the JSON stays comparable with earlier runs.
 """
 import argparse
 import json
@@ -41,12 +43,31 @@ def summarize(ranks_by_layer: dict):
     return out
 
 
+def draw(data, out_dir):
+    """Rows = the two checkpoints; median rank per layer on a log axis with its p25-p75 band, a dashed rule and a
+    point at layer 11 (the layer picked from this pilot, so the registry marks the point post hoc)."""
+    import styles_plot as sp
+    from figstyle import save, vocab
+
+    v = vocab()
+    lines, points = [], []
+    for gender in GENDERS:
+        layers = [d["layer"] for d in data[gender]]
+        lines.append(sp.Line(gender, "method", layers, [d["median"] for d in data[gender]], cell=f"line.{gender}",
+                             band=([d["p25"] for d in data[gender]], [d["p75"] for d in data[gender]]),
+                             interval="iqr"))
+        # no printed value: the library puts it up-right of the point, where this line crosses it (SP601)
+        points.append(sp.Point(gender, "method", 11, cell=f"l11.{gender}"))
+    sweep = sp.Sweep(GENDERS, "layer", "rank", lines, kind="checkpoints", header="median rank", points=points,
+                     rules=[sp.Rule(11, "layer 11")], xticks=[0, 5, 10, 15, 20, 24])
+    return save(sp.Figure("layer_rank_sweep", v).add(sweep), out_dir)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output_json", type=str,
-                         default="user_gender/plots/layer_rank_sweep_chart.json")
-    parser.add_argument("--output_png", type=str,
-                         default="user_gender/plots/layer_rank_sweep_chart.png")
+                         default="results/user_gender/layer_rank_sweep_chart.json")
+    parser.add_argument("--out_dir", type=str, default=None, help="Default: figures/ at the repo root")
     args = parser.parse_args()
 
     data = {gender: summarize(load_ranks(gender)) for gender in GENDERS}
@@ -56,27 +77,7 @@ def main():
         json.dump(data, f, indent=2)
     print(f"Wrote {args.output_json}")
 
-    try:
-        import matplotlib.pyplot as plt
-        fig, ax = plt.subplots(figsize=(9, 5))
-        for gender, color in [("female", "#c2185b"), ("male", "#1565c0")]:
-            layers = [d["layer"] for d in data[gender]]
-            medians = [d["median"] for d in data[gender]]
-            p25 = [d["p25"] for d in data[gender]]
-            p75 = [d["p75"] for d in data[gender]]
-            ax.plot(layers, medians, label=f"{gender} (median)", color=color, linewidth=2)
-            ax.fill_between(layers, p25, p75, color=color, alpha=0.15)
-        ax.axvline(11, color="gray", linestyle="--", linewidth=1, label="layer 11 (best single point)")
-        ax.set_yscale("log")
-        ax.set_xlabel("layer")
-        ax.set_ylabel("full-vocabulary rank of best gender word (log scale, lower = easier to decode)")
-        ax.set_title("Nearest-token rank of gender-related vocabulary vs. layer")
-        ax.legend()
-        fig.tight_layout()
-        fig.savefig(args.output_png, dpi=150)
-        print(f"Wrote {args.output_png}")
-    except ImportError:
-        print("matplotlib not available, skipping PNG")
+    draw(data, args.out_dir)
 
 
 if __name__ == "__main__":

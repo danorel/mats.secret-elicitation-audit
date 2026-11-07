@@ -1,0 +1,242 @@
+# styles-plot vocabulary for mats.esk-audit (styles-plot v0.1.2, docs/ADOPTING.md).
+# Every word a figure prints that names a concept of this project lives here; the status of every drawn cell lives in
+# figures/status.csv. Figures: `make figures` (scripts in user_gender/plots/, PNGs in figures/<target>/, the numbers
+# they read in results/user_gender/).
+
+[project]
+name = "esk-audit"
+
+# ---- roles: one colour, one meaning, in every figure ------------------------------------------------------------------
+[roles.method]
+slot = "violet"
+word = "gender direction"
+meaning = "the gender-direction method: the layer-11 residual read at first-person-pronoun positions"
+
+[roles.readout]
+slot = "teal"
+word = "sign-separability"
+meaning = "classifying each item by the sign of its projection on the direction (no decode, no auditor)"
+
+# ---- the grey things --------------------------------------------------------------------------------------------------
+[controls]
+names = [
+    "the paper's baselines",
+    "the other methods",
+    "other directions",
+    "non-pronoun positions",
+    "a random direction",
+    "the base model",
+]
+
+[intervals]
+sem = "± 1 SEM (bootstrap)"
+iqr = "interquartile range"
+
+# ---- number formats ---------------------------------------------------------------------------------------------------
+[formats.signed_points]
+decimals = 1
+sign = true
+
+[formats.rank]
+decimals = 0
+
+[formats.percent2]
+decimals = 2
+
+[formats.cosine]
+decimals = 2
+sign = true
+
+[formats.gap]
+decimals = 2
+
+# ---- units: axis title (with its denominator), cue quantity, format -----------------------------------------------------
+[units.accuracy]
+title = "auditor accuracy (%)"
+quantity = "accuracy"
+format = "accuracy"
+
+[units.signal]
+title = "accuracy minus the method's own blank-evidence baseline (points)"
+quantity = "difference"
+format = "signed_points"
+cue_word = "larger"
+
+[units.rank]
+title = "rank of the best gender word, lower is better (log scale)"
+quantity = "rank"
+format = "rank"
+scale = "log"
+cue_word = "larger"
+
+[units.layer]
+title = "layer"
+format = "z"
+cue = false
+
+[units.separability]
+title = "items classified correctly by sign (%)"
+quantity = "separability"
+format = "percent2"
+
+[units.projection_gap]
+title = "female − male mean projection"
+quantity = "gap"
+format = "gap"
+cue_word = "larger"
+
+[units.cosine]
+title = "cosine with the fine-tuning change (female − male)"
+quantity = "cosine"
+format = "cosine"
+cue_word = "larger"
+
+[units.prompt_accuracy]
+title = "per-prompt auditor accuracy (share of its answers)"
+quantity = "accuracy"
+format = "share"
+
+[units.prompts]
+title = "unique prompts"
+quantity = "prompts"
+format = "z"
+
+[units.projection]
+title = "projection on the gender direction"
+quantity = "projection"
+format = "z"
+cue_word = "larger"
+
+# ---- words ------------------------------------------------------------------------------------------------------------
+[terms]
+canonical = [
+    "auditor accuracy", "chance", "layer 11", "blank-evidence baseline", "accuracy over the blank-evidence baseline",
+    "direct set", "standard set",
+    "rank", "median rank", "separability", "between-checkpoint gap", "accuracy",
+    "cosine", "projection gap",
+    "UMAP", "PCA", "layer 10", "layer 25",
+    "contrastive", "base model", "random control",
+]
+templates = []
+missing = ["no run", "no interval"]
+not_claimed = []
+
+[[terms.banned]]
+pattern = "Gender Direction"
+use = "gender direction"
+
+[[terms.banned]]
+pattern = "ours"
+use = "gender direction"
+
+[[terms.banned]]
+pattern = "pp"
+use = "points"
+
+# ---- entities: ordered rows per kind ----------------------------------------------------------------------------------
+# Methods in METRICS.md's table order (the paper's), then this project's method last, as in METRICS.md.
+[[entities.methods]]
+key = "io"
+name = "I/O (no evidence)"
+
+[[entities.methods]]
+key = "logit_lens"
+name = "Logit Lens Tokens"
+
+[[entities.methods]]
+key = "residual_tokens"
+name = "Acts Tokens"
+
+[[entities.methods]]
+key = "sae_feature_descriptions"
+name = "SAE Desc"
+
+[[entities.methods]]
+key = "sae_tokens"
+name = "SAE Tokens"
+
+[[entities.methods]]
+key = "gender_direction"
+name = "gender direction (layer 11)"
+
+# blank_baseline_signal_chart.py's rows, in its METHODS order
+[[entities.signal_rows]]
+key = "acts_desc"
+name = "Acts Desc"
+
+[[entities.signal_rows]]
+key = "acts_tokens"
+name = "Acts Tokens"
+
+[[entities.signal_rows]]
+key = "gender_direction_direct"
+name = "gender direction · direct set"
+
+[[entities.signal_rows]]
+key = "gender_direction_standard"
+name = "gender direction · standard set"
+
+[[entities.signal_rows]]
+key = "sae_desc"
+name = "SAE Desc"
+
+[[entities.checkpoints]]
+key = "female"
+name = "female checkpoint"
+
+[[entities.checkpoints]]
+key = "male"
+name = "male checkpoint"
+
+[[entities.prompt_sets]]
+key = "direct"
+name = "direct set"
+
+[[entities.prompt_sets]]
+key = "standard"
+name = "standard set"
+
+# semantic_null_cosine_control.py's CONTROL_AXES, then the Gaussian control, then the real direction
+[[entities.directions]]
+key = "formality"
+name = "formality"
+
+[[entities.directions]]
+key = "tense"
+name = "tense"
+
+[[entities.directions]]
+key = "topic"
+name = "topic"
+
+[[entities.directions]]
+key = "sentiment"
+name = "sentiment"
+
+[[entities.directions]]
+key = "random"
+name = "random (Gaussian)"
+
+[[entities.directions]]
+key = "gender"
+name = "gender direction (real)"
+
+# non_pronoun_position_gap.py's CONTROL_POSITIONS, then the pronoun-mean reference
+[[entities.positions]]
+key = "bos"
+name = "BOS"
+
+[[entities.positions]]
+key = "last_user_token"
+name = "last user-turn token"
+
+[[entities.positions]]
+key = "midpoint_user_token"
+name = "user-turn midpoint"
+
+[[entities.positions]]
+key = "pronoun_mean"
+name = "pronoun mean (reference)"
+
+[registry]
+path = "figures/status.csv"
