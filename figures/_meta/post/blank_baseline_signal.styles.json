@@ -1,5 +1,5 @@
 {
- "styles_plot": "0.1.8",
+ "styles_plot": "0.1.9",
  "vocab": {
   "project": "esk-audit",
   "sha256": "1f5efc3160c85e3605d38d8a423a1e26afde0f0436558b8233e3f27cddbfb1b3"
@@ -13,7 +13,7 @@
  "mode": "strict",
  "publishable": true,
  "png": {
-  "sha256": "b5df57d5e11ee2a8d76ef6f41846127616baa2e83fd4563cde853d12ee2c20f9",
+  "sha256": "9f30308f9e6035cf5988c4158c2f0b17914c984388abd60e37048e8c575ed8f5",
   "dpi": 200
  },
  "roles": [
@@ -51,7 +51,7 @@
    "cell": "signal.acts_desc",
    "timing": "post_hoc",
    "claim": "claimed",
-   "hollow": true
+   "hollow": false
   },
   {
    "kind": "dot",
@@ -59,7 +59,7 @@
    "cell": "signal.acts_tokens",
    "timing": "post_hoc",
    "claim": "claimed",
-   "hollow": true
+   "hollow": false
   },
   {
    "kind": "dot",
@@ -67,7 +67,7 @@
    "cell": "signal.gender_direction_direct",
    "timing": "post_hoc",
    "claim": "claimed",
-   "hollow": true
+   "hollow": false
   },
   {
    "kind": "dot",
@@ -75,7 +75,7 @@
    "cell": "signal.gender_direction_standard",
    "timing": "post_hoc",
    "claim": "claimed",
-   "hollow": true
+   "hollow": false
   },
   {
    "kind": "dot",
@@ -83,13 +83,13 @@
    "cell": "signal.sae_desc",
    "timing": "post_hoc",
    "claim": "claimed",
-   "hollow": true
+   "hollow": false
   }
  ],
  "key": [
+  "all estimates post hoc",
   "grey: the other methods",
-  "whiskers: ± 1 SEM (bootstrap)",
-  "○ post hoc"
+  "whiskers: ± 1 SEM (bootstrap)"
  ],
  "numbers": {
   "signal.acts_desc": "+0.3",
