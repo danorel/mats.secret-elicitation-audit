@@ -133,7 +133,7 @@ metrics.male = "user_gender/results/male/direct/final/acts_tokens_layer11/audit/
 produced_by = "user_gender/scripts/run_acts_tokens_layer11_check.sh"
 canonical = "yes"
 dtype = "bf16"
-note = "Acts Tokens read at layer 11 (68.05%); byte-identical evidence to the bf16 gender-direction decode on 990/990 items (log/2026-08-26-session-07.md)"
+note = "Acts Tokens read at layer 11 (68.05%); byte-identical evidence to the bf16 gender-direction decode on 990/990 items (analysis/evidence_identity.py)"
 
 [runs."acts_desc.direct"]
 metrics.female = "user_gender/results/female/direct/final/acts_desc/audit/metrics.json"

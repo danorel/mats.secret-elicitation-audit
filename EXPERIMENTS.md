@@ -150,7 +150,7 @@ ran (session logs in [log/](log/)).
 - **Data.** `direct`, both checkpoints, n=1000 per checkpoint.
 - **Method.** The paper's own `residual_tokens.py --mode pronouns` at layer 11, nothing else changed (same top-k,
   auditor, template); then the two methods' evidence compared item by item with matched decode arithmetic.
-- **Files.** runs `acts_tokens.l11.direct`, `acts_tokens.l23.direct`, `gender_direction.l11.direct`; `derived/user_gender/reproduction_bar_chart_direct.json` and `cluster_bootstrap_method_comparison_direct.json` (`python3 analysis/reproduction.py`, `python3 analysis/cluster_bootstrap_method_comparison.py`). The 990/990 evidence comparison was run in session 7 and has no script in the repo.
+- **Files.** runs `acts_tokens.l11.direct`, `acts_tokens.l23.direct`, `gender_direction.l11.direct`; `derived/user_gender/reproduction_bar_chart_direct.json` and `cluster_bootstrap_method_comparison_direct.json` (`python3 analysis/reproduction.py`, `python3 analysis/cluster_bootstrap_method_comparison.py`). The 990/990 evidence comparison (with run `projections.l11.contrastive.direct`) is `evidence_identity_layer11_direct.json` (`python3 analysis/evidence_identity.py`).
 - **Rule, fixed in advance.** From the run script's header (`user_gender/scripts/run_acts_tokens_layer11_check.sh`):
   "If this scores close to Gender Direction's 68.55%, the accuracy gain is attributable to the layer choice, not to
   the direction itself."
@@ -317,7 +317,7 @@ ran (session logs in [log/](log/)).
 - **Why I asked.** `standard` is where the secret only matters behaviorally; the base-model control moves too.
 - **Data.** Layer 11, both sets, contrastive and `base_model_control`, n=1000 per checkpoint.
 - **Method.** Auditor accuracy per variant; two-proportion z-tests between sets.
-- **Files.** runs `gender_direction.l11.{direct,standard}` and the base-model control audits (`user_gender/results/*/{direct,standard}/final/gender_direction/audit/layer11_base_model_control/`, not yet in runs.toml). The z-tests were computed in session 4 and have no script in the repo.
+- **Files.** runs `gender_direction.l11.{direct,standard}` and `gender_direction.l11.base_model_control.{direct,standard}`. The accuracies and z-tests were computed in session 4 and have no script in the repo.
 - **Rule, fixed in advance.** Not recorded.
 - **Result.**
 
@@ -381,7 +381,7 @@ ran (session logs in [log/](log/)).
 - **Data.** Layer 11: the gender direction, a sentiment control, the Gaussian random control, and the actual fine-tuning
   delta `mean_delta_female − mean_delta_male`.
 - **Method.** Cosine with every row of the token embedding matrix, both signs (`direction_nearest_neighbors.py`).
-- **Files.** `derived/user_gender/direction_nearest_neighbors_layer11.json` (GPU: `analysis/direction_nearest_neighbors.py --layer 11`); the delta lookup's lists were read in session 8.
+- **Files.** `derived/user_gender/direction_nearest_neighbors_layer11.json` (GPU: `analysis/direction_nearest_neighbors.py --layer 11`); the delta rows are its `actual_finetuning_delta (female-male)` entry, built from `derived/user_gender/mean_delta_vectors/`.
 - **Rule, fixed in advance.** Not recorded.
 - **Result.**
 
@@ -504,7 +504,7 @@ ran (session logs in [log/](log/)).
 
 ![Each method's accuracy minus its own blank-evidence baseline, direct set, 95% prompt-level intervals](figures/post/blank_baseline_signal.png)
 
-- **Files.** runs `io.direct`, `acts_desc.blank.direct`, `blank.token_list.direct`, `blank.sae_desc.direct`; `derived/user_gender/blank_baseline_signal_chart.json` (`python3 analysis/blank_baseline_signal.py`). The guess-rate table was read from the guessing files in session 5 and has no script in the repo.
+- **Files.** runs `io.direct`, `acts_desc.blank.direct`, `blank.token_list.direct`, `blank.sae_desc.direct`; `derived/user_gender/blank_baseline_signal_chart.json` (`python3 analysis/blank_baseline_signal.py`). The guess-rate table and its three z values are `blank_guess_rates_direct.json` (`python3 analysis/blank_guess_rates.py`). The z = −3.21 for real but vague content rests on the Acts Desc split, which is not reproduced by a script ([Acts Desc](#acts-desc)).
 - **Rule, fixed in advance.** Not recorded.
 - **Result.**
 

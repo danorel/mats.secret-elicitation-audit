@@ -34,6 +34,8 @@ numbers:            ## every CPU analysis script: raw runs -> derived/user_gende
 	$(PYTHON) $(A)/published_metrics.py; \
 	$(PYTHON) $(A)/auditor_example.py; \
 	$(PYTHON) $(A)/precision.py; \
+	$(PYTHON) $(A)/evidence_identity.py; \
+	$(PYTHON) $(A)/blank_guess_rates.py; \
 	$(PYTHON) $(A)/projection_separability.py --prompt_set direct --variants contrastive base_model_control; \
 	$(PYTHON) $(A)/projection_separability.py --prompt_set standard --variants contrastive base_model_control; \
 	$(PYTHON) $(A)/projection_separability.py --prompt_set direct --variants contrastive; \

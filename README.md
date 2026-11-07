@@ -4,9 +4,11 @@
 model organism of Cywiński et al. (2025), and what the auditor that scores every method is really reading.*
 
 **Danyil Orel** · Application project for Neel Nanda's MATS 12.0 stream (about 25 hours; advanced to the exploration
-phase) · August 2026 · **Status:** every number below comes from the run files in the public HF dataset
-[danorel/mats.esk-audit](https://huggingface.co/datasets/danorel/mats.esk-audit) (tag `v1.0`) through scripts in this
-repo; the figures are drawn from them by code ([styles-plot](https://github.com/danorel/styles-plot), strict checks;
+phase) · August 2026 · **Status:** every number below is computed by a script in this repo, from the run files in the public HF dataset
+[danorel/mats.esk-audit](https://huggingface.co/datasets/danorel/mats.esk-audit) (tag `v1.0`) or, for the activation
+analyses, from the models on a GPU. Two exceptions were computed in sessions: the base-model control's accuracies and
+the net contributions built on them ([ordinary chat](EXPERIMENTS.md#ordinary-chat)), and the Acts Desc splits with
+the z = −3.21 that rests on them ([Acts Desc](EXPERIMENTS.md#acts-desc)). The figures are drawn from them by code ([styles-plot](https://github.com/danorel/styles-plot), strict checks;
 hollow marks are results whose analysis was chosen after seeing the data). No independent recount yet.
 
 <!-- Dan: TL;DR is a draft for you to edit. -->
