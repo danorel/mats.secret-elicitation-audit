@@ -1,7 +1,8 @@
 # Enough to rebuild every figure (make figures) and every CPU number (make numbers): no torch, no GPU, no HF token.
 # Python >= 3.11 (tomllib). The full research environment is requirements.txt.
-# The rendering stack is pinned exactly: another matplotlib/pillow/numpy draws different PNG bytes (and can move a
-# label onto a mark), so these are the versions the tracked figures were drawn with.
+# The rendering stack is pinned exactly: another matplotlib can draw different pixels (it moved a
+# label onto a mark in one test), so these are the versions the tracked figures were drawn with. PNG compression
+# still differs across platforms (zlib): compare figures by pixels (scripts/dev/snapshot.py), not by file bytes.
 styles-plot @ git+https://github.com/danorel/styles-plot@v0.1.10
 numpy==2.5.2
 matplotlib==3.10.3

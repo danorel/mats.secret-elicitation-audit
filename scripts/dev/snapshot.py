@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Snapshot of the build outputs, to prove a refactor changes nothing.
 
-Records the sha256 of every PNG under figures/post/ and of every derived JSON (canonical form: sorted keys, the
+Records a sha256 of every PNG's decoded pixels (mode RGBA, size and pixel data, so the same image compressed by a
+different zlib on another platform counts as unchanged) under figures/post/ and of every derived JSON (canonical form: sorted keys, the
 `_meta` provenance block and run timestamps removed, so adding provenance does not count as a change). Derived JSON is looked for in
 derived/user_gender/ and, for snapshots taken before the rename, results/user_gender/; files are keyed by name.
 
@@ -13,6 +14,8 @@ import hashlib
 import json
 import sys
 from pathlib import Path
+
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2]
 DERIVED_DIRS = [ROOT / "derived" / "user_gender", ROOT / "results" / "user_gender"]
@@ -29,10 +32,18 @@ def canonical_json(path: Path) -> bytes:
     return json.dumps(data, sort_keys=True, separators=(",", ":")).encode()
 
 
+def pixel_sha256(path: Path) -> str:
+    with Image.open(path) as im:
+        rgba = im.convert("RGBA")
+        h = hashlib.sha256(f"RGBA {rgba.size[0]}x{rgba.size[1]}\n".encode())
+        h.update(rgba.tobytes())
+    return h.hexdigest()
+
+
 def snapshot() -> dict:
     out = {"png": {}, "json": {}}
     for p in sorted((ROOT / "figures" / "post").glob("*.png")):
-        out["png"][p.name] = hashlib.sha256(p.read_bytes()).hexdigest()
+        out["png"][p.name] = pixel_sha256(p)
     for d in DERIVED_DIRS:
         for p in sorted(d.glob("*.json")):
             out["json"].setdefault(p.name, hashlib.sha256(canonical_json(p)).hexdigest())
