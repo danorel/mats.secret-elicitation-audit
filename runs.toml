@@ -97,6 +97,34 @@ canonical = "yes (only layer-11 run on standard)"
 dtype = "fp32"
 note = "decoded in float32 (56.80%); no bf16 / Acts Tokens layer-11 run exists on standard"
 
+[runs."gender_direction.l11.base_model_control.direct"]
+metrics.female = "user_gender/results/female/direct/final/gender_direction/audit/layer11_base_model_control/metrics.json"
+guessing.female = "user_gender/results/female/direct/final/gender_direction/audit/layer11_base_model_control/guessing.json"
+metrics.male = "user_gender/results/male/direct/final/gender_direction/audit/layer11_base_model_control/metrics.json"
+guessing.male = "user_gender/results/male/direct/final/gender_direction/audit/layer11_base_model_control/guessing.json"
+produced_by = "unknown (session 4): run_auditor_residual_tokens.sh on the projections.l11.base_model_control.direct evidence; command not recorded"
+canonical = "yes"
+dtype = "fp32"
+note = "base-model control audit (93.50% / 7.20%). Checked by content (7 Nov): all four files are byte-identical (sha256) to the n1000 audit in experiments/gender_direction/layer11_validated_headline/audit/layer11_base_model_control_PLAIN_n1000/ (female 20260824_132831, male 20260824_134548), whose source_file is that folder's guessing file. The n300 audits are pilots."
+candidates = [
+    "user_gender/results/female/direct/experiments/gender_direction/layer11_validated_headline/audit/layer11_base_model_control_PLAIN_n300/metrics_logit_lens_tokens_google_gemma-3-4b-it_female_20260824_123427.json",
+    "user_gender/results/male/direct/experiments/gender_direction/layer11_validated_headline/audit/layer11_base_model_control_PLAIN_n300/metrics_logit_lens_tokens_google_gemma-3-4b-it_male_20260824_110854.json",
+]
+
+[runs."gender_direction.l11.base_model_control.standard"]
+metrics.female = "user_gender/results/female/standard/final/gender_direction/audit/layer11_base_model_control/metrics.json"
+guessing.female = "user_gender/results/female/standard/final/gender_direction/audit/layer11_base_model_control/guessing.json"
+metrics.male = "user_gender/results/male/standard/final/gender_direction/audit/layer11_base_model_control/metrics.json"
+guessing.male = "user_gender/results/male/standard/final/gender_direction/audit/layer11_base_model_control/guessing.json"
+produced_by = "unknown (session 4): run_auditor_residual_tokens.sh on the projections.l11.base_model_control.standard evidence; command not recorded"
+canonical = "yes"
+dtype = "fp32"
+note = "base-model control audit (97.90% / 2.20%). Checked by content (7 Nov): all four files are byte-identical (sha256) to the audit in experiments/gender_direction/layer11_standard_full/audit/layer11_base_model_control/ (female 20260824_142331, male 20260824_144250). The n30 audits are pilots."
+candidates = [
+    "user_gender/results/female/standard/experiments/gender_direction/layer11_standard_pilot/audit/layer11_base_model_control_n30/metrics_logit_lens_tokens_google_gemma-3-4b-it_female_20260824_140044.json",
+    "user_gender/results/male/standard/experiments/gender_direction/layer11_standard_pilot/audit/layer11_base_model_control_n30/metrics_logit_lens_tokens_google_gemma-3-4b-it_male_20260824_140250.json",
+]
+
 [runs."acts_tokens.l11.direct"]
 evidence.female = "user_gender/results/female/direct/final/acts_tokens_layer11/residual_similarity_pronouns_tokens_layer11_k200_bcywinski_gemma-2-9b-it-user-female_on_direct_results_bcywinski_gemma-2-9b-it-user-female_20260820_213918_20260826_181828.json"
 evidence.male = "user_gender/results/male/direct/final/acts_tokens_layer11/residual_similarity_pronouns_tokens_layer11_k200_bcywinski_gemma-2-9b-it-user-male_on_direct_results_bcywinski_gemma-2-9b-it-user-male_20260822_122033_20260826_180919.json"
