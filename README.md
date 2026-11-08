@@ -544,7 +544,8 @@ make numbers && make figures                          # runs.toml -> derived/ ->
 The methods themselves need a GPU and the full environment (`requirements.txt`); see [DEVELOPER.md](DEVELOPER.md).
 
 Forked from [cywinski/eliciting-secret-knowledge](https://github.com/cywinski/eliciting-secret-knowledge) at commit
-`45aae57`; the paper's pipeline is unchanged.
+`45aae57`; the paper's pipeline is unchanged except for the two edits listed above (an `acts_desc` mode in
+`utils/guess_secret_word.py`; `BATCH_SIZE` 50 → 10 in the SAE feature-filtering step).
 
 ```bibtex
 @article{cywinski2025eliciting,
