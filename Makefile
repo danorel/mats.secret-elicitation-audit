@@ -33,6 +33,7 @@ numbers:            ## every CPU analysis script: raw runs -> derived/user_gende
 	$(PYTHON) $(A)/layer_rank_sweep.py; \
 	$(PYTHON) $(A)/published_metrics.py; \
 	$(PYTHON) $(A)/auditor_example.py; \
+	$(PYTHON) $(A)/rollout_examples.py; \
 	$(PYTHON) $(A)/precision.py; \
 	$(PYTHON) $(A)/evidence_identity.py; \
 	$(PYTHON) $(A)/blank_guess_rates.py; \
