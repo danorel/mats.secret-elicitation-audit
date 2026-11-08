@@ -30,6 +30,7 @@ __pycache__
 # figures are tracked (like bridge-jspace): the PNGs, their styles-plot sidecars and the status registry; the
 # numbers they read are in derived/ (tracked)
 !figures/**/*.png
+!docs/review/*.png
 !figures/**/*.styles.json
 !plots/status.csv
 

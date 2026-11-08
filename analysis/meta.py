@@ -53,7 +53,9 @@ def read_derived(name: str):
     return _strip(json.loads(raw))
 
 
-def write_derived(name: str, data, script: str, indent: int = 2) -> Path:
+def write_derived(name: str, data, script: str, indent: int = 2, meta_extra: dict | None = None) -> Path:
+    """Write derived/user_gender/<name> with the _meta block; `meta_extra` adds keys to _meta (provenance that is
+    not a number, e.g. how an input's layout was established)."""
     dirty = bool(_git("status", "--porcelain", "--", ".", ":!derived", ":!figures/readme", ":!figures/writeup"))
     meta = {
         "script": str(Path(script).resolve().relative_to(ROOT)),
@@ -64,6 +66,10 @@ def write_derived(name: str, data, script: str, indent: int = 2) -> Path:
         "inputs": runs.accessed(),
         "derived_inputs": list(_DERIVED_READ),
     }
+    if meta_extra:
+        clash = set(meta_extra) & set(meta)
+        assert not clash, f"meta_extra would overwrite {sorted(clash)}"
+        meta.update(meta_extra)
     payload = {"_meta": meta, "rows": data} if isinstance(data, list) else {"_meta": meta, **data}
     p = derived_path(name)
     p.parent.mkdir(parents=True, exist_ok=True)

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Requires: CPU. Median full-vocabulary rank of the best-matching gender word vs. layer, both checkpoints (the pilot).
 
-Reads the 30-item pilot (10 unique prompts x 3 response variants; run id rank_pilot.l0to24.direct) and writes the
+Reads the 30-item pilot (3 prompts x 10 responses, by the rank structure; most likely direct prompts 0-2; see
+layer_shift_outside_selection.py; run id rank_pilot.l0to24.direct) and writes the
 per-layer median/p25/p75/min/max to derived/user_gender/layer_rank_sweep_chart.json;
 plots/layer_rank_sweep_chart.py draws it. For the full-scale (n=990), documented-word-list version see
 gender_word_rank_sweep.py. p25/p75 are numpy's linear-interpolated percentiles (before 7 Nov 2026 they were
