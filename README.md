@@ -293,7 +293,7 @@ a diff-of-means construction happens to produce.
 
 </details>
 
-### Finding 3. The secret does not depend on the conversation
+### Finding 3. The checkpoints sit as far apart on ordinary chat as on direct questions <a id="finding-3-the-secret-does-not-depend-on-the-conversation"></a>
 
 In plain terms: at layers 10–12 the two checkpoints sit the same distance apart on the gender axis whether or not the
 conversation is about the user. Decoding that difference into words works much worse on ordinary chat.
