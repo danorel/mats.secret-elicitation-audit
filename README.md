@@ -386,7 +386,7 @@ near 51% is indistinguishable from empty evidence. Run a blank-evidence baseline
 <!-- DRAFT: Dan reviews -->
 
 - A new method beats the paper's published white-box numbers on one setting (the starting plan in
-  [CLAUDE.md](CLAUDE.md)) → **failed**; SAE Desc stays ahead
+  [CLAUDE.md](https://github.com/danorel/mats.secret-elicitation-audit/blob/f1a43ae/CLAUDE.md)) → **failed**; SAE Desc stays ahead
   ([Finding 1](#finding-1-the-gain-comes-from-the-read-layer-not-from-the-direction)).
 - If Acts Tokens at layer 11 scores close to the gender-direction method, the gain is the layer, not the direction →
   **held** ([read layer](EXPERIMENTS.md#read-layer)).
