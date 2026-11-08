@@ -151,7 +151,7 @@ reproduced methods; violet and hollow, Acts Tokens at layer 11.*
   Acts Tokens at layer 23, the paired prompt-level bootstrap gives +7.8<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json | pairwise[2].boot_mean_diff --> points, 95% CI [+3.35<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json | pairwise[2].ci95[0] -->, +12.25<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json | pairwise[2].ci95[1] -->]. Female
   precision rises from 55.70%<!-- src: derived/user_gender/precision_direct.json | rows[2].female.precision --> to 61.11%<!-- src: derived/user_gender/precision_direct.json | rows[5].female.precision --> on the identical template (z 4.82<!-- src: derived/user_gender/precision_direct.json | rows[2].female.z --> → 8.96<!-- src: derived/user_gender/precision_direct.json | rows[5].female.z -->), so the auditor finds more signal
   rather than guessing one class more often.
-  <!-- CREDENCE: Dan -->
+- **Credence: 95%<!-- src: none | the author's credence, not a measured result -->.** What would change it: a margin near zero under several auditor seeds, or on prompts never looked at with a rule written first.
 - **Limits.** Only layer 11 has a full auditor run; layers 9, 10 and 12 are close on both proxies and untested. Layer
   11 was chosen on direct-set data, so the direct-set number is post hoc. The paper most likely fixed layer 23 because
   its SAE-based methods need a Gemma Scope canonical layer and it kept one layer across all five methods; the fair
@@ -233,7 +233,7 @@ position control behind Finding 3.*
 - **Scope.** Layer 11, `direct` set. The direction was built on the base model, with no access to either checkpoint.
 - **Confidence.** Moderate to high. Four controls are too few for a p-value, but the real direction sits about ten
   times further out than any of them.
-  <!-- CREDENCE: Dan -->
+- **Credence: 80%<!-- src: none | the author's credence, not a measured result -->.** What would change it: 20<!-- src: none | a proposed number of control directions, not a result -->–30<!-- src: none | a proposed number of control directions, not a result --> more same-method control directions, with the real one inside their spread.
 - **Arithmetic check.** `0.1219 × 51.29 + 0.3510 × 64.90 = 29.03` and `0.5335 × 54.416 = 29.03` both reproduce the
   measured 29.03<!-- src: derived/user_gender/separability_vs_accuracy.json | gap.direct --> gap on `direct`; this checks the computation, not the claim.
 - **Limits.** Alignment is not decodability: the male delta aligns three times more strongly with the direction
@@ -287,7 +287,7 @@ is hollow because layer 11 was chosen on that set.*
 - **Confidence.** High that the gap is the same on both sets (29.03<!-- src: derived/user_gender/separability_vs_accuracy.json | gap.direct --> vs 28.83<!-- src: derived/user_gender/separability_vs_accuracy.json | gap.standard -->) and that it sits at pronoun positions
   (0.90<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json | positions.bos.gap -->–3.33<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json | positions.midpoint_user_token.gap --> at three other positions in the same passes); the position control is what rules out a checkpoint-wide
   fingerprint, since target gender and checkpoint identity are the same variable.
-  <!-- CREDENCE: Dan -->
+- **Credence: 95%<!-- src: none | the author's credence, not a measured result -->.** What would change it: a different gap at another layer in 10<!-- src: none | layer numbers, not a result -->–12<!-- src: none | layer numbers, not a result -->, or on text with no first-person pronoun.
 - **Limits.** One direction per layer and the uncentered projection. These tests do not tell a standing state from a
   rule that fires at every first-person pronoun.
 
@@ -358,7 +358,7 @@ near 51%<!-- src: derived/user_gender/blank_baseline_signal_chart.json | rows[1]
 - **Confidence.** High at zero information: four evidence shapes, n=1000 per file, symmetric to within z = 1.11<!-- src: derived/user_gender/blank_guess_rates_direct.json | rows[3].z -->. With
   real but vague content the symmetry measurably breaks (z = −3.21<!-- src: none | a session analysis the repository's scripts do not reproduce, disclosed in the sentence -->, from a session analysis the repository's scripts
   do not reproduce; see [Acts Desc](EXPERIMENTS.md#acts-desc)).
-  <!-- CREDENCE: Dan -->
+- **Credence: 90%<!-- src: none | the author's credence, not a measured result -->.** What would change it: a different auditor model without the field-shape default.
 - **Limits.** One grader (Gemma 3 4B) throughout. On blanked token-list and SAE-feature fields, 7<!-- src: derived/user_gender/readme_numbers.json | unclean_grader_responses.shares min -->–13%<!-- src: derived/user_gender/readme_numbers.json | unclean_grader_responses.shares max --> of its raw responses are not a
   clean "female"/"male" and are resolved by a `guessed_words` extraction step whose neutrality is unexamined. The source paper does not discuss this
   bias; its closest passage (Appendix F.1) is about auditors filtering irrelevant evidence.
@@ -382,8 +382,6 @@ near 51%<!-- src: derived/user_gender/blank_baseline_signal_chart.json | rows[1]
 </details>
 
 ## What I predicted, and what happened
-
-<!-- DRAFT: Dan reviews -->
 
 - A new method beats the paper's published white-box numbers on one setting (the starting plan in
   [CLAUDE.md](https://github.com/danorel/mats.secret-elicitation-audit/blob/f1a43ae/CLAUDE.md)) → **failed**; SAE Desc stays ahead
@@ -414,7 +412,6 @@ near 51%<!-- src: derived/user_gender/blank_baseline_signal_chart.json | rows[1]
 - **Mid-tier orderings.** On `direct`, Logit Lens Tokens, Acts Tokens, SAE Tokens and the layer-11 readout are
   statistically indistinguishable from each other except for the layer-11 margin over Acts Tokens at layer 23. Only
   "SAE Desc beats everything" and "I/O loses to everything" survive on both prompt sets.
-- **The female side.** Female recall is at ceiling for every method because of the shared female default (Finding 3).
 - **Reproduction.** 8<!-- src: derived/user_gender/readme_numbers.json | reproduction_vs_published.n_within --> of 10<!-- src: derived/user_gender/readme_numbers.json | reproduction_vs_published.z len --> reproduced rows land within 1.5<!-- src: derived/user_gender/readme_numbers.json | reproduction_vs_published.within_se_threshold --> published standard errors; Acts Tokens and SAE Tokens on
   `direct` are 2.94<!-- src: derived/user_gender/readme_numbers.json | reproduction_vs_published.outside["residual_tokens.direct"] --> and 3.15<!-- src: derived/user_gender/readme_numbers.json | reproduction_vs_published.outside["sae_tokens.direct"] --> SE above published, both upward and both on `direct` only.
 
@@ -482,20 +479,20 @@ near 51%<!-- src: derived/user_gender/blank_baseline_signal_chart.json | rows[1]
   layer-11 vs layer-23 margin on the other half. It removes the one caveat on the headline that is not about the
   organism.
 - **Layers 9, 10 and 12.** Close on both proxies, never run end to end. Next: rerun the pipeline at those layers.
-- **Grader seeds.** No seed variation on the headline. Next: re-grade cached evidence under several grader seeds,
-  which is cheap and would also address the two same-direction reproduction deviations.
+- **Grader seeds.** No seed variation on the headline. Next: re-grade cached evidence under several grader seeds;
+  it is cheap and would also test the two reproduction deviations.
 - **The induction-style Patchscope recipe.** The paper's strongest verbalization recipe was never run on a real
-  residual. Next: `patchscope.py --target_template` with the induction template; no new code needed.
+  residual. Next: `patchscope.py --target_template` with the induction template.
 - **A per-item delta decode.** Decode `r_finetuned(item) − r_base(item)` instead of the raw residual. Next: build it
   as scoped in the [ledger](EXPERIMENTS.md#scoped), with mismatched pairing `r_ft(p_i) − r_base(p_j)` as its control.
 - **A centered separability sweep**, to tell the constant-sign band at layers 14–22 from absent signal. Next: rerun
   the sweep with the shared mean offset subtracted.
 - **Standing state or per-pronoun rule.** The tests here cannot tell a stored offset from a computation that fires at
   every first-person pronoun. Next: a test that separates the two; none is designed yet.
-- **Why the generative decode fails to state the attribute.** The content is linearly present. Next: attention-pattern
-  inspection of the patched position would turn the interpretation into a mechanistic claim.
-- **Other organisms.** Taboo's numbers are degenerate for every published method and SSC is 70B; neither was pursued.
-  Next: SSC, given the compute for a 70B model.
+- **Why the generative decode fails to state the attribute.** The content is linearly present. Next: inspect attention at
+  the patched position.
+- **Other organisms.** Taboo is degenerate for every published method and SSC is 70B. Next: SSC, given compute for a
+  70B model.
 
 </details>
 

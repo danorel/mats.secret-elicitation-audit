@@ -3,6 +3,14 @@
 Changes to a claim, a number or a rule, newest first, with the tag or commit. Starts at the first release tag
 (`v1.0`). Docs housekeeping (rewraps, figure-style pins with no pixel change, path renames) is left out.
 
+## v1.1.1 (2026-11-08)
+
+Docs only; no data, numbers or figures changed.
+
+- **Added: the author's credences** after each finding's Confidence, with what would change each: Finding 1 95%,
+  Finding 2 80%, Finding 3 95%, Finding 4 90%.
+- **Final: "What I predicted, and what happened"**, read by the author; the draft marker is removed, no words changed.
+
 ## v1.1.0 (2026-11-08)
 
 - **Restated: the auditor's "male" share with no evidence section is 88.5%**, printed exactly (it sits on a half, like

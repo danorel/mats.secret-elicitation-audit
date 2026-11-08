@@ -174,8 +174,9 @@ Follow [docs/STANDARD.md](docs/STANDARD.md). This repo's exceptions:
   FINDINGS.md caption said the 9–11 window is lowest; the README no longer claims it.)
 - **README numbers with `src: none`** (each carries its reason; `check_sources.py` prints them all): the effort hours;
   chance (50%, twice: the two-class definition and the arithmetic of a symmetric bias); the Reproduce timings and
-  the dataset's download size; the ledger's test counts (16 and 14, from EXPERIMENTS.md); and z = −3.21 (twice), the
-  Acts Desc symmetry break from a session analysis the scripts do not reproduce.
+  the dataset's download size; the ledger's test counts (16 and 14, from EXPERIMENTS.md); z = −3.21 (twice), the
+  Acts Desc symmetry break from a session analysis the scripts do not reproduce; the author's four credences; and two
+  numbers inside the credences' "what would change it" (a proposed 20–30 control directions; layers 10–12).
 
 ## Upstream <a id="upstream-pipeline"></a>
 
