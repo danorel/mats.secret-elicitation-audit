@@ -5,9 +5,10 @@ auditor that scores every method is really reading.*
 
 **Danyil Orel** · Application project for Neel Nanda's MATS 12.0 stream · August 2026
 
-**Status.** A single-author audit of the paper's released models, about 25<!-- src: none | hours spent on the project, not a measured result --> hours; nothing was trained. Every number is
-computed by code ([verification](docs/STANDARD.md#8-shared-vocabulary) level 1), except the
-[Acts Desc](EXPERIMENTS.md#acts-desc) splits; there is no automated source check (level 2) or independent recount.
+**Status.** A single-author audit of the paper's released models, about 25<!-- src: none | hours spent on the project, not a measured result --> hours, with nothing trained and no
+independent recount. Every number is computed by code ([verification](docs/STANDARD.md#8-shared-vocabulary) level 1)
+except the [Acts Desc](EXPERIMENTS.md#acts-desc) splits; most, not yet all, are matched to their source files
+automatically (level 2 not reached).
 The main caveat: I chose the read layer on the same `direct` prompts that score it, so the headline gain is post hoc.
 
 [Write-up](https://docs.google.com/document/d/1LDWOe_zE5Y1lQP32wpUYFTxRkYrmghvy0c4NN7nZqfA/edit?usp=sharing) ·
