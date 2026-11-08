@@ -1,7 +1,7 @@
 # The layer, not the direction: where white-box secret elicitation gets its signal
 
-*A controlled look at why one interpretability readout beats the published white-box methods on the User Gender
-model organism of Cywiński et al. (2025), and what the auditor that scores every method is really reading.*
+*Where a 'new' white-box method's gain on the User Gender organism of Cywiński et al. (2025) comes from, and what the
+auditor that scores every method is really reading.*
 
 **Danyil Orel** · Application project for Neel Nanda's MATS 12.0 stream (about 25 hours; advanced to the exploration
 phase) · August 2026 · **Status:** every number below is computed by a script in this repo, from the run files in the
