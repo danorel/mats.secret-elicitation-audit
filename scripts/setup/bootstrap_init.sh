@@ -4,7 +4,7 @@
 # reuses the current checkout), installs uv + the Python venv + flash-attn,
 # and creates .env from the template.
 #
-# Once .env is filled in with a real HF_TOKEN, run scripts/bootstrap_post_env.sh
+# Once .env is filled in with a real HF_TOKEN, run scripts/setup/bootstrap_post.sh
 # to verify gated model access, fetch the SAE feature file, and restore
 # previously generated results from the HF dataset backup.
 #
@@ -142,5 +142,5 @@ echo "  1. Edit .env and set HF_TOKEN. That account needs accepted gated"
 echo "     access to: google/gemma-2-9b-it, bcywinski/gemma-2-9b-it-user-female,"
 echo "     bcywinski/gemma-2-9b-it-user-male, google/gemma-3-4b-it (on HF)."
 echo "  2. source .venv/bin/activate"
-echo "  3. bash scripts/bootstrap_post.sh"
+echo "  3. bash scripts/setup/bootstrap_post.sh"
 echo "=================================================================="
