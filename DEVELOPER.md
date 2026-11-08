@@ -24,8 +24,9 @@ derived/user_gender/        the numbers (JSON with _meta, tracked), written by a
 plots/                      figure scripts: *_chart.py draw only, reading derived/ (no GPU, no raw runs)
   figstyle.py               styles-plot setup shared by the chart scripts
   status.csv                styles-plot status registry: one row per drawn cell
-figures/<target>/           the images, one folder per target (post/ today; tracked)
-figures/_meta/<target>/     the styles-plot sidecar of each image (tracked)
+figures/readme/             every image at styles-plot's readme target, linked from README.md and EXPERIMENTS.md (tracked)
+figures/writeup/            the same images at the post target, for the write-up (tracked; make check keeps it in step)
+figures/_meta/<folder>/     the styles-plot sidecar of each image (tracked)
 plotstyle.toml              styles-plot vocabulary: roles, controls, units, entities, words
 README.md                   the write-up and source of truth: summary, findings, limits, how we checked
 EXPERIMENTS.md              the ledger: one card per test, tagged by how the README uses it
@@ -69,8 +70,8 @@ grammar is in the library's `docs/GRAMMAR.md`). Nothing in this repo draws with 
 ```bash
 make install-figures   # styles-plot into .venv (if requirements.txt was installed before the pin)
 make numbers           # CPU analysis: raw runs (runs.toml) -> derived/user_gender/*.json (skips without raw runs)
-make figures           # every chart script: derived/ -> figures/post/<id>.png (+ figures/_meta/post/), then make check
-make check             # styles-plot check figures --vocab plotstyle.toml
+make figures           # every chart script: derived/ -> figures/{readme,writeup}/<id>.png (+ figures/_meta/), then make check
+make check             # styles-plot check figures --vocab plotstyle.toml, and the reference check (scripts/dev/check_refs.py)
 make figures-sheet     # contact sheets (colour and grey)
 make gpu-analysis      # lists the GPU analysis scripts and the commands behind their derived files
 make snapshot && ... && make snapshot-diff   # prove a refactor changes no image or derived number
@@ -128,7 +129,7 @@ finding with its key number, one bold line for practitioners), `## Background`, 
 
 **Claim.** <two sentences>
 
-![<what the figure shows>](figures/post/<id>.png)
+![<what the figure shows>](figures/readme/<id>.png)
 *<caption: what is drawn, what the marks mean, any caveat about the plotted numbers>*
 
 - **Test.** - **Result.** - **Controls.** - **Scope.** - **Confidence.** - **Limits.** - **Takeaway.**
@@ -144,7 +145,7 @@ finding with its key number, one bold line for practitioners), `## Background`, 
 
 - **Question.** - **Why I asked.** - **Data.** - **Method.**
 
-![...](figures/post/<id>.png)
+![...](figures/readme/<id>.png)
 
 - **Rule, fixed in advance.** <quoted, or "Not recorded">
 - **Result.** <table>

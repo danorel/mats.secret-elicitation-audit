@@ -1,0 +1,70 @@
+{
+ "styles_plot": "0.2.2",
+ "vocab": {
+  "project": "esk-audit",
+  "sha256": "5762715fa45e4b84870bba975db5f59627d066e774a4a55b8a97f54028fbc2b0",
+  "hash": "meaning"
+ },
+ "registry": {
+  "path": "plots/status.csv",
+  "sha256": "3844721db641fcdeaee5c5b9af99d5800aca8ccfdc6ae2923f116ca5b0543008"
+ },
+ "figure": "projection_separability_sweep_direct",
+ "target": "readme",
+ "mode": "strict",
+ "publishable": true,
+ "text_only": false,
+ "png": {
+  "pixels_sha256": "4e771ee77772a5cde6a80c8397e9029899d374f0b4ac59e4520b23b115383e9c",
+  "dpi": 160
+ },
+ "roles": [
+  "readout"
+ ],
+ "controls": [],
+ "cells": {
+  "best.direct": {
+   "timing": "post_hoc",
+   "claim": "claimed"
+  },
+  "l11.direct": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "line.direct": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  }
+ },
+ "marks": [
+  {
+   "kind": "line",
+   "role": "readout",
+   "cell": "line.direct",
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  {
+   "kind": "dot",
+   "role": "readout",
+   "cell": "l11.direct",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "readout",
+   "cell": "best.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  }
+ ],
+ "key": [
+  "grey band: constant sign: an artifact of the uncentered readout",
+  "○ post hoc"
+ ],
+ "numbers": {},
+ "problems": []
+}

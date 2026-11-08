@@ -18,7 +18,7 @@ out to be that same method at that layer. The secret sits on the model's own gen
 nothing to do with the user, but the tools struggle to turn it into words, and the LLM that grades every method has a
 strong default guess that anyone using this setup should control for.
 
-![Acts Tokens on the direct set, read at the published layer 23 (grey, 60) and at layer 11 (violet, hollow because layer 11 was chosen after seeing direct-set data, 68), with 95% prompt-level intervals, chance at 50, and two references: the best white-box method, SAE Desc, reproduced at 88, and the best black-box method, prefill, as published at 95 and not rerun here](figures/post/layer_shift_direct.png)
+![Acts Tokens on the direct set, read at the published layer 23 (grey, 60) and at layer 11 (violet, hollow because layer 11 was chosen after seeing direct-set data, 68), with 95% prompt-level intervals, chance at 50, and two references: the best white-box method, SAE Desc, reproduced at 88, and the best black-box method, prefill, as published at 95 and not rerun here](figures/readme/layer_shift_direct.png)
 
 *The paper's Acts Tokens method read at layer 23 and at layer 11, `direct` prompts. Intervals: 95%, from a
 prompt-level bootstrap. Prefill is the paper's published number, not rerun here.*
@@ -142,7 +142,7 @@ bootstrap; shading on rank sweeps is the interquartile range. The dashed "chance
 - Resampled everything at the prompt level (paired cluster bootstrap) and compared all method pairs.
 
 **How layer 11 was found.** I picked layer 11 from a 30-item pilot of the decode-rank measure below (10 prompts × 3
-responses, layers 0–24, no selection rule written down; [figure](figures/post/layer_rank_sweep.png)). Two full-scale
+responses, layers 0–24, no selection rule written down; [figure](figures/readme/layer_rank_sweep.png)). Two full-scale
 measurements, neither of which is auditor accuracy, were run afterwards on the same `direct` set. They agree only
 inside the 10–12 window and put 11 in it, so they confirm the pick but did not make it. They are also computed on the
 prompts the accuracy is scored on.
@@ -156,7 +156,7 @@ n=990/gender:
 | median rank, male | 57 | **54** | 65 | 106 | 105.5 | 78 | 114 | 91 | 66 | 89 | 77 | 95 | 94 |
 | median rank, female | 92 | 77 | **68** | 118 | 110 | 69 | 108 | 105 | 84 | 141 | 127 | 142 | 145 |
 
-![Median rank of the best gender word per layer, one panel per checkpoint, layers 9-21, log scale drawn so that a better (lower) rank is higher, interquartile band, layer 11 marked](figures/post/gender_word_rank_sweep.png)
+![Median rank of the best gender word per layer, one panel per checkpoint, layers 9-21, log scale drawn so that a better (lower) rank is higher, interquartile band, layer 11 marked](figures/readme/gender_word_rank_sweep.png)
 
 *Full table, no rows dropped. Layer 11 is the single best point on the female side and close to best on the male
 side. This sweep stops at layer 21, so the published layer 23 is not on it.*
@@ -168,7 +168,7 @@ direction. n=1980:
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | separability | 99.49% | 98.99% | **100.00%** | 58.03% | exactly 50.00% | 67.88% | 70.71% | 50.00% |
 
-![Sign-separability per layer: a near-perfect window at layers 10-12, a grey band over 14-22 where every item has the same sign, partial recovery at 23-24; layer 11 and the published layer 23 marked, the best layer hollow (post hoc), chance at 50](figures/post/projection_separability_sweep_direct.png)
+![Sign-separability per layer: a near-perfect window at layers 10-12, a grey band over 14-22 where every item has the same sign, partial recovery at 23-24; layer 11 and the published layer 23 marked, the best layer hollow (post hoc), chance at 50](figures/readme/projection_separability_sweep_direct.png)
 
 *Layer 11 scores 98.99% and the best layer, 12, scores 100.00% (about 20 items out of 1980, both at ceiling). The
 published layer 23 scores 67.88%. The exactly-50.00% band at layers 14–22 is a constant projection sign, not absent
@@ -176,7 +176,7 @@ signal: a shared mean offset dominates the residual there, so every item falls o
 sweep would separate the two and has not been run). The same degeneracy is why the base-model control sits at exactly
 50.00%: it puts 96–99% of items on the female side regardless of true gender.*
 
-![Each item's projection on the gender direction at layer 11, direct set: the fine-tuned checkpoints on opposite sides of zero, the base-model control's items on the same side for both checkpoints](figures/post/projection_separability_layer11_direct.png)
+![Each item's projection on the gender direction at layer 11, direct set: the fine-tuned checkpoints on opposite sides of zero, the base-model control's items on the same side for both checkpoints](figures/readme/projection_separability_layer11_direct.png)
 
 ## Findings
 
@@ -187,7 +187,7 @@ scope, confidence and limits are folded underneath.
 
 In plain terms: my "new" method is the paper's Acts Tokens read at layer 11, and that one change is worth 7.8 points.
 
-![Auditor accuracy on the direct set: the five reproduced methods (grey) with Acts Tokens at layer 11 (violet, hollow: layer 11 was chosen after seeing direct-set data) directly under Acts Tokens at layer 23, 95% prompt-level intervals, chance at 50](figures/post/reproduction_direct.png)
+![Auditor accuracy on the direct set: the five reproduced methods (grey) with Acts Tokens at layer 11 (violet, hollow: layer 11 was chosen after seeing direct-set data) directly under Acts Tokens at layer 23, 95% prompt-level intervals, chance at 50](figures/readme/reproduction_direct.png)
 
 **Takeaway.** Not a new method: the paper's own readout at a better layer. The contrastive direction's value was
 locating that layer.
@@ -240,7 +240,7 @@ the same conclusion as the Acts Desc rank-depth result in [EXPERIMENTS.md](EXPER
 In plain terms: the two checkpoints differ along the direction the base model already used for gender, and not along
 directions built the same way for other features.
 
-![The cosine between the fine-tuning delta difference and each direction: four same-method controls and a Gaussian random direction (grey) near zero, the real gender direction (violet) at +0.53; below, the between-checkpoint projection gap at three non-pronoun positions (grey) against the pronoun-mean position (violet), 28.90](figures/post/attribution_controls.png)
+![The cosine between the fine-tuning delta difference and each direction: four same-method controls and a Gaussian random direction (grey) near zero, the real gender direction (violet) at +0.53; below, the between-checkpoint projection gap at three non-pronoun positions (grey) against the pronoun-mean position (violet), 28.90](figures/readme/attribution_controls.png)
 
 *Top: the control behind this finding. Bottom: the position control behind Finding 3. Drawn from the run files of
 `semantic_null_cosine_control.py` and `non_pronoun_position_gap.py`.*
@@ -298,7 +298,7 @@ a diff-of-means construction happens to produce.
 In plain terms: at layers 10–12 the two checkpoints sit the same distance apart on the gender axis whether or not the
 conversation is about the user. Decoding that difference into words works much worse on ordinary chat.
 
-![Per prompt set: sign-separability at ceiling on both sets (99.0 and 100.0), decoded auditor accuracy 68 on direct and 57 on standard](figures/post/separability_vs_accuracy.png)
+![Per prompt set: sign-separability at ceiling on both sets (99.0 and 100.0), decoded auditor accuracy 68 on direct and 57 on standard](figures/readme/separability_vs_accuracy.png)
 
 *Decoded accuracy on `direct` is the layer-11 readout (68.05%), hollow because layer 11 was chosen on direct-set data;
 on `standard` it is the only layer-11 run on that set (56.80%).*
@@ -342,7 +342,7 @@ gender vocabulary. These tests do not tell a standing state from a rule that fir
   fingerprint, since target gender and checkpoint identity are the same variable.
 - **Limits.** One direction per layer and the uncentered projection.
 
-![Each item's projection on the gender direction at layer 11, one row per checkpoint, direct and standard set on one axis (positive = female side): the same gap whether or not gender is the topic](figures/post/projection_direct_vs_standard.png)
+![Each item's projection on the gender direction at layer 11, one row per checkpoint, direct and standard set on one axis (positive = female side): the same gap whether or not gender is the topic](figures/readme/projection_direct_vs_standard.png)
 
 **One explanation ties together five facts.** The base-model control puts 96–99% of items on the female side of the
 axis regardless of true gender. The auditor's own default guesses "female" up to 90% of the time the instant a
@@ -361,7 +361,7 @@ co-directional defaults at once.
 In plain terms: the grader guesses "male" when there is no evidence section and "female" as soon as an empty one
 appears, whatever the method extracted.
 
-![Each method's accuracy minus its own blank-evidence baseline, direct set: Acts Desc at +0.3, Acts Tokens at layer 23 at +9.5, the layer-11 readout at +17.3, SAE Desc at +37.0, with 95% prompt-level intervals; every estimate here is post hoc](figures/post/blank_baseline_signal.png)
+![Each method's accuracy minus its own blank-evidence baseline, direct set: Acts Desc at +0.3, Acts Tokens at layer 23 at +9.5, the layer-11 readout at +17.3, SAE Desc at +37.0, with 95% prompt-level intervals; every estimate here is post hoc](figures/readme/blank_baseline_signal.png)
 
 **Takeaway.** Diagnostic, not corrective: the correction moves every number here by less than one point and reorders
 nothing, but it shows that a method scoring 50.65% is indistinguishable from empty rather than weakly informative, and
@@ -395,7 +395,8 @@ unaffected: the layer-11 readout and Acts Tokens share a baseline, so the gap be
 - **Scope.** Verified at zero information only. The `standard` row uses the `direct` blank baseline, so the figure
   leaves it out.
 - **Confidence.** High at zero information: four evidence shapes, n=1000 per file, symmetric to within z = 1.11. With
-  real but vague content the symmetry measurably breaks (z = −3.21).
+  real but vague content the symmetry measurably breaks (z = −3.21, from a session analysis the repository's scripts
+  do not reproduce; see [Acts Desc](EXPERIMENTS.md#acts-desc)).
 - **Limits.** One grader (Gemma 3 4B) throughout. 7–13% of its raw responses are not a clean "female"/"male" and are
   resolved by a `guessed_words` extraction step whose neutrality is unexamined. The source paper does not discuss this
   bias; its closest passage (Appendix F.1) is about auditors filtering irrelevant evidence.
@@ -414,7 +415,8 @@ unaffected: the layer-11 readout and Acts Tokens share a baseline, so the gap be
 - **The female side.** Female recall is at ceiling for every method because of the shared female default (Finding 3),
   so all of the measured signal is on the male checkpoint.
 - **The auditor-bias correction under real content.** It holds at zero information; with real but vague content the
-  symmetry breaks (z = −3.21).
+  symmetry breaks (z = −3.21, from a session analysis the repository's scripts do not reproduce; see
+  [Acts Desc](EXPERIMENTS.md#acts-desc)).
 - **Reproduction.** 8 of 10 reproduced rows land within 1.5 published standard errors; Acts Tokens and SAE Tokens on
   `direct` are 2.94 and 3.15 SE above published, both upward and both on `direct` only.
 
@@ -447,6 +449,9 @@ In [EXPERIMENTS.md](EXPERIMENTS.md):
 
 ## Open questions and next steps
 
+- **Split-half the layer choice.** Write the selection rule down, apply it on half the prompts, and report the
+  layer-11 vs layer-23 margin on the other half. It removes the one caveat on the headline that is not about the
+  organism.
 - **Layers 9, 10 and 12.** Close on both proxies, never run end to end. *Next:* rerun the pipeline at those layers.
 - **Grader seeds.** No seed variation on the headline; re-grading cached evidence under several grader seeds is cheap
   and would also address the two same-direction reproduction deviations.
@@ -513,14 +518,20 @@ In [EXPERIMENTS.md](EXPERIMENTS.md):
 
 - [EXPERIMENTS.md](EXPERIMENTS.md): every test, with its files and the command that recomputes it.
 - [METRICS.md](METRICS.md): the paper's tables with this fork's rows.
-- [figures/post/](figures/post/): every figure; [plots/status.csv](plots/status.csv): their status registry.
+- [figures/readme/](figures/readme/): every figure, sized for this page; [figures/writeup/](figures/writeup/): the same
+  figures for the write-up; [plots/status.csv](plots/status.csv): their status registry.
 - [DEVELOPER.md](DEVELOPER.md): layout, setup, the figure workflow, running the methods (needs a GPU).
+- This audit's code and data: `analysis/`, `plots/`, `derived/`, `figures/`, `scripts/`, `runs.toml`; three
+  extraction methods in `elicitation_methods/` (`gender_direction.py`, `act_desc.py`, `patchscope.py`) with their run
+  scripts under `user_gender/`; the contrastive pairs and the Acts Desc prompt in `prompts/gender/`. Everything
+  else is the paper's pipeline (fork point `45aae57`), changed in two places: an added `acts_desc` mode in
+  `utils/guess_secret_word.py`, and `BATCH_SIZE` 50 → 10 in `user_gender/scripts/run_get_sae_features.sh`.
 
 Rebuild every figure from a fresh clone: no GPU, no HF token, no raw runs (the numbers are tracked in `derived/`):
 
 ```bash
 uv venv && uv pip install -r requirements-figures.txt
-make figures                           # derived/ -> figures/post/, then styles-plot's checks and the reference check
+make figures                           # derived/ -> figures/{readme,writeup}/, then styles-plot's checks and the reference check
 ```
 
 Recompute the numbers from the raw runs as well (CPU; the run files come from the public HF dataset):

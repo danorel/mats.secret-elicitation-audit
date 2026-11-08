@@ -4,7 +4,7 @@
 Draws derived/user_gender/projection_values_layer{layer}.json (written by analysis/projection_values.py) as styles-plot
 strips (each item a dot, the median a line; violins are not in the grammar): one block per variant, rows = the two
 checkpoints, one shared x axis; the contrastive direction in its role colour, the control variants grey.
-Figure: figures/post/projection_separability_layer{layer}_{prompt_set}[_contrastive_only].png.
+Figure: figures/{readme,writeup}/projection_separability_layer{layer}_{prompt_set}[_contrastive_only].png.
 """
 import argparse
 

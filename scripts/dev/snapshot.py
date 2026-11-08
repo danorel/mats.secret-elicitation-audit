@@ -2,7 +2,8 @@
 """Snapshot of the build outputs, to prove a refactor changes nothing.
 
 Records a sha256 of every PNG's decoded pixels (mode RGBA, size and pixel data, so the same image compressed by a
-different zlib on another platform counts as unchanged) under figures/post/ and of every derived JSON (canonical form: sorted keys, the
+different zlib on another platform counts as unchanged) in each figures/<folder>/ (keyed folder/name; `_` folders
+skipped) and of every derived JSON (canonical form: sorted keys, the
 `_meta` provenance block and run timestamps removed, so adding provenance does not count as a change). Derived JSON is looked for in
 derived/user_gender/ and, for snapshots taken before the rename, results/user_gender/; files are keyed by name.
 
@@ -42,8 +43,8 @@ def pixel_sha256(path: Path) -> str:
 
 def snapshot() -> dict:
     out = {"png": {}, "json": {}}
-    for p in sorted((ROOT / "figures" / "post").glob("*.png")):
-        out["png"][p.name] = pixel_sha256(p)
+    for p in sorted((ROOT / "figures").glob("[!_]*/*.png")):
+        out["png"][f"{p.parent.name}/{p.name}"] = pixel_sha256(p)
     for d in DERIVED_DIRS:
         for p in sorted(d.glob("*.json")):
             out["json"].setdefault(p.name, hashlib.sha256(canonical_json(p)).hexdigest())

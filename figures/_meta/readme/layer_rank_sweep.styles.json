@@ -1,0 +1,85 @@
+{
+ "styles_plot": "0.2.2",
+ "vocab": {
+  "project": "esk-audit",
+  "sha256": "5762715fa45e4b84870bba975db5f59627d066e774a4a55b8a97f54028fbc2b0",
+  "hash": "meaning"
+ },
+ "registry": {
+  "path": "plots/status.csv",
+  "sha256": "3844721db641fcdeaee5c5b9af99d5800aca8ccfdc6ae2923f116ca5b0543008"
+ },
+ "figure": "layer_rank_sweep",
+ "target": "readme",
+ "mode": "strict",
+ "publishable": true,
+ "text_only": false,
+ "png": {
+  "pixels_sha256": "8f61cd5b66edc64a51cae30bbab0c54316af77823678ba616245c9df65d73ea4",
+  "dpi": 160
+ },
+ "roles": [
+  "method"
+ ],
+ "controls": [],
+ "cells": {
+  "l11.female": {
+   "timing": "post_hoc",
+   "claim": "claimed"
+  },
+  "l11.male": {
+   "timing": "post_hoc",
+   "claim": "claimed"
+  },
+  "line.female": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "line.male": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  }
+ },
+ "marks": [
+  {
+   "kind": "line",
+   "role": "method",
+   "cell": "line.female",
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  {
+   "kind": "dot",
+   "role": "method",
+   "cell": "l11.female",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "line",
+   "role": "method",
+   "cell": "line.male",
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  {
+   "kind": "dot",
+   "role": "method",
+   "cell": "l11.male",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  }
+ ],
+ "key": [
+  "line: median",
+  "shading: interquartile range",
+  "○ post hoc"
+ ],
+ "numbers": {
+  "pilot_rank.l11.female": "159",
+  "pilot_rank.l11.male": "66"
+ },
+ "problems": []
+}
