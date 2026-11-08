@@ -395,7 +395,8 @@ unaffected: the layer-11 readout and Acts Tokens share a baseline, so the gap be
 - **Scope.** Verified at zero information only. The `standard` row uses the `direct` blank baseline, so the figure
   leaves it out.
 - **Confidence.** High at zero information: four evidence shapes, n=1000 per file, symmetric to within z = 1.11. With
-  real but vague content the symmetry measurably breaks (z = −3.21).
+  real but vague content the symmetry measurably breaks (z = −3.21, from a session analysis the repository's scripts
+  do not reproduce; see [Acts Desc](EXPERIMENTS.md#acts-desc)).
 - **Limits.** One grader (Gemma 3 4B) throughout. 7–13% of its raw responses are not a clean "female"/"male" and are
   resolved by a `guessed_words` extraction step whose neutrality is unexamined. The source paper does not discuss this
   bias; its closest passage (Appendix F.1) is about auditors filtering irrelevant evidence.
@@ -414,7 +415,8 @@ unaffected: the layer-11 readout and Acts Tokens share a baseline, so the gap be
 - **The female side.** Female recall is at ceiling for every method because of the shared female default (Finding 3),
   so all of the measured signal is on the male checkpoint.
 - **The auditor-bias correction under real content.** It holds at zero information; with real but vague content the
-  symmetry breaks (z = −3.21).
+  symmetry breaks (z = −3.21, from a session analysis the repository's scripts do not reproduce; see
+  [Acts Desc](EXPERIMENTS.md#acts-desc)).
 - **Reproduction.** 8 of 10 reproduced rows land within 1.5 published standard errors; Acts Tokens and SAE Tokens on
   `direct` are 2.94 and 3.15 SE above published, both upward and both on `direct` only.
 
@@ -447,6 +449,9 @@ In [EXPERIMENTS.md](EXPERIMENTS.md):
 
 ## Open questions and next steps
 
+- **Split-half the layer choice.** Write the selection rule down, apply it on half the prompts, and report the
+  layer-11 vs layer-23 margin on the other half. It removes the one caveat on the headline that is not about the
+  organism.
 - **Layers 9, 10 and 12.** Close on both proxies, never run end to end. *Next:* rerun the pipeline at those layers.
 - **Grader seeds.** No seed variation on the headline; re-grading cached evidence under several grader seeds is cheap
   and would also address the two same-direction reproduction deviations.
@@ -516,6 +521,11 @@ In [EXPERIMENTS.md](EXPERIMENTS.md):
 - [figures/readme/](figures/readme/): every figure, sized for this page; [figures/writeup/](figures/writeup/): the same
   figures for the write-up; [plots/status.csv](plots/status.csv): their status registry.
 - [DEVELOPER.md](DEVELOPER.md): layout, setup, the figure workflow, running the methods (needs a GPU).
+- This audit's code and data: `analysis/`, `plots/`, `derived/`, `figures/`, `scripts/`, `runs.toml`; three
+  extraction methods in `elicitation_methods/` (`gender_direction.py`, `act_desc.py`, `patchscope.py`) with their run
+  scripts under `user_gender/`; the contrastive pairs and the Acts Desc prompt in `prompts/gender/`. Everything
+  else is the paper's pipeline (fork point `45aae57`), changed in two places: an added `acts_desc` mode in
+  `utils/guess_secret_word.py`, and `BATCH_SIZE` 50 → 10 in `user_gender/scripts/run_get_sae_features.sh`.
 
 Rebuild every figure from a fresh clone: no GPU, no HF token, no raw runs (the numbers are tracked in `derived/`):
 
