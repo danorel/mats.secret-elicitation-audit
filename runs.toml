@@ -1,7 +1,7 @@
 # Run registry: every raw run an analysis script reads, by id. analysis/runs.py loads them; nothing builds a run
 # path by hand. `canonical`: whether the README's numbers use this run; `candidates` lists other files with the same
 # layer and variant (pilots, or a duplicate checked to give identical numbers). Paths are relative to the repo root; files are restored from
-# the HF dataset danorel/mats.esk-audit (scripts/setup/bootstrap_post.sh).
+# the HF dataset danorel/mats.secret-elicitation-audit (scripts/setup/bootstrap_post.sh).
 
 [runs."io.direct"]
 metrics.female = "user_gender/results/female/direct/baseline/audit/io/metrics_only_input_output_google_gemma-3-4b-it_female_20260822_105334.json"

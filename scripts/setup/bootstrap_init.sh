@@ -4,14 +4,14 @@
 # reuses the current checkout), installs uv + the Python venv + flash-attn,
 # and creates .env from the template.
 #
-# Once .env is filled in with a real HF_TOKEN, run scripts/bootstrap_post_env.sh
+# Once .env is filled in with a real HF_TOKEN, run scripts/setup/bootstrap_post.sh
 # to verify gated model access, fetch the SAE feature file, and restore
 # previously generated results from the HF dataset backup.
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/danorel/mats.esk-audit/main/scripts/bootstrap.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/danorel/mats.secret-elicitation-audit/main/scripts/setup/bootstrap_init.sh | bash
 #   # or, if you already have the repo checked out:
-#   bash scripts/bootstrap.sh
+#   bash scripts/setup/bootstrap_init.sh
 
 set -euo pipefail
 
@@ -19,8 +19,8 @@ set -euo pipefail
 # a brand new box - no SSH key / GitHub deploy key setup needed. This script
 # only ever does clone/pull (read-only); if you need to push from a box, set
 # up your own SSH key or `gh auth login` separately for that.
-REPO_URL="https://github.com/danorel/mats.esk-audit.git"
-REPO_DIR="mats.esk-audit"
+REPO_URL="https://github.com/danorel/mats.secret-elicitation-audit.git"
+REPO_DIR="mats.secret-elicitation-audit"
 
 # Pinned because a prebuilt flash-attn wheel is fetched below for this exact
 # version - bumping it means checking a matching wheel exists first (see
@@ -142,5 +142,5 @@ echo "  1. Edit .env and set HF_TOKEN. That account needs accepted gated"
 echo "     access to: google/gemma-2-9b-it, bcywinski/gemma-2-9b-it-user-female,"
 echo "     bcywinski/gemma-2-9b-it-user-male, google/gemma-3-4b-it (on HF)."
 echo "  2. source .venv/bin/activate"
-echo "  3. bash scripts/bootstrap_post.sh"
+echo "  3. bash scripts/setup/bootstrap_post.sh"
 echo "=================================================================="
