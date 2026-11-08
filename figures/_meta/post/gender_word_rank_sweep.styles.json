@@ -1,8 +1,8 @@
 {
- "styles_plot": "0.1.14",
+ "styles_plot": "0.2.1",
  "vocab": {
   "project": "esk-audit",
-  "sha256": "1cd92e871d6a3bb80a56ef241d6581b4377fbee6a90aaa09b67bc16ac288c992"
+  "sha256": "a70b2967211c34e46f2d60b614cc8b337615480cb40006adb41df723c82f39c5"
  },
  "registry": {
   "path": "plots/status.csv",
