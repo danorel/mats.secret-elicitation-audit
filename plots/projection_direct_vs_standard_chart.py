@@ -8,7 +8,7 @@ projection_separability_layer11_{direct,standard}.png - this isolates just the
 `contrastive` panel from each (dropping `base_model_control`, a separate story) and
 puts them on one shared axis so the near-identical spread is visually comparable rather
 than split across two separately-scaled files. Drawn as styles-plot strips
-(figures/post/projection_direct_vs_standard.png).
+(figures/{readme,writeup}/projection_direct_vs_standard.png).
 
 Usage:
     python3 plots/projection_direct_vs_standard_chart.py

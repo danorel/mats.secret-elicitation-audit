@@ -72,7 +72,7 @@ ran (session logs in [log/](log/)).
 - **Data.** Both checkpoints, `direct` and `standard`, n=1000 per checkpoint.
 - **Method.** The paper's scripts unchanged (layer 23, Gemma 3 4B auditor), balanced average of the two checkpoints.
 
-![Auditor accuracy on the direct set: the five reproduced methods (grey) with Acts Tokens at layer 11 (violet, hollow) directly under Acts Tokens at layer 23, 95% prompt-level intervals, chance at 50%](figures/post/reproduction_direct.png)
+![Auditor accuracy on the direct set: the five reproduced methods (grey) with Acts Tokens at layer 11 (violet, hollow) directly under Acts Tokens at layer 23, 95% prompt-level intervals, chance at 50%](figures/readme/reproduction_direct.png)
 
 - **Files.** runs `io`, `logit_lens.l23`, `acts_tokens.l23`, `sae_tokens.l23`, `sae_desc.l23` (`.direct`, `.standard`), `acts_tokens.l11.direct`, `gender_direction.l11.standard`; `derived/user_gender/reproduction_bar_chart_{direct,standard}.json`; `python3 analysis/reproduction.py --prompt_set direct` (and `standard`).
 - **Rule, fixed in advance.** Not recorded.
@@ -96,7 +96,7 @@ ran (session logs in [log/](log/)).
   - No rollouts were regenerated, so the remaining source of run-to-run variation is the grader; re-grading cached
     evidence under several grader seeds would measure it and has not been done.
 
-![Auditor accuracy on the standard set, same methods](figures/post/reproduction_standard.png)
+![Auditor accuracy on the standard set, same methods](figures/readme/reproduction_standard.png)
 
 ### Which layer should the readout use? (layer choice, sessions 4–5, 24–25 Aug) <a id="layer-choice"></a>
 
@@ -111,7 +111,7 @@ ran (session logs in [log/](log/)).
   fixed gender-word list. Proxy 2: classify each item by the sign of its projection on that layer's contrastive
   direction. Neither is auditor accuracy.
 
-![Median rank of the best gender word per layer in the 30-item pilot, layers 0-24, interquartile band, layer 11 hollow (picked from this pilot)](figures/post/layer_rank_sweep.png)
+![Median rank of the best gender word per layer in the 30-item pilot, layers 0-24, interquartile band, layer 11 hollow (picked from this pilot)](figures/readme/layer_rank_sweep.png)
 
 - **Files.** run `rank_pilot.l0to24.direct` → `derived/user_gender/layer_rank_sweep_chart.json` (`python3 analysis/layer_rank_sweep.py`); `gender_word_rank_sweep.json` and `projection_separability_sweep.json` come from GPU runs (`make gpu-analysis` lists the commands).
 - **Rule, fixed in advance.** Not recorded; layer 11 was picked from the pilot.
@@ -137,7 +137,7 @@ ran (session logs in [log/](log/)).
     ranks are capped at 5001 and its quartiles are `vals[n // 4]`, `vals[3n // 4]`, not interpolated.
   - No layer besides 11 has been run end to end.
 
-![Sign-separability per layer, layers 10-25: near-perfect window at 10-12, exactly 50% at 14-22](figures/post/projection_separability_sweep_direct.png)
+![Sign-separability per layer, layers 10-25: near-perfect window at 10-12, exactly 50% at 14-22](figures/readme/projection_separability_sweep_direct.png)
 
 ### Is the gender-direction gain the direction or the layer? (read layer, session 7, 26 Aug) <a id="read-layer"></a>
 
@@ -256,7 +256,7 @@ ran (session logs in [log/](log/)).
 - **Method.** Sign-separability, decoded auditor accuracy and the between-checkpoint gap on both sets; per-prompt
   `contrast(p) = r_female(p) − r_male(p)` (a pure weight difference at identical input, by causal masking).
 
-![Per prompt set: sign-separability, decoded auditor accuracy and the between-checkpoint gap](figures/post/separability_vs_accuracy.png)
+![Per prompt set: sign-separability, decoded auditor accuracy and the between-checkpoint gap](figures/readme/separability_vs_accuracy.png)
 
 - **Files.** runs `projections.l11.contrastive.{direct,standard}`, `acts_tokens.l11.direct`, `gender_direction.l11.standard`; `derived/user_gender/separability_vs_accuracy.json` (`python3 analysis/separability_vs_accuracy.py`), `projection_values_layer11.json`, `separability_accuracy_layer11_standard_contrastive.json`, and the paired contrast in `finetuning_delta_diagnostic_layer11_direct.json` (GPU).
 - **Rule, fixed in advance.** Not recorded.
@@ -281,7 +281,7 @@ ran (session logs in [log/](log/)).
 - **Caveats.** Uncentered projection on one direction per layer. `standard` decoded accuracy is the fp32 gender-direction
   run, the only layer-11 run on that set.
 
-![Each item's projection on the gender direction at layer 11, direct and standard set on one axis](figures/post/projection_direct_vs_standard.png)
+![Each item's projection on the gender direction at layer 11, direct and standard set on one axis](figures/readme/projection_direct_vs_standard.png)
 
 ### Is the offset a checkpoint-wide fingerprint? (position control, session 8, 27 Aug) <a id="position-control"></a>
 
@@ -505,7 +505,7 @@ ran (session logs in [log/](log/)).
 - **Method.** `--null_control`: the evidence field replaced by a constant placeholder for every item, independent of
   the target.
 
-![Each method's accuracy minus its own blank-evidence baseline, direct set, 95% prompt-level intervals](figures/post/blank_baseline_signal.png)
+![Each method's accuracy minus its own blank-evidence baseline, direct set, 95% prompt-level intervals](figures/readme/blank_baseline_signal.png)
 
 - **Files.** runs `io.direct`, `acts_desc.blank.direct`, `blank.token_list.direct`, `blank.sae_desc.direct`; `derived/user_gender/blank_baseline_signal_chart.json` (`python3 analysis/blank_baseline_signal.py`). The guess-rate table and its three z values are `blank_guess_rates_direct.json` (`python3 analysis/blank_guess_rates.py`). The z = −3.21 for real but vague content rests on the Acts Desc split, which is not reproduced by a script ([Acts Desc](#acts-desc)).
 - **Rule, fixed in advance.** Not recorded.

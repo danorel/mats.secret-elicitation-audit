@@ -1,0 +1,116 @@
+{
+ "styles_plot": "0.2.2",
+ "vocab": {
+  "project": "esk-audit",
+  "sha256": "5762715fa45e4b84870bba975db5f59627d066e774a4a55b8a97f54028fbc2b0",
+  "hash": "meaning"
+ },
+ "registry": {
+  "path": "plots/status.csv",
+  "sha256": "3844721db641fcdeaee5c5b9af99d5800aca8ccfdc6ae2923f116ca5b0543008"
+ },
+ "figure": "reproduction_standard",
+ "target": "readme",
+ "mode": "strict",
+ "publishable": true,
+ "text_only": false,
+ "png": {
+  "pixels_sha256": "bc4f60ea0070f31c0bc78aabdd274bb1aea668c74d24d2f4ffb6fa467f704545",
+  "dpi": 160
+ },
+ "roles": [
+  "method"
+ ],
+ "controls": [
+  "the paper's baselines"
+ ],
+ "cells": {
+  "standard.acts_tokens_l11": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "standard.io": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "standard.logit_lens": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "standard.residual_tokens": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "standard.sae_feature_descriptions": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "standard.sae_tokens": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  }
+ },
+ "marks": [
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "standard.io",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "standard.logit_lens",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "standard.residual_tokens",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "method",
+   "cell": "standard.acts_tokens_l11",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "standard.sae_feature_descriptions",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "standard.sae_tokens",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  }
+ ],
+ "key": [
+  "grey: the paper's baselines",
+  "whiskers: 95% CI (prompt-level bootstrap)"
+ ],
+ "numbers": {
+  "standard.io.avg": "52",
+  "standard.logit_lens.avg": "69",
+  "standard.residual_tokens.avg": "57",
+  "standard.acts_tokens_l11.avg": "57",
+  "standard.sae_feature_descriptions.avg": "86",
+  "standard.sae_tokens.avg": "56"
+ },
+ "problems": []
+}

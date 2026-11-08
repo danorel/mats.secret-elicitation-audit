@@ -1,0 +1,88 @@
+{
+ "styles_plot": "0.2.2",
+ "vocab": {
+  "project": "esk-audit",
+  "sha256": "5762715fa45e4b84870bba975db5f59627d066e774a4a55b8a97f54028fbc2b0",
+  "hash": "meaning"
+ },
+ "registry": {
+  "path": "plots/status.csv",
+  "sha256": "3844721db641fcdeaee5c5b9af99d5800aca8ccfdc6ae2923f116ca5b0543008"
+ },
+ "figure": "separability_vs_accuracy",
+ "target": "readme",
+ "mode": "strict",
+ "publishable": true,
+ "text_only": false,
+ "png": {
+  "pixels_sha256": "4695cd04da98cb6df424b2f8cb049fcdde6e44c5680b874f7ef174368129d9b6",
+  "dpi": 160
+ },
+ "roles": [
+  "method",
+  "readout"
+ ],
+ "controls": [],
+ "cells": {
+  "acc.direct": {
+   "timing": "post_hoc",
+   "claim": "claimed"
+  },
+  "acc.standard": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "sep.direct": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "sep.standard": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  }
+ },
+ "marks": [
+  {
+   "kind": "dot",
+   "role": "readout",
+   "cell": "sep.direct",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "readout",
+   "cell": "sep.standard",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "method",
+   "cell": "acc.direct",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  },
+  {
+   "kind": "dot",
+   "role": "method",
+   "cell": "acc.standard",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  }
+ ],
+ "key": [
+  "○ post hoc"
+ ],
+ "numbers": {
+  "separability.layer11.direct": "99.0",
+  "separability.layer11.standard": "100.0",
+  "decoded_accuracy.layer11.direct": "68",
+  "decoded_accuracy.layer11.standard": "57"
+ },
+ "problems": []
+}

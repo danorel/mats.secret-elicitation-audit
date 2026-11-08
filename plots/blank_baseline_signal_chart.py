@@ -3,7 +3,7 @@
 
 Draws derived/user_gender/blank_baseline_signal_chart.json (analysis/blank_baseline_signal.py): one row per method in
 the vocabulary's order, the signal with its 95% prompt-level interval and printed value, a dashed rule at 0.
-Figure: figures/post/blank_baseline_signal.png.
+Figure: figures/{readme,writeup}/blank_baseline_signal.png.
 """
 import argparse
 

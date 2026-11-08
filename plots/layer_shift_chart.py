@@ -5,7 +5,7 @@ Draws derived/user_gender/reproduction_bar_chart_direct.json (analysis/reproduct
 their 95% prompt-level intervals, and SAE Desc, the best white-box method, reproduced) and
 derived/user_gender/published_metrics.json (analysis/published_metrics.py: prefill, the best black-box method, as
 published in the paper and not rerun here) as one dot-table row joined by a grey connector, with chance at 50.
-Figure: figures/post/layer_shift_direct.png.
+Figure: figures/{readme,writeup}/layer_shift_direct.png.
 """
 import argparse
 

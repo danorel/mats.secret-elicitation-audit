@@ -13,7 +13,7 @@ help:               ## list the targets
 
 # ---- the pipeline -----------------------------------------------------------------------------------------------------
 #   user_gender/results/ (raw runs, HF dataset)  -> analysis/*.py -> derived/user_gender/*.json (tracked)
-#                                                -> plots/*_chart.py -> figures/<target>/*.png (tracked)
+#                                                -> plots/*_chart.py -> figures/{readme,writeup}/*.png (tracked)
 # runs.toml names every raw run the analysis reads. `make figures` needs only derived/ (no GPU, no raw runs).
 
 install-figures:    ## install the pinned styles-plot (the line in requirements.txt) into $(PYTHON)'s environment
@@ -53,7 +53,7 @@ numbers:            ## every CPU analysis script: raw runs -> derived/user_gende
 umap:               ## the direction-vector UMAP (needs umap-learn and scikit-learn; not bit-reproducible across versions)
 	$(PYTHON) $(A)/direction_vectors_umap.py
 
-figures:            ## draw every figure from derived/ into figures/post/, then the checks
+figures:            ## draw every figure from derived/ into figures/readme/ and figures/writeup/, then the checks
 	$(PYTHON) $(F)/layer_shift_chart.py
 	$(PYTHON) $(F)/reproduction_bar_chart.py --prompt_set direct
 	$(PYTHON) $(F)/reproduction_bar_chart.py --prompt_set standard
@@ -67,13 +67,13 @@ figures:            ## draw every figure from derived/ into figures/post/, then 
 	$(PYTHON) $(F)/attribution_controls_chart.py
 	$(MAKE) check
 
-check: figures-check ## styles-plot check, and every image in figures/ is referenced from README/EXPERIMENTS (and exists)
+check: figures-check ## styles-plot check; figures/readme/ referenced from README/EXPERIMENTS (and exists), writeup/ mirrors it
 	$(PYTHON) scripts/dev/check_refs.py
 
 figures-check:      ## styles-plot check: size, palette, staleness, one data key one string, registry unchanged
 	$(STYLES_PLOT) check figures --vocab plotstyle.toml
 
-figures-sheet:      ## contact sheets of figures/post (colour and grey)
+figures-sheet:      ## contact sheets of figures/readme and figures/writeup (colour and grey)
 	$(STYLES_PLOT) sheet figures
 
 gpu-analysis:       ## list the GPU analysis scripts and the commands that produced their derived files (runs nothing)

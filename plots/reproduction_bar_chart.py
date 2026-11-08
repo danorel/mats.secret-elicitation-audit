@@ -3,7 +3,7 @@
 
 Draws derived/user_gender/reproduction_bar_chart_{prompt_set}.json (analysis/reproduction.py) as a styles-plot dot
 table: methods in the vocabulary's fixed order with Acts Tokens at layer 11 directly under layer 23, 95% prompt-level
-intervals, printed values, chance at 50. Figure: figures/post/reproduction_{prompt_set}.png.
+intervals, printed values, chance at 50. Figure: figures/{readme,writeup}/reproduction_{prompt_set}.png.
 """
 import argparse
 

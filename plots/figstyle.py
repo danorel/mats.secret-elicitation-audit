@@ -1,7 +1,9 @@
 """styles-plot setup shared by the chart scripts in plots/.
 
-One vocabulary (plotstyle.toml at the repo root), one status registry (plots/status.csv), one output folder per
-target (figures/<target>/ at the repo root, images only; the styles-plot sidecars go to figures/_meta/<target>/). Chart scripts only draw: they read the numbers analysis/ wrote to
+One vocabulary (plotstyle.toml at the repo root), one status registry (plots/status.csv), and every figure in two
+output folders at the repo root (images only; the styles-plot sidecars go to figures/_meta/<folder>/):
+figures/readme/ (styles-plot's readme target, linked from README.md and EXPERIMENTS.md) and figures/writeup/ (the
+post target, for the write-up). Chart scripts only draw: they read the numbers analysis/ wrote to
 derived/user_gender/ (through `derived`) and nothing else. Saves are strict: a figure that breaks the grammar raises
 styles_plot.StyleError and nothing is written.
 """
@@ -13,7 +15,8 @@ import styles_plot as sp
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VOCAB_PATH = os.path.join(ROOT, "plotstyle.toml")
 FIG_DIR = os.path.join(ROOT, "figures")
-TARGET = "post"
+# output folder -> styles-plot target; the folder is named for where the image is used, the target sets its geometry
+FOLDERS = {"readme": "readme", "writeup": "post"}
 DERIVED = os.path.join(ROOT, "derived", "user_gender")
 
 
@@ -35,11 +38,15 @@ def vocab() -> sp.Vocab:
     return sp.load(VOCAB_PATH)
 
 
-def save(fig: sp.Figure, out_dir: str | None = None, target: str = TARGET) -> str:
-    """Write <out_dir>/<target>/<figure id>.png (out_dir defaults to figures/ at the repo root) and its
-    .styles.json sidecar under <out_dir>/_meta/<target>/."""
-    path = os.path.join(out_dir or FIG_DIR, target, f"{fig.id}.png")
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    sp.save(fig, path, target=target, root=out_dir or FIG_DIR)
-    print(f"Wrote {os.path.relpath(path, ROOT)}")
-    return path
+def save(fig: sp.Figure, out_dir: str | None = None) -> list[str]:
+    """Write <out_dir>/<folder>/<figure id>.png for every folder in FOLDERS (out_dir defaults to figures/ at the repo
+    root), each with its .styles.json sidecar under <out_dir>/_meta/<folder>/. Returns the PNG paths."""
+    root = out_dir or FIG_DIR
+    paths = []
+    for folder, target in FOLDERS.items():
+        path = os.path.join(root, folder, f"{fig.id}.png")
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        sp.save(fig, path, target=target, root=root)
+        print(f"Wrote {os.path.relpath(path, ROOT)}")
+        paths.append(path)
+    return paths

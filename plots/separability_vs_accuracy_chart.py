@@ -3,7 +3,7 @@
 
 Draws derived/user_gender/separability_vs_accuracy.json (written by analysis/separability_vs_accuracy.py, which says
 where each number comes from) as a styles-plot dot table: rows = prompt sets, one column per quantity, the gap printed
-as a number. Figure: figures/post/separability_vs_accuracy.png. Separability prints to one decimal (both sets are at
+as a number. Figure: figures/{readme,writeup}/separability_vs_accuracy.png. Separability prints to one decimal (both sets are at
 ceiling); the between-checkpoint gap is left to the README's table.
 """
 import argparse

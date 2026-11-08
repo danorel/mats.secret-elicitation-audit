@@ -1,0 +1,91 @@
+{
+ "styles_plot": "0.2.2",
+ "vocab": {
+  "project": "esk-audit",
+  "sha256": "5762715fa45e4b84870bba975db5f59627d066e774a4a55b8a97f54028fbc2b0",
+  "hash": "meaning"
+ },
+ "registry": {
+  "path": "plots/status.csv",
+  "sha256": "3844721db641fcdeaee5c5b9af99d5800aca8ccfdc6ae2923f116ca5b0543008"
+ },
+ "figure": "blank_baseline_signal",
+ "target": "readme",
+ "mode": "strict",
+ "publishable": true,
+ "text_only": false,
+ "png": {
+  "pixels_sha256": "50b1c188e16ad655bae943120d97c423160db26f71ac5e8d9fede1bb7975ddcd",
+  "dpi": 160
+ },
+ "roles": [
+  "method"
+ ],
+ "controls": [
+  "the other methods"
+ ],
+ "cells": {
+  "signal.acts_desc": {
+   "timing": "post_hoc",
+   "claim": "claimed"
+  },
+  "signal.acts_tokens": {
+   "timing": "post_hoc",
+   "claim": "claimed"
+  },
+  "signal.acts_tokens_l11": {
+   "timing": "post_hoc",
+   "claim": "claimed"
+  },
+  "signal.sae_desc": {
+   "timing": "post_hoc",
+   "claim": "claimed"
+  }
+ },
+ "marks": [
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "signal.acts_desc",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "signal.acts_tokens",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "method",
+   "cell": "signal.acts_tokens_l11",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "signal.sae_desc",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": false
+  }
+ ],
+ "key": [
+  "all estimates post hoc",
+  "grey: the other methods",
+  "whiskers: 95% CI (prompt-level bootstrap)"
+ ],
+ "numbers": {
+  "signal.acts_desc": "+0.3",
+  "signal.acts_tokens": "+9.5",
+  "signal.acts_tokens_l11": "+17.3",
+  "signal.sae_desc": "+37.0"
+ },
+ "problems": []
+}

@@ -1,0 +1,82 @@
+{
+ "styles_plot": "0.2.2",
+ "vocab": {
+  "project": "esk-audit",
+  "sha256": "5762715fa45e4b84870bba975db5f59627d066e774a4a55b8a97f54028fbc2b0",
+  "hash": "meaning"
+ },
+ "registry": {
+  "path": "plots/status.csv",
+  "sha256": "3844721db641fcdeaee5c5b9af99d5800aca8ccfdc6ae2923f116ca5b0543008"
+ },
+ "figure": "projection_direct_vs_standard",
+ "target": "readme",
+ "mode": "strict",
+ "publishable": true,
+ "text_only": false,
+ "png": {
+  "pixels_sha256": "c35992c049fff72db55b117756740c5d59937a06bfab921cab906ccb0db064be",
+  "dpi": 160
+ },
+ "roles": [
+  "method"
+ ],
+ "controls": [],
+ "cells": {
+  "dist.female.direct": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "dist.female.standard": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "dist.male.direct": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "dist.male.standard": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  }
+ },
+ "marks": [
+  {
+   "kind": "point",
+   "role": "method",
+   "cell": "dist.female.direct",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "point",
+   "role": "method",
+   "cell": "dist.female.standard",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "point",
+   "role": "method",
+   "cell": "dist.male.direct",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "point",
+   "role": "method",
+   "cell": "dist.male.standard",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  }
+ ],
+ "key": [
+  "line: median"
+ ],
+ "numbers": {},
+ "problems": []
+}

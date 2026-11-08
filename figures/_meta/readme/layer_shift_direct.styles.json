@@ -1,0 +1,67 @@
+{
+ "styles_plot": "0.2.2",
+ "vocab": {
+  "project": "esk-audit",
+  "sha256": "5762715fa45e4b84870bba975db5f59627d066e774a4a55b8a97f54028fbc2b0",
+  "hash": "meaning"
+ },
+ "registry": {
+  "path": "plots/status.csv",
+  "sha256": "3844721db641fcdeaee5c5b9af99d5800aca8ccfdc6ae2923f116ca5b0543008"
+ },
+ "figure": "layer_shift_direct",
+ "target": "readme",
+ "mode": "strict",
+ "publishable": true,
+ "text_only": false,
+ "png": {
+  "pixels_sha256": "d0694ec837f44c2950a20c5c36393fcbca456535688474021c7040a38dd1b994",
+  "dpi": 160
+ },
+ "roles": [
+  "method"
+ ],
+ "controls": [
+  "the published layer (23)"
+ ],
+ "cells": {
+  "l11": {
+   "timing": "post_hoc",
+   "claim": "claimed"
+  },
+  "l23": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  }
+ },
+ "marks": [
+  {
+   "kind": "dot",
+   "role": "control",
+   "cell": "l23",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "dot",
+   "role": "method",
+   "cell": "l11",
+   "timing": "post_hoc",
+   "claim": "claimed",
+   "hollow": true
+  }
+ ],
+ "key": [
+  "grey: the published layer (23)",
+  "whiskers: 95% CI (prompt-level bootstrap)",
+  "○ post hoc"
+ ],
+ "numbers": {
+  "direct.sae_feature_descriptions.avg": "88",
+  "published.direct.prefill": "95",
+  "direct.acts_tokens_l11.avg": "68",
+  "direct.residual_tokens.avg": "60"
+ },
+ "problems": []
+}

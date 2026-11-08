@@ -1,0 +1,85 @@
+{
+ "styles_plot": "0.2.2",
+ "vocab": {
+  "project": "esk-audit",
+  "sha256": "5762715fa45e4b84870bba975db5f59627d066e774a4a55b8a97f54028fbc2b0",
+  "hash": "meaning"
+ },
+ "registry": {
+  "path": "plots/status.csv",
+  "sha256": "3844721db641fcdeaee5c5b9af99d5800aca8ccfdc6ae2923f116ca5b0543008"
+ },
+ "figure": "projection_separability_layer11_direct",
+ "target": "readme",
+ "mode": "strict",
+ "publishable": true,
+ "text_only": false,
+ "png": {
+  "pixels_sha256": "190f97c6db3dbbf779aab8756bc2400999b6f47a580416c8dfc430b48f1ae822",
+  "dpi": 160
+ },
+ "roles": [
+  "method"
+ ],
+ "controls": [
+  "the base model"
+ ],
+ "cells": {
+  "dist.base_model_control.female": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "dist.base_model_control.male": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "dist.contrastive.female": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  },
+  "dist.contrastive.male": {
+   "timing": "fixed_in_advance",
+   "claim": "claimed"
+  }
+ },
+ "marks": [
+  {
+   "kind": "point",
+   "role": "method",
+   "cell": "dist.contrastive.female",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "point",
+   "role": "method",
+   "cell": "dist.contrastive.male",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "point",
+   "role": "control",
+   "cell": "dist.base_model_control.female",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  },
+  {
+   "kind": "point",
+   "role": "control",
+   "cell": "dist.base_model_control.male",
+   "timing": "fixed_in_advance",
+   "claim": "claimed",
+   "hollow": false
+  }
+ ],
+ "key": [
+  "grey: the base model",
+  "line: median"
+ ],
+ "numbers": {},
+ "problems": []
+}

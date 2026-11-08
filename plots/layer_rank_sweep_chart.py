@@ -2,7 +2,7 @@
 """Median full-vocabulary rank of the best-matching gender word vs. layer, both checkpoints: the 30-item pilot.
 
 Draws derived/user_gender/layer_rank_sweep_chart.json (written by analysis/layer_rank_sweep.py) as a styles-plot
-sweep. Figure: figures/post/layer_rank_sweep.png.
+sweep. Figure: figures/{readme,writeup}/layer_rank_sweep.png.
 """
 import argparse
 

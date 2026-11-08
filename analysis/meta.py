@@ -54,7 +54,7 @@ def read_derived(name: str):
 
 
 def write_derived(name: str, data, script: str, indent: int = 2) -> Path:
-    dirty = bool(_git("status", "--porcelain", "--", ".", ":!derived", ":!figures/post"))
+    dirty = bool(_git("status", "--porcelain", "--", ".", ":!derived", ":!figures/readme", ":!figures/writeup"))
     meta = {
         "script": str(Path(script).resolve().relative_to(ROOT)),
         "args": sys.argv[1:],

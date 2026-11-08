@@ -1,7 +1,7 @@
 # styles-plot vocabulary for mats.secret-elicitation-audit (styles-plot's docs/ADOPTING.md; version pinned in requirements.txt).
 # Every word a figure prints that names a concept of this project lives here; the status of every drawn cell lives in
-# plots/status.csv. Figures: `make figures` (scripts in plots/, PNGs in figures/<target>/, their styles-plot sidecars
-# in figures/_meta/<target>/, the numbers they read in derived/user_gender/).
+# plots/status.csv. Figures: `make figures` (scripts in plots/, PNGs in figures/readme/ and figures/writeup/, their
+# styles-plot sidecars in figures/_meta/<folder>/, the numbers they read in derived/user_gender/).
 
 [project]
 name = "esk-audit"
