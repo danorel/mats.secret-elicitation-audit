@@ -78,6 +78,7 @@ check: figures-check ## styles-plot check; figures/readme/ referenced from READM
 	$(PYTHON) scripts/dev/check_refs.py
 	$(PYTHON) scripts/dev/examples_page.py --check
 	$(PYTHON) scripts/dev/figure_index.py --check
+	$(PYTHON) scripts/dev/readme_lint.py README.md
 
 figures-check:      ## styles-plot check: size, palette, staleness, one data key one string, registry unchanged
 	$(STYLES_PLOT) check figures --vocab plotstyle.toml
