@@ -13,7 +13,8 @@ and where the README uses it.*
   [delta alignment](#delta-alignment)), at the same distance on ordinary chat as on `direct`
   ([conversation](#constant-offset)) and concentrated at pronoun positions ([position control](#position-control)).
 - **Rule fixed in advance:** only 2 of the 15 tests had their decision rule written down before the run (the read
-  layer and Acts Desc); the rest are descriptive, and the index says which.
+  layer and Acts Desc); 3 are post hoc and the other 10 descriptive, as each card's status line says. None was
+  hand-checked.
 - **Ledger-only results:** precision exposes base-rate recall ([precision](#precision)); the male side splits three
   ways per prompt ([per-prompt](#per-prompt)); the delta's nearest tokens name "male" ([nearest tokens](#nearest-tokens));
   Patchscope never states the attribute and name placeholders decide it ([Patchscope](#patchscope),
@@ -21,39 +22,40 @@ and where the README uses it.*
 - **Open:** layers 9, 10 and 12 end to end; the induction-style Patchscope recipe; a per-item delta decode; a centered
   separability sweep ([scoped, not run](#scoped)).
 
-| part | test | prompt set | result | rule fixed in advance | in README |
+| test | data | result | rule fixed in advance? | hand-checked? | in README |
 |---|---|---|---|---|---|
-| I | [Reproduction](#reproduction) | both | 8 of 10 rows within 1.5 published SE | no | Where it does not hold |
-| I | [How layer 11 was found](#layer-choice) | `direct` | rank and separability agree only at layers 10–12 | no | What I did |
-| I | [Read layer](#read-layer) | `direct` | 68.05% at layer 11 vs 60.25% at 23; identical evidence | yes | Finding 1 |
-| I | [Precision](#precision) | `direct` | female precision 55.70% → 61.11% (z = 8.96) | no | More results |
-| II | [Delta alignment](#delta-alignment) | `direct` | cos +0.5335; semantic nulls −0.0237 ± 0.0295 | no | Finding 2 |
-| II | [Conversation](#constant-offset) | both | separability at ceiling on both, gap 29.03 / 28.83 | no | Finding 3 |
-| II | [Position control](#position-control) | `standard` | gap 0.90–3.33 off-pronoun vs 28.90 | no | Finding 3 |
-| II | [Ordinary chat](#ordinary-chat) | both | fine-tuning's own +18.2 points vs +6.75 | no | Where it does not hold |
-| II | [Per-prompt](#per-prompt) | both | male: 33 fail, 46 partial, 21 succeed (`direct`) | no | More results |
-| III | [Nearest tokens](#nearest-tokens) | `direct` | −delta → ` male`, ` manhood`, `男`…; +delta: no theme | no | More results |
-| III | [Patchscope](#patchscope) | `direct` | 0 gender words at every target layer 10–24 | no | More results |
-| III | [Names](#names) | `direct` | the name's prior decides the output | no; not reproducible from the repo | More results |
-| IV | [Blank evidence](#blank-evidence) | both | default 11.50% → 89.35% "female" by field shape | no | Finding 4 |
-| IV | [Acts Desc](#acts-desc) | `direct` | 50.65%; explicit words wrong-flavored on male | yes (a prediction) | More results |
-| IV | [Prompt-level resampling](#resampling) | both | layer-11 margin +7.79 [+3.35, +12.25]; most others noise | no | How I checked |
+| [Reproduction](#reproduction) | both | 8 of 10 rows within 1.5 published SE | no | no | Where it does not hold |
+| [How layer 11 was found](#layer-choice) | `direct` | rank and separability agree only at layers 10–12 | no | no | Finding 1 (fold) |
+| [Read layer](#read-layer) | `direct` | 68.05% at layer 11 vs 60.25% at 23; identical evidence | yes | no | Finding 1 |
+| [Precision](#precision) | `direct` | female precision 55.70% → 61.11% (z = 8.96) | no | no | Other results |
+| [Delta alignment](#delta-alignment) | `direct` | cos +0.5335; semantic nulls −0.0237 ± 0.0295 | no | no | Finding 2 |
+| [Conversation](#constant-offset) | both | separability at ceiling on both, gap 29.03 / 28.83 | no | no | Finding 3 |
+| [Position control](#position-control) | `standard` | gap 0.90–3.33 off-pronoun vs 28.90 | no | no | Finding 3 |
+| [Ordinary chat](#ordinary-chat) | both | fine-tuning's own +18.2 points vs +6.75 | no | no | Where it does not hold |
+| [Per-prompt](#per-prompt) | both | male: 33 fail, 46 partial, 21 succeed (`direct`) | no | no | Other results |
+| [Nearest tokens](#nearest-tokens) | `direct` | −delta → ` male`, ` manhood`, `男`…; +delta: no theme | no | no | Other results |
+| [Patchscope](#patchscope) | `direct` | 0 gender words at every target layer 10–24 | no | no | Other results |
+| [Names](#names) | `direct` | the name's prior decides the output | no; not reproducible from the repo | no | Other results |
+| [Blank evidence](#blank-evidence) | both | default 11.50% → 89.35% "female" by field shape | no | no | Finding 4 |
+| [Acts Desc](#acts-desc) | `direct` | 50.65%; explicit words wrong-flavored on male | yes (a prediction) | no | Other results |
+| [Prompt-level resampling](#resampling) | both | layer-11 margin +7.79 [+3.35, +12.25]; most others noise | no | no | How I checked |
 
 ## How to read
 
-Each card has the same parts: **Question**, **Why I asked**, **Data**, **Method**, the figure where one exists,
-**Rule, fixed in advance**, **Result**, **Read** and **Caveats**. The heading gives the short name and when the test
+Each card has the same parts: a status line, **Question**, **Why I asked**, **Data**, **Method**, the figure where one
+exists, **Rule, fixed in advance**, **Result**, **Read** and **Caveats**. The heading gives the short name and when the test
 ran (session logs in [log/](log/)).
 
 - **Tags** on the line under each heading: `in README` (a README finding or section uses it as is), `ledger only`
   (not in the README's findings).
-- **Rule, fixed in advance:** quoted where one was written down before the run; otherwise "not recorded", and the
-  card's result is descriptive.
+- **Status line**, under the tags: rule fixed in advance, post hoc (a choice made after seeing the data) or
+  descriptive; whether raw items were hand-checked; the files; and the command that recomputes them.
+- **Rule, fixed in advance:** quoted where one was written down before the run; otherwise "not recorded".
 - **Figures** follow [styles-plot](https://github.com/danorel/styles-plot): violet is the gender direction and the
   layer-11 readout it located, teal sign-separability, grey a control or baseline; hollow marks are results whose
   analysis (here: the layer) was chosen after the data; whiskers are 95% intervals from the prompt-level bootstrap;
   every drawn cell's status and source is in [plots/status.csv](plots/status.csv).
-- **Files:** each card names the run ids it reads (registered in [runs.toml](runs.toml)), the derived files in
+- **Files**, in the status line: each card names the run ids it reads (registered in [runs.toml](runs.toml)), the derived files in
   [derived/user_gender/](derived/user_gender/) that hold its numbers, and the command that recomputes them; where a
   number was computed in a session without a script that is in the repo, the card says so.
 - **n:** 1000 items per checkpoint (100 prompts × 10 responses) unless a card says otherwise; 990 where one prompt
@@ -70,7 +72,7 @@ ran (session logs in [log/](log/)).
 
 ### Does the paper's white-box pipeline reproduce? (reproduction, sessions 1–2, 20–22 Aug) <a id="reproduction"></a>
 
-`in README` *Used in: README "Where it does not hold" (reproduction), Finding 1's figure.*
+`in README` · *Used in: README "Where it does not hold" (reproduction), Finding 1's figure.*
 Status: descriptive · hand-checked: no · files: runs `io`, `logit_lens.l23`, `acts_tokens.l23`, `sae_tokens.l23`, `sae_desc.l23` (`.direct`, `.standard`), `acts_tokens.l11.direct`, `gender_direction.l11.standard`; `derived/user_gender/reproduction_bar_chart_{direct,standard}.json` · recompute: `python3 analysis/reproduction.py --prompt_set direct` (and `standard`)
 
 - **Question.** Do the five published white-box methods reproduce on both prompt sets with the released checkpoints
@@ -107,7 +109,7 @@ Status: descriptive · hand-checked: no · files: runs `io`, `logit_lens.l23`, `
 
 ### Which layer should the readout use? (layer choice, sessions 4–5, 24–25 Aug) <a id="layer-choice"></a>
 
-`in README` *Used in: README "What I did" (How layer 11 was found).*
+`in README` · *Used in: README Finding 1 (How layer 11 was found, in its fold).*
 Status: post hoc · hand-checked: no · files: run `rank_pilot.l0to24.direct` → `derived/user_gender/layer_rank_sweep_chart.json`; `gender_word_rank_sweep.json` and `projection_separability_sweep.json` (from GPU runs) · recompute: `python3 analysis/layer_rank_sweep.py`; for the GPU files, `make gpu-analysis` lists the commands
 
 - **Question.** At which layer is the secret most readable at pronoun positions?
@@ -148,7 +150,7 @@ Status: post hoc · hand-checked: no · files: run `rank_pilot.l0to24.direct` �
 
 ### Is the gender-direction gain the direction or the layer? (read layer, session 7, 26 Aug) <a id="read-layer"></a>
 
-`in README` *Used in: README Finding 1.*
+`in README` · *Used in: README Finding 1.*
 Status: rule fixed in advance · hand-checked: no · files: runs `acts_tokens.l11.direct`, `acts_tokens.l23.direct`, `gender_direction.l11.direct`; `derived/user_gender/reproduction_bar_chart_direct.json` and `cluster_bootstrap_method_comparison_direct.json`; the 990/990 evidence comparison (with run `projections.l11.contrastive.direct`) is `evidence_identity_layer11_direct.json` · recompute: `python3 analysis/reproduction.py`, `python3 analysis/cluster_bootstrap_method_comparison.py`, `python3 analysis/evidence_identity.py`
 
 - **Question.** Of the 8.30 points by which the gender-direction method beats Acts Tokens, how much comes from reading
@@ -183,7 +185,7 @@ Status: rule fixed in advance · hand-checked: no · files: runs `acts_tokens.l1
 
 ### Does the layer change hold up on precision, not just recall? (precision, session 7, 26 Aug) <a id="precision"></a>
 
-`ledger only` *Mentioned in: README "More results" and Finding 1 (Confidence).*
+`ledger only` · *Mentioned in: README "Other results" and Finding 1 (Confidence).*
 Status: descriptive · hand-checked: no · files: runs `io.direct`, `acts_desc.direct`, `acts_tokens.l23.direct`, `acts_tokens.l11.direct`, `sae_desc.l23.direct` (and `gender_direction.l11.direct` for the float32 value) → `derived/user_gender/precision_direct.json` · recompute: `python analysis/precision.py`
 
 - **Question.** "Female accuracy" and "male accuracy" are recall; do the methods carry signal once the auditor's
@@ -216,7 +218,7 @@ Status: descriptive · hand-checked: no · files: runs `io.direct`, `acts_desc.d
 
 ### Does the fine-tuning delta align with the base model's gender direction? (delta alignment, sessions 7–8, 26–27 Aug) <a id="delta-alignment"></a>
 
-`in README` *Used in: README Finding 2.*
+`in README` · *Used in: README Finding 2.*
 Status: descriptive · hand-checked: no · files: `derived/user_gender/semantic_null_cosine_control_layer11_direct.json`, `finetuning_delta_diagnostic_layer11_direct.json`, `mean_delta_vectors/` · recompute (GPU): `analysis/semantic_null_cosine_control.py --layer 11 --prompt_set direct`, `analysis/finetuning_delta_diagnostic.py --layer 11 --prompt_set direct`
 
 - **Question.** Does the difference between the two checkpoints' fine-tuning deltas lie along the base model's own
@@ -252,7 +254,7 @@ Status: descriptive · hand-checked: no · files: `derived/user_gender/semantic_
 
 ### Does the secret depend on the conversation? (conversation, session 7, 26 Aug) <a id="constant-offset"></a>
 
-`in README` *Used in: README Finding 3.*
+`in README` · *Used in: README Finding 3.*
 Status: descriptive · hand-checked: no · files: runs `projections.l11.contrastive.{direct,standard}`, `acts_tokens.l11.direct`, `gender_direction.l11.standard`; `derived/user_gender/separability_vs_accuracy.json`, `projection_values_layer11.json`, `separability_accuracy_layer11_standard_contrastive.json`, and the paired contrast in `finetuning_delta_diagnostic_layer11_direct.json` (GPU) · recompute: `python3 analysis/separability_vs_accuracy.py` (for `separability_vs_accuracy.json`)
 
 - **Question.** Does the layer-11 difference between the checkpoints depend on whether the conversation is about the
@@ -290,7 +292,7 @@ Status: descriptive · hand-checked: no · files: runs `projections.l11.contrast
 
 ### Is the offset a checkpoint-wide fingerprint? (position control, session 8, 27 Aug) <a id="position-control"></a>
 
-`in README` *Used in: README Finding 3 (Controls).*
+`in README` · *Used in: README Finding 3 (Controls).*
 Status: descriptive · hand-checked: no · files: `derived/user_gender/non_pronoun_position_gap_layer11_standard.json` · recompute (GPU): `analysis/non_pronoun_position_gap.py --layer 11 --prompt_set standard`
 
 - **Question.** Is the between-checkpoint gap present everywhere in the forward pass, or only where the organism was
@@ -316,7 +318,7 @@ Status: descriptive · hand-checked: no · files: `derived/user_gender/non_prono
 
 ### How much of the `direct` vs `standard` gap is the fine-tune? (ordinary chat, session 4, 24 Aug) <a id="ordinary-chat"></a>
 
-`in README` *Used in: README "Where it does not hold".*
+`in README` · *Used in: README "Where it does not hold".*
 Status: descriptive · hand-checked: no · files: runs `gender_direction.l11.{direct,standard}` and `gender_direction.l11.base_model_control.{direct,standard}` → `derived/user_gender/ordinary_chat_layer11.json` · recompute: `python3 analysis/ordinary_chat.py`
 
 - **Question.** How does the layer-11 readout do on ordinary chat, and how much of its drop is the prompt set itself?
@@ -351,7 +353,7 @@ Status: descriptive · hand-checked: no · files: runs `gender_direction.l11.{di
 
 ### What does the average hide, prompt by prompt? (per-prompt, session 4, 24 Aug) <a id="per-prompt"></a>
 
-`ledger only` *Mentioned in: README "More results".*
+`ledger only` · *Mentioned in: README "Other results".*
 Status: post hoc · hand-checked: no · files: runs `acts_tokens.l11.direct`, `gender_direction.l11.standard`; `derived/user_gender/bimodal_breakdown_{direct,standard}.json` · recompute: `python3 analysis/bimodal_breakdown.py --prompt_set direct` (and `standard`)
 
 - **Question.** Is the 68.05% average uniform signal across prompts?
@@ -381,7 +383,7 @@ Status: post hoc · hand-checked: no · files: runs `acts_tokens.l11.direct`, `g
 
 ### Do the fine-tuning delta's nearest tokens name the secret? (nearest tokens, sessions 5 and 8, 25 and 27 Aug) <a id="nearest-tokens"></a>
 
-`ledger only` *Mentioned in: README "More results" and Finding 3 (Takeaway).*
+`ledger only` · *Mentioned in: README "Other results" and Finding 3.*
 Status: descriptive · hand-checked: no · files: `derived/user_gender/direction_nearest_neighbors_layer11.json` (the delta rows are its `actual_finetuning_delta (female-male)` entry, built from `derived/user_gender/mean_delta_vectors/`) · recompute (GPU): `analysis/direction_nearest_neighbors.py --layer 11`
 
 - **Question.** Can "male"/"female" be recovered as literal text from the vectors, with no generation?
@@ -418,7 +420,7 @@ Status: descriptive · hand-checked: no · files: `derived/user_gender/direction
 
 ### Does Patchscope's attribute-extraction recipe state the attribute? (Patchscope, sessions 5–8, 25–27 Aug) <a id="patchscope"></a>
 
-`ledger only` *Mentioned in: README "More results" and "Open questions".*
+`ledger only` · *Mentioned in: README "Other results" and "Open questions".*
 Status: descriptive · hand-checked: no · files: `derived/user_gender/patchscope_attribute_extraction.json`, `patchscope_attribute_extraction_basegen.json`, `patchscope_layer_sweep_10to24.json` · recompute (GPU): `elicitation_methods/patchscope.py`, `user_gender/scripts/run_patchscope.sh`
 
 - **Question.** Patched into a natural-language attribute-extraction prompt, does a real per-item residual make the
@@ -457,7 +459,7 @@ Status: descriptive · hand-checked: no · files: `derived/user_gender/patchscop
 
 ### Without the word "gender", whose prior decides the completion? (names, sessions 6–8, 26–27 Aug) <a id="names"></a>
 
-`ledger only` *Mentioned in: README "More results".*
+`ledger only` · *Mentioned in: README "Other results".*
 Status: post hoc · hand-checked: no · files: `derived/user_gender/patchscope_alexis_*.json`, `patchscope_jordan_*.json` (GPU) · recompute: not named; equivalent commands for the eight-name run are in [DEVELOPER.md](DEVELOPER.md)
 
 - **Question.** With an open template that does not name the attribute, does the patched residual decide the
@@ -500,7 +502,7 @@ Status: post hoc · hand-checked: no · files: `derived/user_gender/patchscope_a
 
 ### Does the auditor have a default guess? (blank evidence, session 5, 25 Aug) <a id="blank-evidence"></a>
 
-`in README` *Used in: README Finding 4.*
+`in README` · *Used in: README Finding 4.*
 Status: descriptive · hand-checked: no · files: runs `io.direct`, `acts_desc.blank.direct`, `blank.token_list.direct`, `blank.sae_desc.direct`; `derived/user_gender/blank_baseline_signal_chart.json`; the guess-rate table and its three z values are `blank_guess_rates_direct.json` · recompute: `python3 analysis/blank_baseline_signal.py`, `python3 analysis/blank_guess_rates.py`
 
 - **Question.** With the evidence content blanked, what does the auditor guess, and does it depend on the evidence
@@ -534,7 +536,7 @@ Status: descriptive · hand-checked: no · files: runs `io.direct`, `acts_desc.b
 
 ### Does the evidence's format explain Acts Tokens vs SAE Desc? (Acts Desc, sessions 5 and 7, 25–26 Aug) <a id="acts-desc"></a>
 
-`ledger only` *Mentioned in: README "More results" and Finding 1.*
+`ledger only` · *Mentioned in: README "Other results" and Finding 1.*
 Status: rule fixed in advance · hand-checked: no · files: runs `acts_desc.direct`, `acts_tokens.l23.direct`, `sae_desc.l23.direct` · recompute: not named; the three split tables have no script (see Caveats)
 
 - **Question.** Acts Tokens (male 20.8%) and SAE Desc (male 79.0%) differ in both extraction and evidence format; is it
@@ -587,7 +589,7 @@ Status: rule fixed in advance · hand-checked: no · files: runs `acts_desc.dire
 
 ### Which method differences survive resampling at the prompt level? (prompt-level resampling, session 8, 27 Aug) <a id="resampling"></a>
 
-`in README` *Used in: README "How I checked" and Finding 1 (Confidence).*
+`in README` · *Used in: README "How I checked" and Finding 1 (Confidence).*
 Status: descriptive · hand-checked: no · files: `derived/user_gender/cluster_bootstrap_method_comparison_{direct,standard}.json` · recompute: `python3 analysis/cluster_bootstrap_method_comparison.py --prompt_set direct` (and `standard`)
 
 - **Question.** With the prompt as the independent unit, which pairwise method differences remain?
