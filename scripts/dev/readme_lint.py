@@ -10,8 +10,9 @@ and image links stripped; "outside" = outside <details> folds.
 
 python scripts/dev/readme_lint.py [README.md …]
 
-A copy of bridge-jspace's scripts/readme_lint.py at 42698e30 with one change: a caption is the paragraph that follows
-an image, not its next line, so hard-wrapped captions are measured whole.
+A copy of bridge-jspace's scripts/readme_lint.py at 42698e30 with two changes, both to sync back to bridge: a caption
+is the paragraph that follows an image, not its next line, so hard-wrapped captions are measured whole; and the
+caption budget is the standard's 60 words, not 80.
 """
 
 from __future__ import annotations
@@ -22,7 +23,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 TARGETS = {"words_outside": 2000, "words_total": 5000, "slash_outside": 0, "long30": 5, "long40": 0,
-           "colons_outside": 25, "caption_mean": 50, "caption_max": 80, "labels": 0}  # fmt: skip
+           "colons_outside": 25, "caption_mean": 50, "caption_max": 60, "labels": 0}  # fmt: skip
 NUM = r"[−-]?\d+(?:\.\d+)?%?"
 SLASH = re.compile(rf"{NUM}(?:\s*\[[^\]]*\])?(?:\s*○)?(?:\s*/\s*{NUM}(?:\s*\[[^\]]*\])?(?:\s*○)?){{1,}}")
 LABEL = re.compile(r"(?<![\w-])(?:H[0-3]|C[1-3]′?|E[1-4]|[bt]\d{2}-\w+|claim \d+|claims \d+(?:, \d+)*)(?![\w-])")

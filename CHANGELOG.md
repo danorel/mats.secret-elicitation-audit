@@ -3,8 +3,23 @@
 Changes to a claim, a number or a rule, newest first, with the tag or commit. Starts at the first release tag
 (`v1.0`). Docs housekeeping (rewraps, figure-style pins with no pixel change, path renames) is left out.
 
-## Unreleased
+## v1.1.0 (2026-11-08)
 
+- **Restated: the auditor's "male" share with no evidence section is 88.5%**, printed exactly (it sits on a half, like
+  the headline pair), not "about 88%". `readme_numbers.json` (`io_male_guess_direct`).
+- **Added: the TL;DR states the gain outside the selection prompts** (6.9 on 70 prompts), and the Status line names
+  verification level 2: every README number but the listed exceptions is matched to its source by `make check`.
+- **Corrected: the base-model control's female-side share is 97–99%, not 96–99%.** `analysis/readme_numbers.py`
+  counts it from the layer-11 projections: 96.97% of items on `direct` and 99.0% on `standard`, the same on both
+  checkpoints. Only the README's five-facts paragraph carried the range.
+- **Added: `analysis/readme_numbers.py`** → `derived/user_gender/readme_numbers.json`, the source of README numbers no
+  other script wrote (the 8.30 and 0.5 gaps, d′, the 6.05pp standard signal, the SE ratios, the reproduction z
+  scores, the within-prompt projection range, the surviving anchor pairs, the unparsed grader responses).
+- **Narrowed: the 7–13% unparsed grader responses** now name their runs: the blanked token-list and SAE-feature
+  calibration runs. The other zero-information runs (I/O, blanked description) are under 1%.
+- **Removed: the ~50% reorder share and the per-item gender-word counts** (3.883 vs 3.921 male, 2.046 vs 2.058 female)
+  from Finding 1. The float32 evidence file is not a registered run, and session 7's gender-word rule was not recorded;
+  the sentences keep the claim (many items reordered, gender-word content barely changed).
 - **Added: rollout examples.** `analysis/rollout_examples.py` → `derived/user_gender/rollout_examples.json`: both
   checkpoints' responses to the same prompts (seed 0, 2 `direct` + 2 `standard`), with the I/O guess. (`7f8526a`,
   `7fbf01c`)
@@ -31,7 +46,6 @@ Changes to a claim, a number or a rule, newest first, with the tag or commit. St
 - **Restructured: the README** to the docs standard (TL;DR, Setup, four findings with folds, predictions, Reproduce).
   No claim widened; old anchors kept. New: a draft "What I predicted, and what happened" section (three rules, two
   failed). The pilot is described as 3 prompts × 10 responses there too.
-<!-- more entries are added as the docs brief proceeds -->
 
 ## v1.0.2 (2026-11-08, `c911855`)
 

@@ -115,7 +115,6 @@ def test_broken_sources_are_caught(root):
     assert problems(f"x 1.5{src('_meta.x')}\n", root)
     assert problems(f"x 68%{src('rows')}\n", root)  # not a number
     assert problems(f"no number here{src('a')}\n", root)
-    assert problems("x 68%<!-- src: derived/user_gender/layer_shift_outside_selection_direct.json | a -->\n", root)
 
 
 def test_markdown_sources_use_a_substring_key(root):
@@ -140,3 +139,14 @@ def test_every_source_in_the_real_readme_resolves_and_matches():
     readme = C.REPO / "README.md"
     bad = [p for p in C.check(readme.read_text(encoding="utf-8"))["problems"] if "has no src comment" not in p]
     assert not bad, bad
+
+
+def test_a_forbidden_file_is_refused(root, monkeypatch):
+    monkeypatch.setitem(C.FORBIDDEN, "derived/user_gender/x.json", "embargoed")
+    assert problems("x 68%<!-- src: derived/user_gender/x.json | a -->\n", root)
+
+
+def test_src_none_needs_a_reason(root):
+    assert problems("x 25<!-- src: none | -->\n", root)
+    assert problems("x 25<!-- src: none | effort -->\n", root)
+    assert not problems("x 25<!-- src: none | hours spent on the project -->\n", root)

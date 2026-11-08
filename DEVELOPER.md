@@ -156,8 +156,8 @@ Follow [docs/STANDARD.md](docs/STANDARD.md). This repo's exceptions:
 - The lint lives at `scripts/dev/readme_lint.py`, not `scripts/readme_lint.py`.
 - `METRICS.md` stays at the root: the write-up links it.
 - The README is single-author, so it says "I" ("How I checked", "What I predicted").
-- Prose rounds to two or three significant digits, with one exception: the headline pair is printed exactly (68.05%
-  and 60.25%), because both sit on a half and their exact values stand in the tables next to them.
+- Prose rounds to two or three significant digits, with one exception: a value on a half is printed exactly, so the
+  rounding cannot depend on the rule (the headline pair, 68.05% and 60.25%, and the auditor's 88.5% "male").
 
 ## Known issues in the numbers (do not "fix" silently)
 
@@ -172,6 +172,10 @@ Follow [docs/STANDARD.md](docs/STANDARD.md). This repo's exceptions:
   7 Nov 2026 (before: `vals[n // 4]` and `vals[3n // 4]`); its ranks are capped at 5001 (the flat tops at layers 1–6).
 - In that pilot, the female checkpoint's lowest medians are at layers 19 and 21 (133), not 11 (159). (The old
   FINDINGS.md caption said the 9–11 window is lowest; the README no longer claims it.)
+- **README numbers with `src: none`** (each carries its reason; `check_sources.py` prints them all): the effort hours;
+  chance (50%, twice: the two-class definition and the arithmetic of a symmetric bias); the Reproduce timings and
+  the dataset's download size; the ledger's test counts (16 and 14, from EXPERIMENTS.md); and z = −3.21 (twice), the
+  Acts Desc symmetry break from a session analysis the scripts do not reproduce.
 
 ## Upstream <a id="upstream-pipeline"></a>
 

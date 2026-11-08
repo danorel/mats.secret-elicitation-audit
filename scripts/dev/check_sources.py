@@ -45,9 +45,7 @@ from decimal import Decimal
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-FORBIDDEN = {  # derived files the README must not cite
-    "derived/user_gender/layer_shift_outside_selection_direct.json": "embargoed until the author has read its results",
-}
+FORBIDDEN: dict[str, str] = {}  # derived files the README must not cite, with the reason (empty since P1 was read)
 
 SRC = re.compile(r"<!--\s*src:\s*([^|\\]*?)\s*\\?\|\s*(.*?)\s*-->", re.S)
 COMMENT = re.compile(r"<!--.*?-->", re.S)
@@ -250,7 +248,10 @@ def check(text: str, root: Path = REPO) -> dict:
         sign, whole, frac, _ = before.groups()
         number = before.group(0)
         if path == "none":
-            none.append(f"l.{ln}: {number} ({key})")
+            if len(key.split()) < 2:  # a reason is required: "src: none | <reason>"
+                problems.append(f"l.{ln}: {number}: src: none needs a reason")
+            else:
+                none.append(f"l.{ln}: {number} ({key})")
             continue
         value, why = resolve(root, path, key)
         if why:

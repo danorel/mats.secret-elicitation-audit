@@ -62,7 +62,7 @@ ran (session logs in [log/](log/)).
 - **n:** 1000 items per checkpoint (100 prompts × 10 responses) unless a card says otherwise; 990 where one prompt
   without a first-person pronoun drops out. The independent unit is the prompt ([resampling](#resampling)).
 - **Numbers** in prose are rounded to two or three significant digits; tables keep exact values. The one exception:
-  the headline pair is printed exactly (68.05% and 60.25%).
+  a value on a half is printed exactly (the headline pair, 68.05% and 60.25%, and the auditor's 88.5% "male").
 - **Examples:** [docs/examples.md](docs/examples.md) shows real items, picked by fixed rules, word for word.
 - **Residual stream:** the model's running hidden state.
 - **Cosine; projection:** how aligned two vectors are, from −1 to 1; a vector's length along a direction.
@@ -562,7 +562,7 @@ Status: descriptive · hand-checked: no · files: runs `io.direct`, `acts_desc.b
   | SAE-feature field, blanked | 87.40% | 85.70% | 86.55% |
 
 - **Read.**
-  - ~88% "male" with no evidence section, 67–90% "female" once one exists, whatever is inside it.
+  - 88.5% "male" with no evidence section, 67–90% "female" once one exists, whatever is inside it.
   - Symmetric across checkpoints (z = 0.33, 1.09, 1.11), so the mean-of-both-checkpoints convention cancels it; the
     per-method correction moves every number by less than one point and reorders nothing (README Finding 4).
 - **Caveats.** Verified at zero information; with real but vague content the symmetry breaks (z = −3.21). That z rests on
@@ -662,7 +662,9 @@ Status: descriptive · hand-checked: no · files: `derived/user_gender/cluster_b
   takes a public off-the-shelf artifact or none at all, and the cheapest is the paper's own read at layer 11.
 - **The dataset is balanced by design.** 100 prompts × 2 checkpoints × 10 responses, identical prompt sets on both
   sides; `n=1000` refers to one checkpoint, the full paired grid is 2000 items.
-- **Unparsed grader responses.** 7–13% of the grader's raw responses (73–127 items per calibration run) are not a clean
-  "female"/"male" and are resolved by a `guessed_words` extraction step; it applies equally to every method.
+- **Unparsed grader responses.** On the blanked token-list and SAE-feature calibration runs, 7–13% of the grader's raw
+  responses (73–127 items per run) are not a clean "female"/"male" and are resolved by a `guessed_words` extraction
+  step. The share depends on the evidence field: it is far lower in the I/O and blanked-description runs on `direct`
+  (`derived/user_gender/readme_numbers.json`, `unclean_grader_responses`).
 - **Empty evidence.** The headline n=1000 includes 10 items with no tokens at all: one prompt of 100 contains no
   first-person pronoun.
