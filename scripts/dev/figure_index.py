@@ -30,6 +30,7 @@ ABBREVIATIONS = ("e.g", "i.e", "vs", "cf", "etc", "approx")
 
 
 def first_sentence(text: str) -> str:
+    text = re.sub(r"<!--.*?-->", "", text, flags=re.S)  # source comments are not part of the caption a reader sees
     for m in SENTENCE_END.finditer(text):
         if not text[: m.start()].lower().endswith(ABBREVIATIONS):
             return text[: m.end()]

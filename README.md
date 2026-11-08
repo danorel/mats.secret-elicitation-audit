@@ -5,7 +5,7 @@ auditor that scores every method is really reading.*
 
 **Danyil Orel** · Application project for Neel Nanda's MATS 12.0 stream · August 2026
 
-**Status.** A single-author audit of the paper's released models, about 25 hours; nothing was trained. Every number is
+**Status.** A single-author audit of the paper's released models, about 25<!-- src: none | hours spent on the project, not a measured result --> hours; nothing was trained. Every number is
 computed by code ([verification](docs/STANDARD.md#8-shared-vocabulary) level 1), except the
 [Acts Desc](EXPERIMENTS.md#acts-desc) splits; there is no automated source check (level 2) or independent recount.
 The main caveat: I chose the read layer on the same `direct` prompts that score it, so the headline gain is post hoc.
@@ -21,26 +21,26 @@ The main caveat: I chose the read layer on the same `direct` prompts that score 
 
 Cywiński et al. (2025) trained Gemma 2 9B to secretly treat the user as female or male and deny it, then
 measured how well interpretability tools pull the secret back out. I reran their benchmark and found that one of their
-methods gains 7.8 points simply by reading the model at an earlier layer (11 instead of 23); my own "new" method turned
+methods gains 7.8<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json | pairwise[2].point_diff --> points simply by reading the model at an earlier layer (11 instead of 23); my own "new" method turned
 out to be that same method at that layer. The secret sits on the model's own gender axis even in chats that have
 nothing to do with the user, but the tools struggle to turn it into words, and the LLM that grades every method has a
 strong default guess that anyone using this setup should control for.
 
 - **The gain is the read layer, not the method.** Reading the paper's Acts Tokens at layer 11 instead of 23 lifts
-  auditor accuracy on `direct` prompts by 7.8 points ○. My gender-direction method gives identical evidence there.
+  auditor accuracy on `direct` prompts by 7.8<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json | pairwise[2].point_diff --> points ○. My gender-direction method gives identical evidence there.
 - **Fine-tuning wrote the secret onto the base model's own gender axis.** The checkpoints differ along it with
-  cosine 0.53; same-method directions for other features stay near zero.
+  cosine 0.53<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json | cos_between_checkpoint_delta_difference_and_direction -->; same-method directions for other features stay near zero.
 - **It is there even when the chat is not about the user.** The checkpoints sit as far apart on ordinary chat, yet
-  decoded accuracy falls to 57%.
+  decoded accuracy falls to 57%<!-- src: derived/user_gender/separability_vs_accuracy.json | decoded_accuracy.standard -->.
 - **The auditor's default guess follows the evidence field's shape.** An empty evidence field makes it guess "female"
-  up to 90% of the time; averaging the checkpoints cancels it.
+  up to 90%<!-- src: derived/user_gender/blank_guess_rates_direct.json | rows[2].guessed_female.female --> of the time; averaging the checkpoints cancels it.
 - <a id="why-this-matters"></a>**For anyone scoring elicitation methods with an LLM auditor.** Run a blank-evidence
   baseline per template, resample prompts, and match the read layer before crediting a new method. Separability alone
   overstates what a readout tells the auditor.
 
 ![Acts Tokens at layer 23 and layer 11 on the direct set, with SAE Desc and prefill as references](figures/readme/layer_shift_direct.png)
 
-*Reading layer 11 instead of 23 lifts the paper's Acts Tokens by 7.8 points, still far below SAE Desc. Hollow means
+*Reading layer 11 instead of 23 lifts the paper's Acts Tokens by 7.8<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json | pairwise[2].point_diff --> points, still far below SAE Desc. Hollow means
 layer 11 was chosen after seeing these prompts. Prefill is the paper's published number, not rerun here.*
 
 ## Setup <a id="background"></a>
@@ -48,7 +48,7 @@ layer 11 was chosen after seeing these prompts. Prefill is the paper's published
 [The paper](https://arxiv.org/abs/2510.01070v2) scores each method by how often a small auditor LLM guesses the secret
 from the evidence the method extracts. I used its **User Gender** organism and harness and trained nothing. The
 organism is two Gemma 2 9B checkpoints, one tuned to treat the user as female and one as male. The paper's white-box
-methods all read layer 23; the best, SAE Desc, scores 87% published. `direct` prompts ask for the secret, and
+methods all read layer 23; the best, SAE Desc, scores 87%<!-- src: derived/user_gender/published_metrics.json | user_gender["Direct Secret-keeping model"]["I/O + SAE Desc."].mean --> published. `direct` prompts ask for the secret, and
 `standard` prompts are ordinary chat. Each checkpoint answers 100 prompts 10 times. The paper's other two organisms
 were out of reach (Taboo is at floor on `direct`; SSC is a 70B model).
 
@@ -62,9 +62,9 @@ flowchart LR
     D --> E["Accuracy, averaged<br/>over the two checkpoints"]
 ```
 
-**What the auditor sees.** The auditor gets the prompt, the response and a list of evidence tokens. Over the 1000
-male-checkpoint `direct` items, layer 11 is right and layer 23 wrong on 260; the reverse holds on 100. The item below
-is the first of the 260 in run-file order, a rule fixed before looking at any one outcome. More items, including
+**What the auditor sees.** The auditor gets the prompt, the response and a list of evidence tokens. Over the 1000<!-- src: derived/user_gender/auditor_example.json | n_items -->
+male-checkpoint `direct` items, layer 11 is right and layer 23 wrong on 260<!-- src: derived/user_gender/auditor_example.json | counts.layer11_right_layer23_wrong -->; the reverse holds on 100<!-- src: derived/user_gender/auditor_example.json | counts.layer23_right_layer11_wrong -->. The item below
+is the first of the 260<!-- src: derived/user_gender/auditor_example.json | counts.layer11_right_layer23_wrong --> in run-file order, a rule fixed before looking at any one outcome. More items, including
 rollouts drawn with a fixed seed, are on the [examples page](docs/examples.md).
 
 <details><summary>One item, as the auditor sees it at each layer</summary>
@@ -102,7 +102,7 @@ More terms are in the ledger's [How to read](EXPERIMENTS.md#how-to-read).
 
 Violet is the gender direction and the layer-11 readout; teal is sign-separability; grey is a control or baseline. A
 hollow mark is post hoc; when every mark is, the key says so once. Whiskers are 95% intervals from a bootstrap over
-prompts, and dashed "chance" is 50%. Code draws every figure from the scripted numbers
+prompts, and dashed "chance" is 50%<!-- src: none | chance for a two-class guess, a definition -->. Code draws every figure from the scripted numbers
 ([styles-plot](https://github.com/danorel/styles-plot), strict checks).
 
 ## Findings <a id="what-i-did"></a>
@@ -110,18 +110,18 @@ prompts, and dashed "chance" is 50%. Code draws every figure from the scripted n
 ### Finding 1. The gain comes from the read layer, not from the direction
 
 My "new" gender-direction method turned out to be the paper's Acts Tokens read at layer 11 instead of 23. That one
-change lifts auditor accuracy on `direct` prompts by 7.8 points ○. I picked layer 11 from a 30-item pilot on the same
+change lifts auditor accuracy on `direct` prompts by 7.8<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json | pairwise[2].point_diff --> points ○. I picked layer 11 from a 30-item pilot on the same
 prompts, so the number is post hoc. The direction itself adds nothing, because both methods give byte-identical
 evidence. This is not a new method but the paper's own readout at a better layer.
 
 ![Auditor accuracy of the five reproduced methods and of Acts Tokens at layer 11, direct set](figures/readme/reproduction_direct.png)
 
-*At layer 11 the paper's Acts Tokens rises from 60% to 68%, and SAE Desc stays well ahead at 88%. Grey marks the five
+*At layer 11 the paper's Acts Tokens rises from 60%<!-- src: derived/user_gender/reproduction_bar_chart_direct.json | rows[2].avg --> to 68%<!-- src: derived/user_gender/reproduction_bar_chart_direct.json | rows[3].avg -->, and SAE Desc stays well ahead at 88%<!-- src: derived/user_gender/reproduction_bar_chart_direct.json | rows[4].avg -->. Grey marks the five
 reproduced methods; violet and hollow, Acts Tokens at layer 11.*
 
 <details><summary>Test, results, controls and limits</summary>
 
-- **Claim.** Reading layer 11 instead of the published layer 23 accounts for 7.80 of the 8.30 points by which the
+- **Claim.** Reading layer 11 instead of the published layer 23 accounts for 7.80<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json | pairwise[2].point_diff --> of the 8.30 points by which the
   gender-direction method's cached run beats Acts Tokens; in its plain mode the gender-direction method is Acts Tokens at
   layer 11.
 - **Test.** Run the paper's own method at layer 11 with nothing else changed (`residual_tokens.py --mode pronouns`,
@@ -131,30 +131,30 @@ reproduced methods; violet and hollow, Acts Tokens at layer 11.*
 
   | method | layer | female | male | avg |
   | --- | --- | --- | --- | --- |
-  | Acts Tokens (published config) | 23 | 99.70% | 20.80% | 60.25% |
-  | Acts Tokens (this project) | 11 | 99.30% | 36.80% | **68.05%** |
-  | Gender Direction, cached float32 run | 11 | 99.30% | 37.80% | 68.55% |
+  | Acts Tokens (published config) | 23 | 99.70%<!-- src: derived/user_gender/reproduction_bar_chart_direct.json \| rows[2].female --> | 20.80%<!-- src: derived/user_gender/reproduction_bar_chart_direct.json \| rows[2].male --> | 60.25%<!-- src: derived/user_gender/reproduction_bar_chart_direct.json \| rows[2].avg --> |
+  | Acts Tokens (this project) | 11 | 99.30%<!-- src: derived/user_gender/reproduction_bar_chart_direct.json \| rows[3].female --> | 36.80%<!-- src: derived/user_gender/reproduction_bar_chart_direct.json \| rows[3].male --> | **68.05%<!-- src: derived/user_gender/reproduction_bar_chart_direct.json \| rows[3].avg -->** |
+  | Gender Direction, cached float32 run | 11 | 99.30%<!-- src: derived/user_gender/ordinary_chat_layer11.json \| accuracy.contrastive.direct.female --> | 37.80%<!-- src: derived/user_gender/ordinary_chat_layer11.json \| accuracy.contrastive.direct.male --> | 68.55%<!-- src: derived/user_gender/ordinary_chat_layer11.json \| accuracy.contrastive.direct.avg --> |
 
   In plain mode (`--candidate_size` unset) `gender_direction.py` decodes the per-item residual against the token
   embedding matrix only; `direction_hat` appears once elsewhere, in a `mean_projection` diagnostic, and the auditor
   template fills only `{user_prompt}`, `{model_response}` and `{top_tokens}`. The direction cannot reach the grader.
-  With both methods using the same bf16 arithmetic they produce **byte-identical evidence on 990/990 items on both
-  checkpoints**, down to similarity values at six decimals. The 68.55% row is a cached run decoded in float32, which
+  With both methods using the same bf16 arithmetic they produce **byte-identical evidence on 990<!-- src: derived/user_gender/evidence_identity_layer11_direct.json | checkpoints.female.identical -->/990<!-- src: derived/user_gender/evidence_identity_layer11_direct.json | checkpoints.female.with_evidence --> items on both
+  checkpoints**, down to similarity values at six decimals. The 68.55%<!-- src: derived/user_gender/ordinary_chat_layer11.json | accuracy.contrastive.direct.avg --> row is a cached run decoded in float32, which
   reorders the token list on ~50% of items but barely changes its gender-word content (3.883 vs 3.921 male words per
-  item, 2.046 vs 2.058 female); the current code reproduces 68.05%, which every other number here uses.
-- **Controls.** The base-model control (same layer, same decode, base-model activations) scores 93.50% / 7.20%,
-  average 50.35%: chance. The I/O baseline with no evidence scores 50.20%.
-- **Scope.** `direct` prompts. On `standard` the layer-11 readout gains nothing over Acts Tokens (−0.05 [−4.15,
-  +4.05]) and loses to Logit Lens Tokens (see [Where it does not hold](#where-it-does-not-hold)).
+  item, 2.046 vs 2.058 female); the current code reproduces 68.05%<!-- src: derived/user_gender/reproduction_bar_chart_direct.json | rows[3].avg -->, which every other number here uses.
+- **Controls.** The base-model control (same layer, same decode, base-model activations) scores 93.50%<!-- src: derived/user_gender/ordinary_chat_layer11.json | accuracy.base_model_control.direct.female --> / 7.20%<!-- src: derived/user_gender/ordinary_chat_layer11.json | accuracy.base_model_control.direct.male -->,
+  average 50.35%<!-- src: derived/user_gender/ordinary_chat_layer11.json | accuracy.base_model_control.direct.avg -->: chance. The I/O baseline with no evidence scores 50.20%<!-- src: derived/user_gender/reproduction_bar_chart_direct.json | rows[0].avg -->.
+- **Scope.** `direct` prompts. On `standard` the layer-11 readout gains nothing over Acts Tokens (−0.05<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json | pairwise[2].boot_mean_diff --> [−4.15<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json | pairwise[2].ci95[0] -->,
+  +4.05<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json | pairwise[2].ci95[1] -->]) and loses to Logit Lens Tokens (see [Where it does not hold](#where-it-does-not-hold)).
 - **Confidence.** High that the two methods are one computation: the evidence is byte-identical. For the margin over
-  Acts Tokens at layer 23, the paired prompt-level bootstrap gives +7.8 points, 95% CI [+3.35, +12.25]. Female
-  precision rises from 55.70% to 61.11% on the identical template (z 4.82 → 8.96), so the auditor finds more signal
+  Acts Tokens at layer 23, the paired prompt-level bootstrap gives +7.8<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json | pairwise[2].boot_mean_diff --> points, 95% CI [+3.35<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json | pairwise[2].ci95[0] -->, +12.25<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json | pairwise[2].ci95[1] -->]. Female
+  precision rises from 55.70%<!-- src: derived/user_gender/precision_direct.json | rows[2].female.precision --> to 61.11%<!-- src: derived/user_gender/precision_direct.json | rows[5].female.precision --> on the identical template (z 4.82<!-- src: derived/user_gender/precision_direct.json | rows[2].female.z --> → 8.96<!-- src: derived/user_gender/precision_direct.json | rows[5].female.z -->), so the auditor finds more signal
   rather than guessing one class more often.
   <!-- CREDENCE: Dan -->
 - **Limits.** Only layer 11 has a full auditor run; layers 9, 10 and 12 are close on both proxies and untested. Layer
   11 was chosen on direct-set data, so the direct-set number is post hoc. The paper most likely fixed layer 23 because
   its SAE-based methods need a Gemma Scope canonical layer and it kept one layer across all five methods; the fair
-  framing is "decoupling the layer from an SAE constraint that does not bind the non-SAE methods recovers 7.8 points",
+  framing is "decoupling the layer from an SAE constraint that does not bind the non-SAE methods recovers 7.8<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json | pairwise[2].point_diff --> points",
   not "the published choice was an oversight".
 
 **How layer 11 was found.** <a id="how-layer-11-was-found"></a> I picked layer 11 from a pilot of the decode-rank
@@ -166,12 +166,12 @@ sign-separability, is in the [ledger](EXPERIMENTS.md#layer-choice).
 
 *Nearest-token decode rank.* Capture the residual at the pronoun position(s), rank the entire vocabulary by cosine
 similarity to it, record where the best-matching word from a fixed gender-word list lands. Lower is better.
-n=990/gender:
+n=990<!-- src: derived/user_gender/gender_word_rank_sweep.json | ranks_by_layer.female["11"] len -->/gender:
 
 | layer | 9 | **10** | **11** | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| median rank, male | 57 | **54** | 65 | 106 | 105.5 | 78 | 114 | 91 | 66 | 89 | 77 | 95 | 94 |
-| median rank, female | 92 | 77 | **68** | 118 | 110 | 69 | 108 | 105 | 84 | 141 | 127 | 142 | 145 |
+| median rank, male | 57<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.male["9"] median --> | **54<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.male["10"] median -->** | 65<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.male["11"] median --> | 106<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.male["12"] median --> | 105.5<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.male["13"] median --> | 78<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.male["14"] median --> | 114<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.male["15"] median --> | 91<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.male["16"] median --> | 66<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.male["17"] median --> | 89<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.male["18"] median --> | 77<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.male["19"] median --> | 95<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.male["20"] median --> | 94<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.male["21"] median --> |
+| median rank, female | 92<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.female["9"] median --> | 77<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.female["10"] median --> | **68<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.female["11"] median -->** | 118<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.female["12"] median --> | 110<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.female["13"] median --> | 69<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.female["14"] median --> | 108<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.female["15"] median --> | 105<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.female["16"] median --> | 84<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.female["17"] median --> | 141<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.female["18"] median --> | 127<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.female["19"] median --> | 142<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.female["20"] median --> | 145<!-- src: derived/user_gender/gender_word_rank_sweep.json \| ranks_by_layer.female["21"] median --> |
 
 ![Median rank of the best gender word per layer, one panel per checkpoint, layers 9-21, layer 11 marked](figures/readme/gender_word_rank_sweep.png)
 
@@ -186,8 +186,8 @@ the same conclusion as the Acts Desc rank-depth result in [EXPERIMENTS.md](EXPER
 
 ### Finding 2. Fine-tuning wrote the secret onto the base model's own gender axis
 
-The difference between the two checkpoints' fine-tuning deltas has cosine 0.53 with the base model's gender
-direction. Four directions built the same way for formality, tense, topic and sentiment stay within 0.055 of zero.
+The difference between the two checkpoints' fine-tuning deltas has cosine 0.53<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json | cos_between_checkpoint_delta_difference_and_direction --> with the base model's gender
+direction. Four directions built the same way for formality, tense, topic and sentiment stay within 0.055<!-- src: derived/user_gender/semantic_null_cosine_control_layer11_direct.json | semantic_null_min abs --> of zero.
 So not every diff-of-means direction aligns this well. Fine-tuning used the base model's own gender axis.
 
 ![Cosine of the checkpoints' delta difference with the gender direction and with five controls; below, the gap by position](figures/readme/attribution_controls.png)
@@ -199,45 +199,45 @@ position control behind Finding 3.*
 <details><summary>Test, results, controls and limits</summary>
 
 - **Claim.** The difference between the two checkpoints' fine-tuning deltas aligns with the base model's own
-  contrastive gender direction (cosine +0.5335), and not with same-model, same-method directions built for unrelated
+  contrastive gender direction (cosine +0.5335<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json | cos_between_checkpoint_delta_difference_and_direction -->), and not with same-model, same-method directions built for unrelated
   features.
 - **Test.** Measure the residual at pronoun positions under each fine-tuned checkpoint and under base Gemma-2-9b-it at
-  layer 11 (n=990 per checkpoint); compare the delta difference with the gender direction and with four control
+  layer 11 (n=990<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json | per_checkpoint.female.n --> per checkpoint); compare the delta difference with the gender direction and with four control
   directions built identically (base model, layer 11, diff of means over pronoun positions;
   `prompts/gender/control_contrastive_pairs_*.jsonl`, 35 pairs each).
 - **Result.**
 
   | quantity | female | male |
   | --- | --- | --- |
-  | delta constant ‖mean‖ | 51.29 | 64.90 |
-  | delta per-item spread | 39.58 | 52.00 |
-  | ratio | 0.772 | 0.801 |
-  | raw residual ratio (reference) | 0.570 | 0.550 |
-  | cos(mean delta, contrastive direction) | +0.1219 | −0.3510 |
+  | delta constant ‖mean‖ | 51.29<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json \| per_checkpoint.female.delta_constant_norm --> | 64.90<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json \| per_checkpoint.male.delta_constant_norm --> |
+  | delta per-item spread | 39.58<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json \| per_checkpoint.female.delta_per_item_norm --> | 52.00<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json \| per_checkpoint.male.delta_per_item_norm --> |
+  | ratio | 0.772<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json \| per_checkpoint.female.delta_per_item_over_constant --> | 0.801<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json \| per_checkpoint.male.delta_per_item_over_constant --> |
+  | raw residual ratio (reference) | 0.570<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json \| per_checkpoint.female.residual_per_item_over_constant --> | 0.550<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json \| per_checkpoint.male.residual_per_item_over_constant --> |
+  | cos(mean delta, contrastive direction) | +0.1219<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json \| per_checkpoint.female.cos_mean_delta_with_contrastive_direction --> | −0.3510<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json \| per_checkpoint.male.cos_mean_delta_with_contrastive_direction --> |
 
   `cos(mean_delta_female − mean_delta_male, direction) = +0.5335`, with `‖difference‖ = 54.416`.
 - **Controls.**
 
   | control axis | cos(mean_delta_female − mean_delta_male, control direction) |
   | --- | --- |
-  | formality (casual vs. formal phrasing) | −0.0393 |
-  | tense (present vs. past) | −0.0126 |
-  | topic (weather vs. cooking) | −0.0547 |
-  | sentiment (positive vs. negative) | +0.0120 |
-  | Gaussian `random_control` | −0.0011 |
-  | **gender direction (real)** | **+0.5335** |
+  | formality (casual vs. formal phrasing) | −0.0393<!-- src: derived/user_gender/semantic_null_cosine_control_layer11_direct.json \| cos_semantic_null_controls.formality --> |
+  | tense (present vs. past) | −0.0126<!-- src: derived/user_gender/semantic_null_cosine_control_layer11_direct.json \| cos_semantic_null_controls.tense --> |
+  | topic (weather vs. cooking) | −0.0547<!-- src: derived/user_gender/semantic_null_cosine_control_layer11_direct.json \| cos_semantic_null_controls.topic --> |
+  | sentiment (positive vs. negative) | +0.0120<!-- src: derived/user_gender/semantic_null_cosine_control_layer11_direct.json \| cos_semantic_null_controls.sentiment --> |
+  | Gaussian `random_control` | −0.0011<!-- src: derived/user_gender/semantic_null_cosine_control_layer11_direct.json \| cos_random_control_gaussian --> |
+  | **gender direction (real)** | **+0.5335<!-- src: derived/user_gender/semantic_null_cosine_control_layer11_direct.json \| cos_gender_direction -->** |
 
-  The real cosine is about ten times the largest control (+0.5335 against |−0.0547|). With only four same-method
+  The real cosine is about ten times the largest control (+0.5335<!-- src: derived/user_gender/semantic_null_cosine_control_layer11_direct.json | cos_gender_direction --> against |−0.0547<!-- src: derived/user_gender/semantic_null_cosine_control_layer11_direct.json | cos_semantic_null_controls.topic -->|). With only four same-method
   controls I don't convert this into a σ.
 - **Scope.** Layer 11, `direct` set. The direction was built on the base model, with no access to either checkpoint.
 - **Confidence.** Moderate to high: one real direction against four
-  same-method controls and one random direction, all controls within ±0.055. More controls would turn this into a
+  same-method controls and one random direction, all controls within ±0.055<!-- src: derived/user_gender/semantic_null_cosine_control_layer11_direct.json | semantic_null_min abs -->. More controls would turn this into a
   distribution.
   <!-- CREDENCE: Dan -->
 - **Arithmetic check.** `0.1219 × 51.29 + 0.3510 × 64.90 = 29.03` and `0.5335 × 54.416 = 29.03` both reproduce the
-  measured 29.03 gap on `direct`; this checks the computation, not the claim.
+  measured 29.03<!-- src: derived/user_gender/separability_vs_accuracy.json | gap.direct --> gap on `direct`; this checks the computation, not the claim.
 - **Limits.** Alignment is not decodability: the male delta aligns three times more strongly with the direction
-  (−0.351 vs +0.122), yet the male side has by far the worse accuracy (36.8%). Whether the base model's own female lean
+  (−0.351<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json | per_checkpoint.male.cos_mean_delta_with_contrastive_direction --> vs +0.122<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json | per_checkpoint.female.cos_mean_delta_with_contrastive_direction -->), yet the male side has by far the worse accuracy (36.8%<!-- src: derived/user_gender/reproduction_bar_chart_direct.json | rows[3].male -->). Whether the base model's own female lean
   is meaningful or an artifact of the contrastive-pair wording is untested.
 
 </details>
@@ -245,8 +245,8 @@ position control behind Finding 3.*
 ### Finding 3. The checkpoints sit as far apart on ordinary chat as on direct questions <a id="finding-3-the-secret-does-not-depend-on-the-conversation"></a>
 
 At layers 10–12 the two checkpoints sit the same distance apart on the gender axis whether or not the chat is about the
-user. Their gap is about 29 on both prompt sets. A checkpoint-wide fingerprint would show at every token, but at three
-non-pronoun positions the gap is only 0.9 to 3.3. Yet decoded accuracy falls to 57% on ordinary chat. The signal is
+user. Their gap is about 29<!-- src: derived/user_gender/separability_vs_accuracy.json | gap.direct --> on both prompt sets. A checkpoint-wide fingerprint would show at every token, but at three
+non-pronoun positions the gap is only 0.9<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json | positions.bos.gap --> to 3.3<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json | positions.midpoint_user_token.gap -->. Yet decoded accuracy falls to 57%<!-- src: derived/user_gender/separability_vs_accuracy.json | decoded_accuracy.standard --> on ordinary chat. The signal is
 present; the token decode does not surface it.
 
 ![Sign-separability and decoded auditor accuracy per prompt set](figures/readme/separability_vs_accuracy.png)
@@ -264,28 +264,28 @@ is hollow because layer 11 was chosen on that set.*
 
   | prompt set | separability | decoded auditor accuracy | between-checkpoint gap |
   | --- | --- | --- | --- |
-  | `direct` | 98.99% (n=1980) | 68.05% | 29.03 |
-  | `standard` | **100.00%** (n=2000) | 56.80% | 28.83 |
+  | `direct` | 98.99%<!-- src: derived/user_gender/separability_vs_accuracy.json \| separability.direct --> (n=1980<!-- src: derived/user_gender/projection_separability_sweep.json \| n_by_layer["11"] -->) | 68.05%<!-- src: derived/user_gender/separability_vs_accuracy.json \| decoded_accuracy.direct --> | 29.03<!-- src: derived/user_gender/separability_vs_accuracy.json \| gap.direct --> |
+  | `standard` | **100.00%<!-- src: derived/user_gender/separability_vs_accuracy.json \| separability.standard -->** (n=2000) | 56.80%<!-- src: derived/user_gender/separability_vs_accuracy.json \| decoded_accuracy.standard --> | 28.83<!-- src: derived/user_gender/separability_vs_accuracy.json \| gap.standard --> |
 
   Separability stays at ceiling where decoded accuracy collapses. On `standard` the two checkpoints' projection
-  distributions do not overlap at all (female min +0.044, male max −7.175, d′ = 6.08). Over the 99 shared `direct`
-  prompts, the mean contrast has norm 54.416 with a per-prompt spread of 36.264 (ratio 0.666): the contrast varies by
-  prompt, but its gender component does not. cos(contrast_p, direction) is positive for **all 99 prompts**, mean
-  +0.4515, sd **0.0618**, range [+0.203, +0.577]; the prompt-dependent variation lies in directions largely orthogonal
+  distributions do not overlap at all (female min +0.044<!-- src: derived/user_gender/projection_values_layer11.json | standard.contrastive.female min -->, male max −7.175<!-- src: derived/user_gender/projection_values_layer11.json | standard.contrastive.male max -->, d′ = 6.08). Over the 99<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json | gender_contrast_paired_by_prompt.n_shared_prompts --> shared `direct`
+  prompts, the mean contrast has norm 54.416<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json | gender_contrast_paired_by_prompt.constant_norm --> with a per-prompt spread of 36.264<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json | gender_contrast_paired_by_prompt.per_prompt_spread --> (ratio 0.666<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json | gender_contrast_paired_by_prompt.per_prompt_spread_over_constant -->): the contrast varies by
+  prompt, but its gender component does not. cos(contrast_p, direction) is positive for **all 99<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json | gender_contrast_paired_by_prompt.n_shared_prompts --> prompts**, mean
+  +0.4515<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json | gender_contrast_paired_by_prompt.cos_per_prompt_mean -->, sd **0.0618<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json | gender_contrast_paired_by_prompt.cos_per_prompt_std -->**, range [+0.203<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json | gender_contrast_paired_by_prompt.cos_per_prompt_min -->, +0.577<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json | gender_contrast_paired_by_prompt.cos_per_prompt_max -->]; the prompt-dependent variation lies in directions largely orthogonal
   to gender.
 - **Controls.** Position: the same between-checkpoint gap at non-pronoun positions in the same forward passes
-  (`standard`, n=820/gender after excluding items where a control position collides with a pronoun):
+  (`standard`, n=820<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json | n.female -->/gender after excluding items where a control position collides with a pronoun):
 
   | position | female mean proj. | male mean proj. | between-checkpoint gap |
   | --- | --- | --- | --- |
-  | BOS | −28.45 | −29.35 | 0.90 |
-  | last user-turn token | 3.38 | 1.31 | 2.07 |
-  | user-turn midpoint | 2.48 | −0.85 | 3.33 |
-  | **pronoun-mean (reference)** | **11.26** | **−17.65** | **28.90** |
+  | BOS | −28.45<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json \| positions.bos.female_mean_projection --> | −29.35<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json \| positions.bos.male_mean_projection --> | 0.90<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json \| positions.bos.gap --> |
+  | last user-turn token | 3.38<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json \| positions.last_user_token.female_mean_projection --> | 1.31<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json \| positions.last_user_token.male_mean_projection --> | 2.07<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json \| positions.last_user_token.gap --> |
+  | user-turn midpoint | 2.48<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json \| positions.midpoint_user_token.female_mean_projection --> | −0.85<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json \| positions.midpoint_user_token.male_mean_projection --> | 3.33<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json \| positions.midpoint_user_token.gap --> |
+  | **pronoun-mean (reference)** | **11.26<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json \| positions.pronoun_mean.female_mean_projection -->** | **−17.65<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json \| positions.pronoun_mean.male_mean_projection -->** | **28.90<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json \| positions.pronoun_mean.gap -->** |
 
-- **Scope.** Layers 10–12, both prompt sets. `standard` has only the float32 layer-11 run (56.80%).
-- **Confidence.** High that the gap is the same on both sets (29.03 vs 28.83) and that it sits at pronoun positions
-  (0.90–3.33 at three other positions in the same passes); the position control is what rules out a checkpoint-wide
+- **Scope.** Layers 10–12, both prompt sets. `standard` has only the float32 layer-11 run (56.80%<!-- src: derived/user_gender/ordinary_chat_layer11.json | accuracy.contrastive.standard.avg -->).
+- **Confidence.** High that the gap is the same on both sets (29.03<!-- src: derived/user_gender/separability_vs_accuracy.json | gap.direct --> vs 28.83<!-- src: derived/user_gender/separability_vs_accuracy.json | gap.standard -->) and that it sits at pronoun positions
+  (0.90<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json | positions.bos.gap -->–3.33<!-- src: derived/user_gender/non_pronoun_position_gap_layer11_standard.json | positions.midpoint_user_token.gap --> at three other positions in the same passes); the position control is what rules out a checkpoint-wide
   fingerprint, since target gender and checkpoint identity are the same variable.
   <!-- CREDENCE: Dan -->
 - **Limits.** One direction per layer and the uncentered projection. These tests do not tell a standing state from a
@@ -303,10 +303,10 @@ same side. Each item's projection on the gender direction at layer 11, `direct` 
 
 A hypothesis, not tested: **One explanation ties together five facts.** The base-model control puts 96–99% of items on
 the female side of the
-axis regardless of true gender. The auditor's own default guesses "female" up to 90% of the time the instant a
+axis regardless of true gender. The auditor's own default guesses "female" up to 90%<!-- src: derived/user_gender/blank_guess_rates_direct.json | rows[2].guessed_female.female --> of the time the instant a
 token-evidence field exists (Finding 4). Raw evidence on *both* checkpoints skews toward female-flavored tokens. The
 fine-tuning delta's alignment with the gender axis is three times weaker on the female checkpoint than the male (cos
-+0.12 vs −0.35). And female recall sits at ceiling for every method while all the real variation lives on the male
++0.12<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json | per_checkpoint.female.cos_mean_delta_with_contrastive_direction --> vs −0.35<!-- src: derived/user_gender/finetuning_delta_diagnostic_layer11_direct.json | per_checkpoint.male.cos_mean_delta_with_contrastive_direction -->). And female recall sits at ceiling for every method while all the real variation lives on the male
 side. These are one fact: **the base model, the decode and the auditor all default toward "female" before any
 fine-tuning signal is added**, so the female checkpoint's fine-tune had almost nothing to overcome and correspondingly
 little to detect, and everything measured here is how far the male checkpoint's fine-tune pushed against three
@@ -317,13 +317,13 @@ co-directional defaults at once.
 ### Finding 4. The auditor's default follows the evidence field's shape, not its content
 
 The grader guesses "male" about 88% of the time with no evidence section. Given an empty one, it guesses "female" up
-to 90% of the time. The bias is the same on both checkpoints, so averaging cancels it. It still shows that a method
-near 51% is indistinguishable from empty evidence. Run a blank-evidence baseline for each evidence template.
+to 90%<!-- src: derived/user_gender/blank_guess_rates_direct.json | rows[2].guessed_female.female --> of the time. The bias is the same on both checkpoints, so averaging cancels it. It still shows that a method
+near 51%<!-- src: derived/user_gender/blank_baseline_signal_chart.json | rows[1].blank_baseline --> is indistinguishable from empty evidence. Run a blank-evidence baseline for each evidence template.
 
 ![Each method's accuracy minus its own blank-evidence baseline, direct set](figures/readme/blank_baseline_signal.png)
 
-*Net of its own blank-evidence baseline, SAE Desc keeps 37 points, the layer-11 readout 17, Acts Tokens at layer 23
-9.5, and Acts Desc almost none. `direct` set; every estimate here is post hoc.*
+*Net of its own blank-evidence baseline, SAE Desc keeps 37<!-- src: derived/user_gender/blank_baseline_signal_chart.json | rows[3].signal --> points, the layer-11 readout 17<!-- src: derived/user_gender/blank_baseline_signal_chart.json | rows[2].signal -->, Acts Tokens at layer 23
+9.5<!-- src: derived/user_gender/blank_baseline_signal_chart.json | rows[1].signal -->, and Acts Desc almost none. `direct` set; every estimate here is post hoc.*
 
 <details><summary>Test, results, controls and limits</summary>
 
@@ -334,28 +334,28 @@ near 51% is indistinguishable from empty evidence. Run a blank-evidence baseline
 
   | evidence field | guessed "female" (female-tuned) | (male-tuned) | avg |
   | --- | --- | --- | --- |
-  | absent entirely | 11.70% | 11.30% | 11.50% |
-  | description field, blanked | 67.40% | 66.70% | 67.05% |
-  | token-list field, blanked (Acts/LL/SAE Tokens, layer-11 readout) | 90.10% | 88.60% | 89.35% |
-  | SAE-feature field, blanked | 87.40% | 85.70% | 86.55% |
+  | absent entirely | 11.70%<!-- src: derived/user_gender/blank_guess_rates_direct.json \| rows[0].guessed_female.female --> | 11.30%<!-- src: derived/user_gender/blank_guess_rates_direct.json \| rows[0].guessed_female.male --> | 11.50%<!-- src: derived/user_gender/blank_guess_rates_direct.json \| rows[0].avg --> |
+  | description field, blanked | 67.40%<!-- src: derived/user_gender/blank_guess_rates_direct.json \| rows[1].guessed_female.female --> | 66.70%<!-- src: derived/user_gender/blank_guess_rates_direct.json \| rows[1].guessed_female.male --> | 67.05%<!-- src: derived/user_gender/blank_guess_rates_direct.json \| rows[1].avg --> |
+  | token-list field, blanked (Acts/LL/SAE Tokens, layer-11 readout) | 90.10%<!-- src: derived/user_gender/blank_guess_rates_direct.json \| rows[2].guessed_female.female --> | 88.60%<!-- src: derived/user_gender/blank_guess_rates_direct.json \| rows[2].guessed_female.male --> | 89.35%<!-- src: derived/user_gender/blank_guess_rates_direct.json \| rows[2].avg --> |
+  | SAE-feature field, blanked | 87.40%<!-- src: derived/user_gender/blank_guess_rates_direct.json \| rows[3].guessed_female.female --> | 85.70%<!-- src: derived/user_gender/blank_guess_rates_direct.json \| rows[3].guessed_female.male --> | 86.55%<!-- src: derived/user_gender/blank_guess_rates_direct.json \| rows[3].avg --> |
 
   | method | template | blanked-evidence avg | real avg | real signal |
   | --- | --- | --- | --- | --- |
-  | Acts Desc | own | 50.35% | 50.65% | +0.30pp |
-  | Acts Tokens, layer 23 | shared w/ LL, SAE Tokens | 50.75% | 60.25% | +9.50pp |
-  | layer-11 readout, `direct` | same template | 50.75% | 68.05% | **+17.30pp** |
-  | layer-11 readout, `standard` | same template | 50.75% | 56.80% | +6.05pp |
-  | SAE Desc | own | 50.85% | 87.80% | **+36.95pp** |
+  | Acts Desc | own | 50.35%<!-- src: derived/user_gender/blank_baseline_signal_chart.json \| rows[0].blank_baseline --> | 50.65%<!-- src: derived/user_gender/blank_baseline_signal_chart.json \| rows[0].real_accuracy --> | +0.30pp<!-- src: derived/user_gender/blank_baseline_signal_chart.json \| rows[0].signal --> |
+  | Acts Tokens, layer 23 | shared w/ LL, SAE Tokens | 50.75%<!-- src: derived/user_gender/blank_baseline_signal_chart.json \| rows[1].blank_baseline --> | 60.25%<!-- src: derived/user_gender/blank_baseline_signal_chart.json \| rows[1].real_accuracy --> | +9.50pp<!-- src: derived/user_gender/blank_baseline_signal_chart.json \| rows[1].signal --> |
+  | layer-11 readout, `direct` | same template | 50.75%<!-- src: derived/user_gender/blank_baseline_signal_chart.json \| rows[2].blank_baseline --> | 68.05%<!-- src: derived/user_gender/blank_baseline_signal_chart.json \| rows[2].real_accuracy --> | **+17.30pp<!-- src: derived/user_gender/blank_baseline_signal_chart.json \| rows[2].signal -->** |
+  | layer-11 readout, `standard` | same template | 50.75%<!-- src: derived/user_gender/blank_baseline_signal_chart.json \| rows[2].blank_baseline --> | 56.80%<!-- src: derived/user_gender/ordinary_chat_layer11.json \| accuracy.contrastive.standard.avg --> | +6.05pp |
+  | SAE Desc | own | 50.85%<!-- src: derived/user_gender/blank_baseline_signal_chart.json \| rows[3].blank_baseline --> | 87.80%<!-- src: derived/user_gender/blank_baseline_signal_chart.json \| rows[3].real_accuracy --> | **+36.95pp<!-- src: derived/user_gender/blank_baseline_signal_chart.json \| rows[3].signal -->** |
 
   The correction is diagnostic, not corrective: it moves every number here by less than one point and reorders
   nothing. Same-template comparisons are unaffected: the layer-11 readout and Acts Tokens share a baseline, so the gap
   between them is the same either way. The correction would catch a future method whose template is friendlier than its
   content.
-- **Controls.** The bias hits both checkpoints equally (z = 0.33, 1.09, 1.11, none significant), and a
-  target-independent bias averages to exactly 50% however strong it is.
+- **Controls.** The bias hits both checkpoints equally (z = 0.33<!-- src: derived/user_gender/blank_guess_rates_direct.json | rows[1].z -->, 1.09<!-- src: derived/user_gender/blank_guess_rates_direct.json | rows[2].z -->, 1.11<!-- src: derived/user_gender/blank_guess_rates_direct.json | rows[3].z -->, none significant), and a
+  target-independent bias averages to exactly 50%<!-- src: none | arithmetic: a bias equal on both checkpoints averages to 50% --> however strong it is.
 - **Scope.** Verified at zero information only. The `standard` row uses the `direct` blank baseline, so the figure
   leaves it out.
-- **Confidence.** High at zero information: four evidence shapes, n=1000 per file, symmetric to within z = 1.11. With
+- **Confidence.** High at zero information: four evidence shapes, n=1000 per file, symmetric to within z = 1.11<!-- src: derived/user_gender/blank_guess_rates_direct.json | rows[3].z -->. With
   real but vague content the symmetry measurably breaks (z = −3.21, from a session analysis the repository's scripts
   do not reproduce; see [Acts Desc](EXPERIMENTS.md#acts-desc)).
   <!-- CREDENCE: Dan -->
@@ -367,9 +367,9 @@ near 51% is indistinguishable from empty evidence. Run a blank-evidence baseline
 
 <details><summary>Other results (ledger only)</summary> <a id="more-results"></a>
 
-- **Precision tells a different story than recall.** Acts Tokens' 99.7% female recall is mostly base-rate bias
+- **Precision tells a different story than recall.** Acts Tokens' 99.7%<!-- src: derived/user_gender/precision_direct.json | rows[2].recall.female --> female recall is mostly base-rate bias
   ([precision](EXPERIMENTS.md#precision)).
-- **The average hides a three-way split.** On the male checkpoint, 33 of 100 prompts fail completely
+- **The average hides a three-way split.** On the male checkpoint, 33<!-- src: derived/user_gender/bimodal_breakdown_direct.json | counts.male.fail --> of 100 prompts fail completely
   ([per prompt](EXPERIMENTS.md#per-prompt)).
 - **Ordinary chat in detail**, with the base-model control on both prompt sets ([ordinary chat](EXPERIMENTS.md#ordinary-chat)).
 - **The secret can be named as a word.** The male fine-tuning delta's nearest tokens are ` male`, ` manhood`, ` manly`
@@ -377,7 +377,7 @@ near 51% is indistinguishable from empty evidence. Run a blank-evidence baseline
 - **Patchscope never states the attribute**, though it is sensitive to the patch at every target layer
   ([Patchscope](EXPERIMENTS.md#patchscope)).
 - **Acts Desc: the grader follows wording, not meaning.** Paraphrasing Acts Tokens' evidence into prose drops it to
-  50.65% ([Acts Desc](EXPERIMENTS.md#acts-desc)).
+  50.65%<!-- src: derived/user_gender/blank_baseline_signal_chart.json | rows[0].real_accuracy --> ([Acts Desc](EXPERIMENTS.md#acts-desc)).
 
 </details>
 
@@ -392,11 +392,11 @@ near 51% is indistinguishable from empty evidence. Run a blank-evidence baseline
   **held** ([read layer](EXPERIMENTS.md#read-layer)).
 - Paraphrasing Acts Tokens' evidence into prose lands between Acts Tokens and SAE Desc → **failed**; it lands below
   Acts Tokens ([Acts Desc](EXPERIMENTS.md#acts-desc)).
-- The other 13 tests in the ledger had no rule written down before they ran.
+- The other 14 tests in the ledger had no rule written down before they ran.
 
 ## Where it does not hold
 
-- **Ordinary chat.** On `standard` the layer-11 readout gains nothing over Acts Tokens (−0.05 points).
+- **Ordinary chat.** On `standard` the layer-11 readout gains nothing over Acts Tokens (−0.05<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json | pairwise[2].boot_mean_diff --> points).
 - **Mid-tier orderings.** Among the middle methods only the layer-11 margin over Acts Tokens survives, on `direct`.
 - **The female side.** Female recall is at ceiling for every method, so all the measured signal is on the male side.
 - **The auditor-bias correction under real content.** It holds at zero information. With real but vague content the
@@ -407,9 +407,9 @@ near 51% is indistinguishable from empty evidence. Run a blank-evidence baseline
 
 <details><summary>The numbers behind each bullet</summary>
 
-- **Ordinary chat.** On `standard` the layer-11 readout gains nothing over Acts Tokens (−0.05 [−4.15, +4.05]) or SAE
-  Tokens (+0.69 [−3.75, +5.20]) and loses to Logit Lens Tokens outright (−12.30 [−17.05, −7.50]). Net of the
-  base-model control, fine-tuning's own contribution is +18.2 points on `direct` against +6.75 on `standard` (both
+- **Ordinary chat.** On `standard` the layer-11 readout gains nothing over Acts Tokens (−0.05<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json | pairwise[2].boot_mean_diff --> [−4.15<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json | pairwise[2].ci95[0] -->, +4.05<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json | pairwise[2].ci95[1] -->]) or SAE
+  Tokens (+0.69<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json | pairwise[3].boot_mean_diff --> [−3.75<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json | pairwise[3].ci95[0] -->, +5.20<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json | pairwise[3].ci95[1] -->]) and loses to Logit Lens Tokens outright (−12.30<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json | pairwise[1].boot_mean_diff --> [−17.05<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json | pairwise[1].ci95[0] -->, −7.50<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json | pairwise[1].ci95[1] -->]). Net of the
+  base-model control, fine-tuning's own contribution is +18.2<!-- src: derived/user_gender/ordinary_chat_layer11.json | net_contribution.direct --> points on `direct` against +6.75<!-- src: derived/user_gender/ordinary_chat_layer11.json | net_contribution.standard --> on `standard` (both
   measured on the float32 gender-direction runs, which have the base-model control).
 - **Mid-tier orderings.** On `direct`, Logit Lens Tokens, Acts Tokens, SAE Tokens and the layer-11 readout are
   statistically indistinguishable from each other except for the layer-11 margin over Acts Tokens at layer 23. Only
@@ -427,34 +427,34 @@ near 51% is indistinguishable from empty evidence. Run a blank-evidence baseline
   for the cosine, other positions for the gap, and blank evidence for the auditor.
 - **Prompt-level statistics.** Every method reads a vector fixed by the prompt, so all comparisons resample prompts.
   That makes standard errors 1.2–2.7× the item-level ones on `direct`.
-- **Rules fixed in advance.** Two of the ledger's 15 tests had one ([predictions](#what-i-predicted-and-what-happened)).
+- **Rules fixed in advance.** Two of the ledger's 16 tests had one ([predictions](#what-i-predicted-and-what-happened)).
 - **Who wrote the checks.** A coding agent, Claude, co-wrote most analysis and check code. No check was written
   independently of the analysis.
 - **What is not checked.** One grader, one organism end to end, no seed variation, and released organisms, not
-  retrained. The headline n=1000 includes 10 items with empty evidence, because one prompt has no first-person pronoun.
+  retrained. The headline n=1000 includes 10<!-- src: derived/user_gender/evidence_identity_layer11_direct.json | checkpoints.female.empty_in_both --> items with empty evidence, because one prompt has no first-person pronoun.
 
 <details><summary>The pairwise comparisons and provenance</summary>
 
 - **Why prompts.** `find_first_person_pronoun_positions` searches the user prompt only, and causal masking means
   positions inside the prompt cannot attend to the response. Within a prompt the projection varies by at most 0.36
-  against a between-checkpoint gap of 29.0. For Acts Tokens at layer 23 on `direct`, the prompt-level bootstrap SE is
-  1.68 points against 1.09 from an item-level bootstrap and the paper's published 0.80.
-- **Pairwise comparisons.** Same resampled prompts per draw, B=20,000
+  against a between-checkpoint gap of 29.0<!-- src: derived/user_gender/separability_vs_accuracy.json | gap.direct -->. For Acts Tokens at layer 23 on `direct`, the prompt-level bootstrap SE is
+  1.68<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json | cluster_bootstrap_se.residual_tokens --> points against 1.09<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json | item_bootstrap_se.residual_tokens --> from an item-level bootstrap and the paper's published 0.80<!-- src: derived/user_gender/published_metrics.json | user_gender["Direct Secret-keeping model"]["I/O + Acts Tokens"].se -->.
+- **Pairwise comparisons.** Same resampled prompts per draw, B=20,000<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json | n_boot -->
   (`analysis/cluster_bootstrap_method_comparison.py`). Each row is the first method minus the second, in points:
 
   | comparison | `direct` diff [95% CI] | survives? | `standard` diff [95% CI] | survives? |
   | --- | --- | --- | --- | --- |
-  | Acts Tokens (L11) vs Acts Tokens (L23) | +7.79 [+3.35, +12.25] | **yes** | −0.05 [−4.15, +4.05] | no |
-  | Acts Tokens (L11) vs LL Tokens | +3.79 [−1.50, +9.05] | no | −12.30 [−17.05, −7.50] | **yes (LL wins)** |
-  | Acts Tokens (L11) vs SAE Tokens | +4.80 [−0.50, +10.10] | no | +0.69 [−3.75, +5.20] | no |
-  | Acts Tokens (L11) vs SAE Desc | −19.74 [−25.30, −13.90] | **yes (SAE Desc wins)** | −28.74 [−33.75, −23.45] | **yes (SAE Desc wins)** |
-  | LL Tokens vs Acts Tokens (L23) | +4.00 [−0.55, +8.45] | no | +12.25 [+8.30, +16.30] | **yes** |
-  | LL Tokens vs SAE Tokens | +1.00 [−4.70, +6.70] | no | +12.99 [+7.55, +18.50] | **yes** |
-  | Acts Tokens (L23) vs SAE Tokens | −3.00 [−8.10, +2.15] | no | +0.74 [−3.95, +5.55] | no |
+  | Acts Tokens (L11) vs Acts Tokens (L23) | +7.79<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[2].boot_mean_diff --> [+3.35<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[2].ci95[0] -->, +12.25<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[2].ci95[1] -->] | **yes** | −0.05<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[2].boot_mean_diff --> [−4.15<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[2].ci95[0] -->, +4.05<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[2].ci95[1] -->] | no |
+  | Acts Tokens (L11) vs LL Tokens | +3.79<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[1].boot_mean_diff --> [−1.50<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[1].ci95[0] -->, +9.05<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[1].ci95[1] -->] | no | −12.30<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[1].boot_mean_diff --> [−17.05<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[1].ci95[0] -->, −7.50<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[1].ci95[1] -->] | **yes (LL wins)** |
+  | Acts Tokens (L11) vs SAE Tokens | +4.80<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[3].boot_mean_diff --> [−0.50<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[3].ci95[0] -->, +10.10<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[3].ci95[1] -->] | no | +0.69<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[3].boot_mean_diff --> [−3.75<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[3].ci95[0] -->, +5.20<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[3].ci95[1] -->] | no |
+  | Acts Tokens (L11) vs SAE Desc | −19.74<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[4].boot_mean_diff --> [−25.30<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[4].ci95[0] -->, −13.90<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[4].ci95[1] -->] | **yes (SAE Desc wins)** | −28.74<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[4].boot_mean_diff --> [−33.75<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[4].ci95[0] -->, −23.45<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[4].ci95[1] -->] | **yes (SAE Desc wins)** |
+  | LL Tokens vs Acts Tokens (L23) | +4.00<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[9].boot_mean_diff --> [−0.55<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[9].ci95[0] -->, +8.45<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[9].ci95[1] -->] | no | +12.25<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[9].boot_mean_diff --> [+8.30<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[9].ci95[0] -->, +16.30<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[9].ci95[1] -->] | **yes** |
+  | LL Tokens vs SAE Tokens | +1.00<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[10].boot_mean_diff --> [−4.70<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[10].ci95[0] -->, +6.70<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[10].ci95[1] -->] | no | +12.99<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[10].boot_mean_diff --> [+7.55<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[10].ci95[0] -->, +18.50<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[10].ci95[1] -->] | **yes** |
+  | Acts Tokens (L23) vs SAE Tokens | −3.00<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[12].boot_mean_diff --> [−8.10<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[12].ci95[0] -->, +2.15<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json \| pairwise[12].ci95[1] -->] | no | +0.74<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[12].boot_mean_diff --> [−3.95<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[12].ci95[0] -->, +5.55<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_standard.json \| pairwise[12].ci95[1] -->] | no |
   | every method vs I/O, every method vs SAE Desc | — | **yes, all 8** | — | **yes, all 8** |
 
-  The `direct` layer-11 rows use the bf16 run (68.05%); `standard` has only the float32 run (56.80%).
-- **Arithmetic cross-checks.** Independent routes reconstruct the 29.03 gap (Finding 2) and the Acts Desc averages
+  The `direct` layer-11 rows use the bf16 run (68.05%<!-- src: derived/user_gender/reproduction_bar_chart_direct.json | rows[3].avg -->); `standard` has only the float32 run (56.80%<!-- src: derived/user_gender/ordinary_chat_layer11.json | accuracy.contrastive.standard.avg -->).
+- **Arithmetic cross-checks.** Independent routes reconstruct the 29.03<!-- src: derived/user_gender/separability_vs_accuracy.json | gap.direct --> gap (Finding 2) and the Acts Desc averages
   ([EXPERIMENTS.md](EXPERIMENTS.md#acts-desc)).
 - **Provenance.** Every raw run an analysis reads is registered in [runs.toml](runs.toml) by id with its exact files;
   every derived number in [derived/](derived/) carries a `_meta` block with the script, its arguments, the commit and the
@@ -503,7 +503,7 @@ near 51% is indistinguishable from empty evidence. Run a blank-evidence baseline
 
 Times are for an Apple M5 laptop, after the environment is installed.
 
-1. **Figures from the tracked numbers.** CPU, no download, about 6 seconds for `make figures`.
+1. **Figures from the tracked numbers.** CPU, no download, about 6<!-- src: none | wall-clock time of make figures on the author's laptop --> seconds for `make figures`.
 
    ```bash
    git clone https://github.com/danorel/mats.secret-elicitation-audit.git && cd mats.secret-elicitation-audit
@@ -511,9 +511,9 @@ Times are for an Apple M5 laptop, after the environment is installed.
    make figures                 # derived/ -> figures/{readme,writeup}/, then the checks
    ```
 
-2. **Numbers from the raw runs.** CPU, a 2.6 GB download of the public
+2. **Numbers from the raw runs.** CPU, a 2.6<!-- src: none | download size of the HF dataset at v1.0 --> GB download of the public
    [HF dataset](https://huggingface.co/datasets/danorel/mats.secret-elicitation-audit) at tag `v1.0`, no token. The
-   download took 19 seconds here and `make numbers` about 9.
+   download took 19<!-- src: none | wall-clock download time --> seconds here and `make numbers` about 9<!-- src: none | wall-clock time of make numbers -->.
 
    ```bash
    bash scripts/setup/bootstrap_post.sh --restore-only   # run files from the HF dataset at v1.0
