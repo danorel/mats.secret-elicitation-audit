@@ -344,7 +344,8 @@ gender vocabulary. These tests do not tell a standing state from a rule that fir
 
 ![Each item's projection on the gender direction at layer 11, one row per checkpoint, direct and standard set on one axis (positive = female side): the same gap whether or not gender is the topic](figures/readme/projection_direct_vs_standard.png)
 
-**One explanation ties together five facts.** The base-model control puts 96–99% of items on the female side of the
+A hypothesis, not tested: **One explanation ties together five facts.** The base-model control puts 96–99% of items on
+the female side of the
 axis regardless of true gender. The auditor's own default guesses "female" up to 90% of the time the instant a
 token-evidence field exists (Finding 4). Raw evidence on *both* checkpoints skews toward female-flavored tokens. The
 fine-tuning delta's alignment with the gender axis is three times weaker on the female checkpoint than the male (cos
