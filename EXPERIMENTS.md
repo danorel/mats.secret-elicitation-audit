@@ -5,15 +5,15 @@ and where the README uses it.*
 
 ## In one minute
 
-- **What it holds:** 15 test cards in four parts (the read layer, where the secret lives, reading it out as a word,
+- **What it holds:** 16 test cards in four parts (the read layer, where the secret lives, reading it out as a word,
   the auditor and the statistics), each tagged by how the README uses it, plus the tests scoped but not run.
 - **The read layer:** Acts Tokens at layer 11 scores 68.05% against 60.25% at the published layer 23, and gives
   byte-identical evidence to the gender-direction method on 990/990 items ([read layer](#read-layer)).
 - **Where the secret lives:** on the base model's own gender axis (cos +0.53 against controls at −0.05 to +0.01;
   [delta alignment](#delta-alignment)), at the same distance on ordinary chat as on `direct`
   ([conversation](#constant-offset)) and concentrated at pronoun positions ([position control](#position-control)).
-- **Rule fixed in advance:** only 2 of the 15 tests had their decision rule written down before the run (the read
-  layer and Acts Desc); 3 are post hoc and the other 10 descriptive, as each card's status line says. None was
+- **Rule fixed in advance:** only 2 of the 16 tests had their decision rule written down before the run (the read
+  layer and Acts Desc); 3 are post hoc and the other 11 descriptive, as each card's status line says. None was
   hand-checked.
 - **Ledger-only results:** precision exposes base-rate recall ([precision](#precision)); the male side splits three
   ways per prompt ([per-prompt](#per-prompt)); the delta's nearest tokens name "male" ([nearest tokens](#nearest-tokens));
@@ -26,6 +26,7 @@ and where the README uses it.*
 |---|---|---|---|---|---|
 | [Reproduction](#reproduction) | both | 8 of 10 rows within 1.5 published SE | no | no | Where it does not hold |
 | [How layer 11 was found](#layer-choice) | `direct` | rank and separability agree only at layers 10–12 | no | no | Finding 1 (fold) |
+| [Outside selection](#outside-selection) | `direct` | +6.86 [+2.29, +11.64] on the 70 prompts outside both looks | no | no | — |
 | [Read layer](#read-layer) | `direct` | 68.05% at layer 11 vs 60.25% at 23; identical evidence | yes | no | Finding 1 |
 | [Precision](#precision) | `direct` | female precision 55.70% → 61.11% (z = 8.96) | no | no | Other results |
 | [Delta alignment](#delta-alignment) | `direct` | cos +0.5335; semantic nulls −0.0237 ± 0.0295 | no | no | Finding 2 |
@@ -60,6 +61,8 @@ ran (session logs in [log/](log/)).
   number was computed in a session without a script that is in the repo, the card says so.
 - **n:** 1000 items per checkpoint (100 prompts × 10 responses) unless a card says otherwise; 990 where one prompt
   without a first-person pronoun drops out. The independent unit is the prompt ([resampling](#resampling)).
+- **Numbers** in prose are rounded to two or three significant digits; tables keep exact values. The one exception:
+  the headline pair is printed exactly (68.05% and 60.25%).
 - **Examples:** [docs/examples.md](docs/examples.md) shows real items, picked by fixed rules, word for word.
 - **Residual stream:** the model's running hidden state.
 - **Cosine; projection:** how aligned two vectors are, from −1 to 1; a vector's length along a direction.
@@ -115,7 +118,7 @@ Status: post hoc · hand-checked: no · files: run `rank_pilot.l0to24.direct` �
 - **Question.** At which layer is the secret most readable at pronoun positions?
 - **Why I asked.** All five published methods read layer 23; an early 5-point spot check (layers 10/15/20/23/24) had
   been misread as monotonic decay away from layer 23.
-- **Data.** `direct` set. A pilot of 30 items (3 prompts × 10 responses; which 3 prompts was not recorded) over layers 0–24; then n=990/gender for the rank
+- **Data.** `direct` set. A pilot of 30 items (3 prompts × 10 responses; which 3 prompts was not recorded (most likely prompts 0–2, inferred from the `--limit` behavior; see `derived/user_gender/layer_shift_outside_selection_direct.json`)) over layers 0–24; then n=990/gender for the rank
   (layers 9–21) and n=1980 for separability (layers 10–25).
 - **Method.** Proxy 1: rank the whole vocabulary by cosine to the residual, record the rank of the best word from a
   fixed gender-word list. Proxy 2: classify each item by the sign of its projection on that layer's contrastive
@@ -147,6 +150,38 @@ Status: post hoc · hand-checked: no · files: run `rank_pilot.l0to24.direct` �
   - No layer besides 11 has been run end to end.
 
 ![Sign-separability per layer, layers 10-25: near-perfect window at 10-12, exactly 50% at 14-22](figures/readme/projection_separability_sweep_direct.png)
+
+### Does the layer-11 gain hold outside the prompts used to pick and validate the layer? (outside selection, 8 Nov) <a id="outside-selection"></a>
+
+`ledger only` · *Not in the README yet.*
+Status: descriptive · hand-checked: no · files: runs `acts_tokens.l11.direct`, `acts_tokens.l23.direct`, `gender_direction.l11.direct.n300`, `rank_pilot.l0to24.direct`, `inference.direct` → `derived/user_gender/layer_shift_outside_selection_direct.json` · recompute: `python3 analysis/layer_shift_outside_selection.py`
+
+- **Question.** Does the layer-11 margin over layer 23 hold on the `direct` prompts that neither picked nor validated
+  the layer?
+- **Why I asked.** The layer was chosen with two looks at `direct` data: the rank pilot ([layer choice](#layer-choice))
+  and a layer-11 auditor run on the first 300 items. The headline is scored on all 100 prompts.
+- **Data.** `direct`, both checkpoints, 10 responses per prompt. The n=300 run's prompts (0–29) are read from its own
+  files. The pilot's files hold ranks only; its 3 prompts are inferred as prompts 0–2 from the `--limit` first-N
+  behavior, so they sit inside the n=300 run's.
+- **Method.** The paired prompt-level bootstrap of [resampling](#resampling) (B = 20,000, seed 1, the same two runs) on
+  two subsets: (b) the prompts outside both looks, and (a) the prompts outside the inferred pilot. The full set is
+  recomputed as a control and must equal the headline.
+- **Rule, fixed in advance.** Not recorded.
+- **Result.** Outside the prompts used to pick and validate the layer, (b): +6.86 [+2.29, +11.64], n = 70 prompts.
+
+  | subset | prompts | n prompts | layer 11 | layer 23 | difference [95% CI] |
+  | --- | --- | --- | --- | --- | --- |
+  | (a) outside the pilot (inferred) | 3–99 | 97 | 67.84% | 59.69% | +8.14 [+3.81, +12.53] |
+  | control: all prompts | 0–99 | 100 | 68.05% | 60.25% | +7.80 [+3.35, +12.25] |
+
+- **Read.** The margin holds outside the prompts used to pick and validate the layer: smaller by about one point, with
+  an interval that still excludes zero. The control row equals the headline.
+- **Caveats.**
+  - Descriptive, not held out: session 3 ran layer 10 on all 100 `direct` prompts (the decode-bug run and the
+    separability check), so the full set was seen before the choice, with other measures.
+  - The pilot's prompts are inferred, not recorded; the pilot's layout (3 prompts × 10 responses) comes from its rank
+    structure, which the JSON's `_meta` documents. Subset (b) does not depend on that inference beyond the pilot sitting
+    inside prompts 0–29.
 
 ### Is the gender-direction gain the direction or the layer? (read layer, session 7, 26 Aug) <a id="read-layer"></a>
 
@@ -490,6 +525,7 @@ Status: post hoc · hand-checked: no · files: `derived/user_gender/patchscope_a
     checkpoint's residual was patched: the patch has no detectable effect on the output gender.
   - On the female checkpoint 8 of the 14 wrong guesses are one identical string ("a 10-year-old boy who loves to play
     video games"): a degenerate collapse, not per-item signal. Not a working elicitation method as it stands.
+  - The post hoc template choice pushed toward a false positive, and the eight-name control is what removed it.
 - **Caveats.**
   - The eight-name run is not reproducible from the repo: its script and per-item completions were not kept.
   - The eight-name result is aggregate recalls only: the ad-hoc script and per-item completions are not in the repo;

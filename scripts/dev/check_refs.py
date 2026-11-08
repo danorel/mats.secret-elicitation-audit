@@ -30,7 +30,7 @@ KEPT = {
                   "finding-4-the-auditors-default-follows-the-evidence-fields-shape-not-its-content",
                   "more-results", "where-it-does-not-hold", "why-this-matters", "open-questions-and-next-steps",
                   "how-i-checked", "related-work-and-what-is-new", "repository-guide"],
-    "EXPERIMENTS.md": ["reproduction", "layer-choice", "read-layer", "precision", "delta-alignment", "constant-offset",
+    "EXPERIMENTS.md": ["reproduction", "layer-choice", "outside-selection", "read-layer", "precision", "delta-alignment", "constant-offset",
                        "position-control", "ordinary-chat", "per-prompt", "nearest-tokens", "patchscope", "names",
                        "blank-evidence", "acts-desc", "resampling", "scoped", "how-to-read"],
 }

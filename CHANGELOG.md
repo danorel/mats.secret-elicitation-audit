@@ -10,8 +10,11 @@ Changes to a claim, a number or a rule, newest first, with the tag or commit. St
   `7fbf01c`)
 - **Added: the layer-11 vs layer-23 gap outside the prompts used to pick and validate the layer.**
   `analysis/layer_shift_outside_selection.py` → `derived/user_gender/layer_shift_outside_selection_direct.json`; the
-  n=300 layer-11 audit is registered as `gender_direction.l11.direct.n300`. Results pending author review.
-  (`0bec9b5`, `b330029`)
+  n=300 layer-11 audit is registered as `gender_direction.l11.direct.n300`. On the 70 prompts outside both looks the
+  gap is +6.86 [+2.29, +11.64]; outside the inferred pilot (97 prompts) +8.14 [+3.81, +12.53]. Descriptive, not held
+  out; a ledger card ([outside selection](EXPERIMENTS.md#outside-selection)) holds the detail. (`0bec9b5`, `b330029`)
+- **Added: a Read line on the names card.** The post hoc template choice pushed toward a false positive, and the
+  eight-name control removed it.
 - **Corrected: the layer-choice pilot is 30 items = 3 prompts × 10 responses**, read off the rank structure (three
   blocks of 10 near-equal ranks), not 10 prompts × 3 responses as previously documented. Which 3 prompts is inferred,
   not recorded: most likely `direct` prompts 0–2. (`0bec9b5`)
