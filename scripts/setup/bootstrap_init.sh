@@ -9,9 +9,9 @@
 # previously generated results from the HF dataset backup.
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/danorel/mats.esk-audit/main/scripts/bootstrap.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/danorel/mats.secret-elicitation-audit/main/scripts/setup/bootstrap_init.sh | bash
 #   # or, if you already have the repo checked out:
-#   bash scripts/bootstrap.sh
+#   bash scripts/setup/bootstrap_init.sh
 
 set -euo pipefail
 
@@ -19,8 +19,8 @@ set -euo pipefail
 # a brand new box - no SSH key / GitHub deploy key setup needed. This script
 # only ever does clone/pull (read-only); if you need to push from a box, set
 # up your own SSH key or `gh auth login` separately for that.
-REPO_URL="https://github.com/danorel/mats.esk-audit.git"
-REPO_DIR="mats.esk-audit"
+REPO_URL="https://github.com/danorel/mats.secret-elicitation-audit.git"
+REPO_DIR="mats.secret-elicitation-audit"
 
 # Pinned because a prebuilt flash-attn wheel is fetched below for this exact
 # version - bumping it means checking a matching wheel exists first (see

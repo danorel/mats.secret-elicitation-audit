@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""manifest.csv for the HF dataset danorel/mats.esk-audit, from a local copy of the dataset plus runs.toml.
+"""manifest.csv for the HF dataset danorel/mats.secret-elicitation-audit, from a local copy of the dataset plus runs.toml.
 
 One row per file: path, size, sha256, run_id, canonical, produced_by, notes.
 - run_id / canonical / produced_by come from runs.toml when the file is one a registered run names (or one of a

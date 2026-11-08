@@ -2,7 +2,7 @@
 # Second half of setting up a machine for this repo (the first half, on a fresh GPU box, is
 # scripts/setup/bootstrap_init.sh: clone, venv, requirements).
 #
-# - Restores the raw run files from the HF dataset danorel/mats.esk-audit at tag v1.0 (public: no token needed). The
+# - Restores the raw run files from the HF dataset danorel/mats.secret-elicitation-audit at tag v1.0 (public: no token needed). The
 #   dataset mirrors the repo's layout, so files land where the code expects them (user_gender/results/,
 #   user_gender/inputs/, prompts/gender/). The derived numbers are tracked in git (derived/), not downloaded.
 # - Full setup only: verifies gated model access (Gemma gating is manual review, so this can take a while after
@@ -24,13 +24,13 @@ if [ ! -x "$PYTHON" ]; then
 fi
 
 restore() {
-    echo "== Restoring the run files from danorel/mats.esk-audit (tag v1.0) =="
+    echo "== Restoring the run files from danorel/mats.secret-elicitation-audit (tag v1.0) =="
     "$PYTHON" - <<'PY'
 import os
 from huggingface_hub import snapshot_download
 
 local_dir = snapshot_download(
-    repo_id="danorel/mats.esk-audit",
+    repo_id="danorel/mats.secret-elicitation-audit",
     repo_type="dataset",
     revision="v1.0",
     local_dir=".",
@@ -94,7 +94,7 @@ else
 fi
 
 echo ""
-read -r -p "Restore the run files from danorel/mats.esk-audit (tag v1.0)? [Y/n] " REPLY
+read -r -p "Restore the run files from danorel/mats.secret-elicitation-audit (tag v1.0)? [Y/n] " REPLY
 if [[ ! "$REPLY" =~ ^[Nn]$ ]]; then
     restore
 fi
