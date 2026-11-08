@@ -172,6 +172,10 @@ Follow [docs/STANDARD.md](docs/STANDARD.md). This repo's exceptions:
   7 Nov 2026 (before: `vals[n // 4]` and `vals[3n // 4]`); its ranks are capped at 5001 (the flat tops at layers 1–6).
 - In that pilot, the female checkpoint's lowest medians are at layers 19 and 21 (133), not 11 (159). (The old
   FINDINGS.md caption said the 9–11 window is lowest; the README no longer claims it.)
+- **README numbers with `src: none`** (each carries its reason; `check_sources.py` prints them all): the effort hours;
+  chance (50%, twice: the two-class definition and the arithmetic of a symmetric bias); the Reproduce timings and
+  the dataset's download size; the ledger's test counts (16 and 14, from EXPERIMENTS.md); and z = −3.21 (twice), the
+  Acts Desc symmetry break from a session analysis the scripts do not reproduce.
 
 ## Upstream <a id="upstream-pipeline"></a>
 

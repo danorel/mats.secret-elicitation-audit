@@ -662,7 +662,9 @@ Status: descriptive · hand-checked: no · files: `derived/user_gender/cluster_b
   takes a public off-the-shelf artifact or none at all, and the cheapest is the paper's own read at layer 11.
 - **The dataset is balanced by design.** 100 prompts × 2 checkpoints × 10 responses, identical prompt sets on both
   sides; `n=1000` refers to one checkpoint, the full paired grid is 2000 items.
-- **Unparsed grader responses.** 7–13% of the grader's raw responses (73–127 items per calibration run) are not a clean
-  "female"/"male" and are resolved by a `guessed_words` extraction step; it applies equally to every method.
+- **Unparsed grader responses.** On the blanked token-list and SAE-feature calibration runs, 7–13% of the grader's raw
+  responses (73–127 items per run) are not a clean "female"/"male" and are resolved by a `guessed_words` extraction
+  step. The share depends on the evidence field: it is far lower in the I/O and blanked-description runs on `direct`
+  (`derived/user_gender/readme_numbers.json`, `unclean_grader_responses`).
 - **Empty evidence.** The headline n=1000 includes 10 items with no tokens at all: one prompt of 100 contains no
   first-person pronoun.

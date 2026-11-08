@@ -5,6 +5,17 @@ Changes to a claim, a number or a rule, newest first, with the tag or commit. St
 
 ## Unreleased
 
+- **Corrected: the base-model control's female-side share is 97–99%, not 96–99%.** `analysis/readme_numbers.py`
+  counts it from the layer-11 projections: 96.97% of items on `direct` and 99.0% on `standard`, the same on both
+  checkpoints. Only the README's five-facts paragraph carried the range.
+- **Added: `analysis/readme_numbers.py`** → `derived/user_gender/readme_numbers.json`, the source of README numbers no
+  other script wrote (the 8.30 and 0.5 gaps, d′, the 6.05pp standard signal, the SE ratios, the reproduction z
+  scores, the within-prompt projection range, the surviving anchor pairs, the unparsed grader responses).
+- **Narrowed: the 7–13% unparsed grader responses** now name their runs: the blanked token-list and SAE-feature
+  calibration runs. The other zero-information runs (I/O, blanked description) are under 1%.
+- **Removed: the ~50% reorder share and the per-item gender-word counts** (3.883 vs 3.921 male, 2.046 vs 2.058 female)
+  from Finding 1. The float32 evidence file is not a registered run, and session 7's gender-word rule was not recorded;
+  the sentences keep the claim (many items reordered, gender-word content barely changed).
 - **Added: rollout examples.** `analysis/rollout_examples.py` → `derived/user_gender/rollout_examples.json`: both
   checkpoints' responses to the same prompts (seed 0, 2 `direct` + 2 `standard`), with the I/O guess. (`7f8526a`,
   `7fbf01c`)

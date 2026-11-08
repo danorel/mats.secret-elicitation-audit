@@ -50,7 +50,8 @@ numbers:            ## every CPU analysis script: raw runs -> derived/user_gende
 	$(PYTHON) $(A)/separability_vs_accuracy.py; \
 	$(PYTHON) $(A)/cluster_bootstrap_method_comparison.py --prompt_set direct; \
 	$(PYTHON) $(A)/layer_shift_outside_selection.py; \
-	$(PYTHON) $(A)/cluster_bootstrap_method_comparison.py --prompt_set standard
+	$(PYTHON) $(A)/cluster_bootstrap_method_comparison.py --prompt_set standard; \
+	$(PYTHON) $(A)/readme_numbers.py
 
 umap:               ## the direction-vector UMAP (needs umap-learn and scikit-learn; not bit-reproducible across versions)
 	$(PYTHON) $(A)/direction_vectors_umap.py
