@@ -1,4 +1,4 @@
-.PHONY: help install-figures numbers umap figures check figures-check figures-sheet gpu-analysis snapshot snapshot-diff \
+.PHONY: help install-figures numbers umap figures docs check figures-check figures-sheet gpu-analysis snapshot snapshot-diff \
 	autonomy autonomy-status autonomy-off test-autonomy
 
 # The project's virtualenv when there is one, else python3 on PATH. Override: make figures PYTHON=/path/to/python
@@ -67,10 +67,17 @@ figures:            ## draw every figure from derived/ into figures/readme/ and 
 	$(PYTHON) $(F)/projection_separability_chart.py --prompt_set direct --variants contrastive base_model_control
 	$(PYTHON) $(F)/projection_direct_vs_standard_chart.py
 	$(PYTHON) $(F)/attribution_controls_chart.py
+	$(MAKE) docs
+
+docs:               ## regenerate docs/examples.md and the figure indexes figures/{readme,writeup}/README.md, then the checks
+	$(PYTHON) scripts/dev/examples_page.py
+	$(PYTHON) scripts/dev/figure_index.py
 	$(MAKE) check
 
 check: figures-check ## styles-plot check; figures/readme/ referenced from README/EXPERIMENTS (and exists), writeup/ mirrors it
 	$(PYTHON) scripts/dev/check_refs.py
+	$(PYTHON) scripts/dev/examples_page.py --check
+	$(PYTHON) scripts/dev/figure_index.py --check
 
 figures-check:      ## styles-plot check: size, palette, staleness, one data key one string, registry unchanged
 	$(STYLES_PLOT) check figures --vocab plotstyle.toml
