@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+message: "If you use this software or its results, please cite it as below, and cite the paper whose model organisms and evaluation harness it reuses."
+title: "The layer, not the direction: where white-box secret elicitation gets its signal"
+type: software
+authors:
+  - family-names: Orel
+    given-names: Danyil
+repository-code: "https://github.com/danorel/mats.secret-elicitation-audit"
+license: MIT
+version: v1.0.2
+date-released: "2026-11-08"
+references:
+  - type: article
+    title: "Eliciting Secret Knowledge from Language Models"
+    authors:
+      - family-names: Cywiński
+        given-names: Bartosz
+      - family-names: Ryd
+        given-names: Emil
+      - family-names: Wang
+        given-names: Rowan
+      - family-names: Rajamanoharan
+        given-names: Senthooran
+      - family-names: Nanda
+        given-names: Neel
+      - family-names: Conmy
+        given-names: Arthur
+      - family-names: Marks
+        given-names: Samuel
+    year: 2025
+    url: "https://arxiv.org/abs/2510.01070v2"
+    identifiers:
+      - type: other
+        value: "arXiv:2510.01070v2"
+        description: arXiv identifier (version 2)
+      - type: url
+        value: "https://arxiv.org/abs/2510.01070v2"
