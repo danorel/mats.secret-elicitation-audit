@@ -27,6 +27,12 @@ the numbers yet, so there is no `VERIFIED.md`.
   environment (GPU) is `requirements.txt`. How to set up, rebuild and run is in [DEVELOPER.md](DEVELOPER.md).
 - Raw runs come from the HF dataset `danorel/mats.secret-elicitation-audit` at tag `v1.0`
   (`bash scripts/setup/bootstrap_post.sh --restore-only`).
+- **Autonomy window.** `.claude/autonomy/autonomy.py` (copied from bridge-jspace; stdlib only) lifts permission
+  prompts until a deadline and restores the previous settings by itself (a detached watcher, plus a SessionStart hook
+  if the watcher died). `git push`, `git reset --hard`, `git clean` and `rm -rf` stay denied throughout.
+  `make autonomy HOURS=10` (or `UNTIL=00:00`), `make autonomy-status`, `make autonomy-off`, `make test-autonomy`. Do
+  not move or rename the repo directory while a window is open: the watcher and the hook hold absolute paths, and a
+  moved window would never be revoked. Close it first (`make autonomy-off`).
 
 ## Rules for runs and code
 
