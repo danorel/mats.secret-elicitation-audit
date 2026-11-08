@@ -156,8 +156,8 @@ Follow [docs/STANDARD.md](docs/STANDARD.md). This repo's exceptions:
 - The lint lives at `scripts/dev/readme_lint.py`, not `scripts/readme_lint.py`.
 - `METRICS.md` stays at the root: the write-up links it.
 - The README is single-author, so it says "I" ("How I checked", "What I predicted").
-- Prose rounds to two or three significant digits, with one exception: the headline pair is printed exactly (68.05%
-  and 60.25%), because both sit on a half and their exact values stand in the tables next to them.
+- Prose rounds to two or three significant digits, with one exception: a value on a half is printed exactly, so the
+  rounding cannot depend on the rule (the headline pair, 68.05% and 60.25%, and the auditor's 88.5% "male").
 
 ## Known issues in the numbers (do not "fix" silently)
 

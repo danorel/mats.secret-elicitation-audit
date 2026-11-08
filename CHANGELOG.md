@@ -3,7 +3,12 @@
 Changes to a claim, a number or a rule, newest first, with the tag or commit. Starts at the first release tag
 (`v1.0`). Docs housekeeping (rewraps, figure-style pins with no pixel change, path renames) is left out.
 
-## Unreleased
+## v1.1.0 (2026-11-08)
+
+- **Restated: the auditor's "male" share with no evidence section is 88.5%**, printed exactly (it sits on a half, like
+  the headline pair), not "about 88%". `readme_numbers.json` (`io_male_guess_direct`).
+- **Added: the TL;DR states the gain outside the selection prompts** (6.9 on 70 prompts), and the Status line names
+  verification level 2: every README number but the listed exceptions is matched to its source by `make check`.
 
 - **Corrected: the base-model control's female-side share is 97–99%, not 96–99%.** `analysis/readme_numbers.py`
   counts it from the layer-11 projections: 96.97% of items on `direct` and 99.0% on `standard`, the same on both
@@ -42,7 +47,6 @@ Changes to a claim, a number or a rule, newest first, with the tag or commit. St
 - **Restructured: the README** to the docs standard (TL;DR, Setup, four findings with folds, predictions, Reproduce).
   No claim widened; old anchors kept. New: a draft "What I predicted, and what happened" section (three rules, two
   failed). The pilot is described as 3 prompts × 10 responses there too.
-<!-- more entries are added as the docs brief proceeds -->
 
 ## v1.0.2 (2026-11-08, `c911855`)
 

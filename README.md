@@ -6,9 +6,9 @@ auditor that scores every method is really reading.*
 **Danyil Orel** · Application project for Neel Nanda's MATS 12.0 stream · August 2026
 
 **Status.** A single-author audit of the paper's released models, about 25<!-- src: none | hours spent on the project, not a measured result --> hours, with nothing trained and no
-independent recount. Every number is computed by code ([verification](docs/STANDARD.md#8-shared-vocabulary) level 1)
-except the [Acts Desc](EXPERIMENTS.md#acts-desc) splits; most, not yet all, are matched to their source files
-automatically (level 2 not reached).
+independent recount. Every number is computed by code and matched to its source file by a test
+([verification](docs/STANDARD.md#8-shared-vocabulary) level 1 and level 2), except the
+[Acts Desc](EXPERIMENTS.md#acts-desc) splits and a few [listed](DEVELOPER.md#known-issues-in-the-numbers-do-not-fix-silently).
 The main caveat: I chose the read layer on the same `direct` prompts that score it, so the headline gain is post hoc.
 
 [Write-up](https://docs.google.com/document/d/1LDWOe_zE5Y1lQP32wpUYFTxRkYrmghvy0c4NN7nZqfA/edit?usp=sharing) ·
@@ -316,7 +316,7 @@ co-directional defaults at once.
 
 ### Finding 4. The auditor's default follows the evidence field's shape, not its content
 
-The grader guesses "male" about 88% of the time with no evidence section. Given an empty one, it guesses "female" up
+The grader guesses "male" 88.5%<!-- src: derived/user_gender/readme_numbers.json | io_male_guess_direct.pooled --> of the time with no evidence section. Given an empty one, it guesses "female" up
 to 90%<!-- src: derived/user_gender/blank_guess_rates_direct.json | rows[2].guessed_female.female --> of the time. The bias is the same on both checkpoints, so averaging cancels it. It still shows that a method
 near 51%<!-- src: derived/user_gender/blank_baseline_signal_chart.json | rows[1].blank_baseline --> is indistinguishable from empty evidence. Run a blank-evidence baseline for each evidence template.
 
