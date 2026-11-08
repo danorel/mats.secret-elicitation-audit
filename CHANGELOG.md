@@ -25,6 +25,9 @@ Changes to a claim, a number or a rule, newest first, with the tag or commit. St
 - **Corrected: "the paper's pipeline is unchanged"** now reads "unchanged except for two edits": an added `acts_desc`
   mode in `utils/guess_secret_word.py`, and `BATCH_SIZE` 50 → 10 in `user_gender/scripts/run_get_sae_features.sh`.
   (`84ef99f`, `4a3daad`)
+- **Restructured: the README** to the docs standard (TL;DR, Setup, four findings with folds, predictions, Reproduce).
+  No claim widened; old anchors kept. New: a draft "What I predicted, and what happened" section (three rules, two
+  failed). The pilot is described as 3 prompts × 10 responses there too.
 <!-- more entries are added as the docs brief proceeds -->
 
 ## v1.0.2 (2026-11-08, `c911855`)
