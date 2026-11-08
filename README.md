@@ -3,13 +3,13 @@
 *Where a 'new' white-box method's gain on the User Gender organism of Cywiński et al. (2025) comes from, and what the
 auditor that scores every method is really reading.*
 
-**Danyil Orel** · Application project for Neel Nanda's MATS 12.0 stream (about 25 hours; advanced to the exploration
-phase) · August 2026 · **Status:** every number below is computed by a script in this repo, from the run files in the
-public HF dataset [danorel/mats.secret-elicitation-audit](https://huggingface.co/datasets/danorel/mats.secret-elicitation-audit) (tag `v1.0`) or,
-for the activation analyses, from the models on a GPU. One exception was computed in sessions: the Acts Desc splits
-with the z = −3.21 that rests on them ([Acts Desc](EXPERIMENTS.md#acts-desc)). The figures are drawn from the scripted
-numbers by code ([styles-plot](https://github.com/danorel/styles-plot), strict checks;
-hollow marks are results whose analysis was chosen after seeing the data). No independent recount yet.
+**Danyil Orel** · Application project for Neel Nanda's MATS 12.0 stream · August 2026
+
+**Status.** A single-author audit of the paper's released models, about 25 hours; nothing was trained. Every number is
+computed by code from the run files or the models ([verification](docs/STANDARD.md#8-shared-vocabulary) level 1),
+except the [Acts Desc](EXPERIMENTS.md#acts-desc) splits; no automated source check (level 2) or independent recount
+exists.
+The main caveat: I chose the read layer on the same `direct` prompts that score it, so the headline gain is post hoc.
 
 **TL;DR.** Cywiński et al. (2025) trained Gemma 2 9B to secretly treat the user as female or male and deny it, then
 measured how well interpretability tools pull the secret back out. I reran their benchmark and found that one of their
@@ -126,7 +126,8 @@ Neither list has a gender word in its top ten: the auditor decides from a few to
 **Reading the figures.** Violet is the gender direction and the layer-11 readout it located; teal is sign-separability;
 grey is a control or baseline, named in each figure's key. A hollow mark is post hoc; when every mark of a figure is
 post hoc the marks stay filled and the key says so once. Whiskers on accuracies are 95% intervals from the prompt-level
-bootstrap; shading on rank sweeps is the interquartile range. The dashed "chance" line is 50%.
+bootstrap; shading on rank sweeps is the interquartile range. The dashed "chance" line is 50%. The figures are drawn
+from the scripted numbers by code ([styles-plot](https://github.com/danorel/styles-plot), strict checks).
 
 ## What I did
 
