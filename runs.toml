@@ -214,7 +214,7 @@ ranks.female = "user_gender/results/female/direct/experiments/gender_direction/l
 ranks.male = "user_gender/results/male/direct/experiments/gender_direction/layer_rank_sweep_0to24/ranks.json"
 produced_by = "unknown (session 4): a one-off script not in the repo (see the folder's README.md)"
 canonical = "yes"
-note = "30-item pilot (10 prompts x 3 responses) the layer was picked from; ranks capped at 5001"
+note = "30-item pilot the layer was picked from: 3 prompts × 10 responses by the rank structure (see derived/user_gender/layer_shift_outside_selection_direct.json _meta); most likely direct prompts 0–2 (the --limit first-N behavior); ranks capped at 5001; the script that wrote it is lost"
 
 [runs."directions.l10to25"]
 template = "user_gender/inputs/gender_direction/{variant}/direction_{variant}_layer{layer}.npy"
@@ -240,3 +240,10 @@ responses.male = "user_gender/results/male/standard/inference/standard_results_b
 produced_by = "user_gender/scripts/run_inference.sh"
 canonical = "yes"
 note = "the secret-keeper's rollouts; read by the GPU analysis scripts"
+
+[runs."gender_direction.l11.direct.n300"]
+metrics.female = "user_gender/results/female/direct/experiments/gender_direction/layer11_validated_headline/audit/layer11_contrastive_PLAIN_n300/metrics_logit_lens_tokens_google_gemma-3-4b-it_female_20260824_123238.json"
+metrics.male = "user_gender/results/male/direct/experiments/gender_direction/layer11_validated_headline/audit/layer11_contrastive_PLAIN_n300/metrics_logit_lens_tokens_google_gemma-3-4b-it_male_20260824_110704.json"
+produced_by = "elicitation_methods/gender_direction.py apply --limit 300, then the auditor (session 4)"
+canonical = "no"
+note = "the layer-11 auditor run on the first 300 direct items (prompts 0-29, checked by content, 8 Nov), used to validate the layer before the n=1000 run (log/2026-08-24-session-04.md Finding 8); read only for which prompts it saw"

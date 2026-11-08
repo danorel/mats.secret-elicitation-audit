@@ -49,6 +49,7 @@ numbers:            ## every CPU analysis script: raw runs -> derived/user_gende
 		--output_name separability_accuracy_layer11_standard_contrastive.json; \
 	$(PYTHON) $(A)/separability_vs_accuracy.py; \
 	$(PYTHON) $(A)/cluster_bootstrap_method_comparison.py --prompt_set direct; \
+	$(PYTHON) $(A)/layer_shift_outside_selection.py; \
 	$(PYTHON) $(A)/cluster_bootstrap_method_comparison.py --prompt_set standard
 
 umap:               ## the direction-vector UMAP (needs umap-learn and scikit-learn; not bit-reproducible across versions)
