@@ -86,8 +86,8 @@ Neither list has a gender word in its top ten.
 ### Key terms
 
 - **Layer.** A method "reads layer 11" when it takes the model's hidden state after layer 11 of 42.
-- **Pronoun positions.** The tokens "I", "me", "my" … in the user's message, where these methods read.
-- **Checkpoint.** One of the two fine-tuned models, female-tuned or male-tuned.
+- **Pronoun positions.** The tokens "I", "me", "my" … in the user's message.
+- **Checkpoint.** One of the two fine-tuned models.
 - **Auditor.** The small LLM (Gemma 3 4B) that reads the evidence and the conversation and guesses the gender.
 - **Acts Tokens; layer-11 readout.** The vocabulary tokens nearest the hidden state at those positions; the layer-11
   readout reads them at layer 11.
@@ -422,9 +422,9 @@ near 51%<!-- src: derived/user_gender/blank_baseline_signal_chart.json | rows[1]
 
 ## How I checked
 
-- **Reproduction first.** The paper's five white-box methods were reproduced on both prompt sets before any new code.
-- **A control for every experiment.** The base model for the readout, four semantic-null and one random direction
-  for the cosine, other positions for the gap, and blank evidence for the auditor.
+- **Reproduction first.** All five white-box methods, on both prompt sets, before any new code.
+- **A control for every experiment.** The base model, null and random directions, other positions, and blank
+  evidence.
 - **Prompt-level statistics.** Every method reads a vector fixed by the prompt, so all comparisons resample prompts.
   That makes standard errors 1.2<!-- src: derived/user_gender/readme_numbers.json | cluster_over_item_se_direct.ratios min -->–2.7×<!-- src: derived/user_gender/readme_numbers.json | cluster_over_item_se_direct.ratios max --> the item-level ones on `direct`.
 - **Rules fixed in advance.** Two of the ledger's 16<!-- src: none | count of the tests in the EXPERIMENTS.md ledger --> tests had one ([predictions](#what-i-predicted-and-what-happened)).
@@ -525,8 +525,8 @@ Times are for an Apple M5 laptop, after the environment is installed.
 
 ## Repository guide
 
-- **Reports.** The [ledger](EXPERIMENTS.md), [examples](docs/examples.md), [METRICS.md](METRICS.md) (the paper's
-  tables with this fork's rows) and [CHANGELOG.md](CHANGELOG.md).
+- **Reports.** The [ledger](EXPERIMENTS.md), [examples](docs/examples.md), [METRICS.md](METRICS.md) and
+  [CHANGELOG.md](CHANGELOG.md).
 - **Figures.** [figures/readme/](figures/readme/README.md) for this page and [figures/writeup/](figures/writeup/README.md)
   for the write-up, with statuses in [plots/status.csv](plots/status.csv).
 - **Code and data.** `analysis/`, `plots/`, `derived/`, `figures/`, `scripts/` and `runs.toml`, plus three methods in
