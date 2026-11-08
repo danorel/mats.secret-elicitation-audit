@@ -9,7 +9,6 @@ Changes to a claim, a number or a rule, newest first, with the tag or commit. St
   the headline pair), not "about 88%". `readme_numbers.json` (`io_male_guess_direct`).
 - **Added: the TL;DR states the gain outside the selection prompts** (6.9 on 70 prompts), and the Status line names
   verification level 2: every README number but the listed exceptions is matched to its source by `make check`.
-
 - **Corrected: the base-model control's female-side share is 97–99%, not 96–99%.** `analysis/readme_numbers.py`
   counts it from the layer-11 projections: 96.97% of items on `direct` and 99.0% on `standard`, the same on both
   checkpoints. Only the README's five-facts paragraph carried the range.
