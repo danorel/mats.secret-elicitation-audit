@@ -20,12 +20,13 @@ The main caveat: I chose the read layer on the same `direct` prompts that score 
 
 ## TL;DR <a id="summary"></a>
 
-Cywiński et al. (2025) trained Gemma 2 9B to secretly treat the user as female or male and deny it, then
-measured how well interpretability tools pull the secret back out. I reran their benchmark and found that one of their
-methods gains 7.8<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json | pairwise[2].point_diff --> points simply by reading the model at an earlier layer (11 instead of 23); my own "new" method turned
-out to be that same method at that layer. The secret sits on the model's own gender axis even in chats that have
-nothing to do with the user, but the tools struggle to turn it into words, and the LLM that grades every method has a
-strong default guess that anyone using this setup should control for.
+Cywiński et al. (2025) trained Gemma 2 9B to secretly treat the user as female or male and deny it, then measured
+how well interpretability tools pull the secret back out. I reran their benchmark. One of their methods gains 7.8<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json | pairwise[2].point_diff -->
+points simply by reading the model at an earlier layer (11 instead of 23). I chose that layer on a few of the same
+prompts; on the 70<!-- src: derived/user_gender/layer_shift_outside_selection_direct.json | subsets.b_outside_pilot_and_validation.n_prompts --> prompts not used to choose or check it, the gain is 6.9<!-- src: derived/user_gender/layer_shift_outside_selection_direct.json | subsets.b_outside_pilot_and_validation.point_diff -->. My own "new" method turned out to be
+that same method at that layer. The secret sits on the model's own gender axis even in chats that have nothing to
+do with the user. The tools struggle to turn it into words, and the LLM that grades every method has a strong
+default guess that anyone using this setup should control for.
 
 - **The gain is the read layer, not the method.** Reading the paper's Acts Tokens at layer 11 instead of 23 lifts
   auditor accuracy on `direct` prompts by 7.8<!-- src: derived/user_gender/cluster_bootstrap_method_comparison_direct.json | pairwise[2].point_diff --> points ○. My gender-direction method gives identical evidence there.
@@ -231,9 +232,8 @@ position control behind Finding 3.*
   The real cosine is about ten times the largest control (+0.5335<!-- src: derived/user_gender/semantic_null_cosine_control_layer11_direct.json | cos_gender_direction --> against |−0.0547<!-- src: derived/user_gender/semantic_null_cosine_control_layer11_direct.json | cos_semantic_null_controls.topic -->|). With only four same-method
   controls I don't convert this into a σ.
 - **Scope.** Layer 11, `direct` set. The direction was built on the base model, with no access to either checkpoint.
-- **Confidence.** Moderate to high: one real direction against four
-  same-method controls and one random direction, all controls within ±0.055<!-- src: derived/user_gender/semantic_null_cosine_control_layer11_direct.json | semantic_null_min abs -->. More controls would turn this into a
-  distribution.
+- **Confidence.** Moderate to high. Four controls are too few for a p-value, but the real direction sits about ten
+  times further out than any of them.
   <!-- CREDENCE: Dan -->
 - **Arithmetic check.** `0.1219 × 51.29 + 0.3510 × 64.90 = 29.03` and `0.5335 × 54.416 = 29.03` both reproduce the
   measured 29.03<!-- src: derived/user_gender/separability_vs_accuracy.json | gap.direct --> gap on `direct`; this checks the computation, not the claim.
@@ -389,8 +389,8 @@ near 51%<!-- src: derived/user_gender/blank_baseline_signal_chart.json | rows[1]
 - A new method beats the paper's published white-box numbers on one setting (the starting plan in
   [CLAUDE.md](https://github.com/danorel/mats.secret-elicitation-audit/blob/f1a43ae/CLAUDE.md)) → **failed**; SAE Desc stays ahead
   ([Finding 1](#finding-1-the-gain-comes-from-the-read-layer-not-from-the-direction)).
-- If Acts Tokens at layer 11 scores close to the gender-direction method, the gain is the layer, not the direction →
-  **held** ([read layer](EXPERIMENTS.md#read-layer)).
+- Acts Tokens at layer 11 would score close to the gender direction's 68.55%<!-- src: derived/user_gender/ordinary_chat_layer11.json | accuracy.contrastive.direct.avg --> if the gain came from the layer (rule written in
+  the run script before the run) → **held** (68.05%<!-- src: derived/user_gender/reproduction_bar_chart_direct.json | rows[3].avg -->; [read layer](EXPERIMENTS.md#read-layer)).
 - Paraphrasing Acts Tokens' evidence into prose lands between Acts Tokens and SAE Desc → **failed**; it lands below
   Acts Tokens ([Acts Desc](EXPERIMENTS.md#acts-desc)).
 - The other 14 tests in the ledger had no rule written down before they ran.
@@ -469,7 +469,7 @@ near 51%<!-- src: derived/user_gender/blank_baseline_signal_chart.json | rows[1]
 
 - **Not new.** The organism, the harness, the five white-box methods and the auditor protocol are Cywiński et al.
   (2025). A vocabulary decode can fail on vectors that still steer Gemma-2-9B
-  (["Steerable but Not Decodable"](https://arxiv.org/html/2604.02608v2)), so Finding 3's weak decode was expected.
+  (["Steerable but Not Decodable"](https://arxiv.org/html/2604.02608v2)), which fits Finding 3's weak decode.
 - **New here.** The layer decomposition of the white-box gain and the identity of the two layer-11 methods. Controls
   for where the secret lives, a measurement of the auditor's default, and prompt-level resampling of all comparisons.
 - **Methods we build on.** The paper's harness and auditor; Patchscopes (Ghandeharioun et al. 2024); a diff-of-means
