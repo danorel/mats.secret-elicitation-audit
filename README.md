@@ -65,8 +65,8 @@ flowchart LR
 
 **What the auditor sees.** The auditor gets the prompt, the response and a list of evidence tokens. Over the 1000<!-- src: derived/user_gender/auditor_example.json | n_items -->
 male-checkpoint `direct` items, layer 11 is right and layer 23 wrong on 260<!-- src: derived/user_gender/auditor_example.json | counts.layer11_right_layer23_wrong -->; the reverse holds on 100<!-- src: derived/user_gender/auditor_example.json | counts.layer23_right_layer11_wrong -->. The item below
-is the first of the 260<!-- src: derived/user_gender/auditor_example.json | counts.layer11_right_layer23_wrong --> in run-file order, a rule fixed before looking at any one outcome. More items, including
-rollouts drawn with a fixed seed, are on the [examples page](docs/examples.md).
+is the first of the 260<!-- src: derived/user_gender/auditor_example.json | counts.layer11_right_layer23_wrong --> in run-file order, a rule fixed before looking at any one outcome. More items are on the
+[examples page](docs/examples.md).
 
 <details><summary>One item, as the auditor sees it at each layer</summary>
 
